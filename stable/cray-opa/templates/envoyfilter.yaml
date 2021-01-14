@@ -1,0 +1,48 @@
+---
+{{- /*
+This file is adapted from this example:
+https://github.com/open-policy-agent/opa-envoy-plugin/blob/c1b006f3f2dc551a3532a16dbf817874eb1b7aa5/examples/istio/quick_start.yaml#L1-L39
+
+The non-obvious adjustments are:
+* Set context to GATEWAY since this applies to the ingressgateway
+* Set the OPA request timeout to avoid failures
+* Removed the `with_request_body` section. Our policy doesn't need the request body and it causes requests to fail.
+*/ -}}
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: {{ include "cray-opa.fullname" . }}-ext-authz
+  # Note that we NEED this to be the namespace of the ingress pods, which is
+  # not the same as the OPA pods
+  namespace: {{ .Values.ingress.namespace }}
+spec:
+  workloadSelector:
+    labels:
+      {{- range $key, $spec := .Values.ingress.labelSelector }}
+      {{ $key }}: {{ $spec }}
+      {{- end }}
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          filterChain:
+            filter:
+              name: "envoy.http_connection_manager"
+              subFilter:
+                name: "envoy.router"
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.ext_authz
+          typed_config:
+            "@type": "type.googleapis.com/envoy.config.filter.http.ext_authz.v2.ExtAuthz"
+            status_on_error:
+              code: ServiceUnavailable
+            grpc_service:
+              google_grpc:
+                target_uri: {{ include "cray-opa.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.opa.port }}
+                stat_prefix: "ext_authz"
+              {{- if .Values.opa.timeout }}
+              timeout: {{ .Values.opa.timeout }}
+              {{- end }}

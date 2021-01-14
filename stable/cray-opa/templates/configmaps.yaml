@@ -1,0 +1,28 @@
+{{- /*
+Copyright 2020 Hewlett Packard Enterprise Development LP
+*/ -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cray-opa.fullname" . }}-istio-config
+  namespace: {{ .Release.Namespace }}
+data:
+  config.yaml: |
+    plugins:
+      envoy_ext_authz_grpc:
+        addr: :{{ .Values.opa.port }}
+        query: {{ .Values.opa.query }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cray-opa.fullname" . }}-policy
+  namespace: {{ .Release.Namespace }}
+data:
+  policy.rego: |-
+    {{- if .Values.policy }}
+    {{- .Values.policy | nindent 4 }}
+    {{- else }}
+    {{- include "cray-opa.policy" . | nindent 4 }}
+    {{- end }}
+
