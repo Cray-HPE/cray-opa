@@ -206,6 +206,7 @@ allowed_methods := {
 
     {"method": "GET",  "path": `^/apis/smd/.*$`},
     {"method": "HEAD",  "path": `^/apis/smd/.*$`},
+    {"method": "PATCH",  "path": `^/apis/smd/hsm/v1/State/Components/BulkSoftwareStatus$`},
 
     {"method": "GET",  "path": `^/apis/hmnfd/.*$`},
     {"method": "HEAD",  "path": `^/apis/hmnfd/.*$`},
