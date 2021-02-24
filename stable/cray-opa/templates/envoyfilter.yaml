@@ -41,7 +41,7 @@ spec:
               code: ServiceUnavailable
             grpc_service:
               google_grpc:
-                target_uri: {{ include "cray-opa.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.opa.port }}
+                target_uri: {{ include "cray-opa.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local.:{{ .Values.opa.port }}
                 stat_prefix: "ext_authz"
               {{- if .Values.opa.timeout }}
               timeout: {{ .Values.opa.timeout }}

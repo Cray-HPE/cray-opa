@@ -170,9 +170,6 @@ allowed_methods := {
       {"method": "DELETE", "path": `^/apis/pals/v1/.*$`}, # All PALs API Calls - DELETE
       {"method": "HEAD", "path": `^/apis/pals/v1/.*$`}, # All PALs API Calls - HEAD
       {"method": "PATCH", "path": `^/apis/pals/v1/.*$`}, # All PALs API Calls - PATCH
-      # Replicant
-      {"method": "GET", "path": `^/apis/rm/v1/report/[\d\w|-]+$`}, # Get Report by id
-      {"method": "GET", "path": `^/apis/rm/v1/reports$`}, # Get Reports
       # Analytics Capsules
       {"method": "DELETE", "path": `^/apis/capsules/.*$`}, # All Capsules API Calls - DELETE
       {"method": "GET", "path": `^/apis/capsules/.*$`}, # All Capsules API Calls - GET

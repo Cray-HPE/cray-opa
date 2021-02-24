@@ -30,13 +30,16 @@ opa:
       memory: "128Mi"
       cpu: "250m"
     limits:
-      memory: "2Gi"
+      memory: "5Gi"
       cpu: "2"
-  # Timeout defaults to 200ms if not specified. Setting it to 10s, an
+  # Timeout defaults to 200ms if not specified. Setting it to 20s, an
   # arbitrary long timeout, provides sufficient overhead to resolve
   # CASMPET-1804/2570 "deadline exceeded" gRPC errors for the ext_authz filter.
   # A newer version of OPA might fix this with better performance.
-  timeout: 10s
+  timeout: 25s
+  # http.send requests default to 5s timeout. This was failing on a system so
+  # increase this to 10s.
+  httpTimeout: 10s
 
 
 # To overide the default policy in files/policy.rego follow the example below
@@ -65,7 +68,7 @@ affinity:
 
 jwtValidation:
   keycloak:
-    jwksUri: "https://istio-ingressgateway.istio-system.svc.cluster.local/keycloak/realms/shasta/protocol/openid-connect/certs"
+    jwksUri: "https://istio-ingressgateway.istio-system.svc.cluster.local./keycloak/realms/shasta/protocol/openid-connect/certs"
     issuers:
       # These are expected to be overriden via values.yaml customization.
       # XXX `shasta` is work-around until the CLI can support a separate
@@ -79,6 +82,6 @@ jwtValidation:
       mgmt_http: "http://mgmt-plane-cmn.local/keycloak/realms/shasta"
       mgmt_https: "https://mgmt-plane-cmn.local/keycloak/realms/shasta"
   spire:
-    jwksUri: "https://istio-ingressgateway.istio-system.svc.cluster.local/spire-jwks-vshastaio/keys"
+    jwksUri: "https://istio-ingressgateway.istio-system.svc.cluster.local./spire-jwks-vshastaio/keys"
     issuers:
       vshasta.io: "http://spire.local/shasta/vshastaio"
