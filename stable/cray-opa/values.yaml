@@ -30,7 +30,7 @@ opa:
       memory: "128Mi"
       cpu: "250m"
     limits:
-      memory: "5Gi"
+      memory: "10Gi"
       cpu: "2"
   # Timeout defaults to 200ms if not specified. Setting it to 20s, an
   # arbitrary long timeout, provides sufficient overhead to resolve
