@@ -3,4 +3,4 @@ appVersion: 0.24.0
 name: cray-opa
 description: Cray Open Policy Agent
 home: "cloud/cray-charts"
-version: 0.15.2
+version: 0.15.3
