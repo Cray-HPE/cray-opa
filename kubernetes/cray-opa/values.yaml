@@ -1,7 +1,7 @@
 
 imagesHost: ""
 image: openpolicyagent/opa
-imageTag: 0.24.0-envoy-1
+imageTag: 0.24.0-envoy-1  # When changing this, also update files/Dockerfile.
 imagePullPolicy: IfNotPresent
 
 ingress:

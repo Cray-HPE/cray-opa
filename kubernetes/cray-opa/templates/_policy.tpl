@@ -127,7 +127,7 @@ parsed_kc_token = {"payload": payload} {
     # Verify that the issuer is as expected.
     allowed_issuers := [
 {{- range $key, $value := .Values.jwtValidation.keycloak.issuers }}
-      {{ $value | quote }},
+      "{{ $value }}",
 {{- end }}
     ]
     allowed_issuers[_] = payload.iss
@@ -142,7 +142,7 @@ parsed_spire_token = {"payload": payload} {
     # Verify that the issuer is as expected.
     allowed_issuers := [
 {{- range $key, $value := .Values.jwtValidation.spire.issuers }}
-      {{ $value | quote }},
+      "{{ $value }}",
 {{- end }}
     ]
     allowed_issuers[_] = payload.iss
