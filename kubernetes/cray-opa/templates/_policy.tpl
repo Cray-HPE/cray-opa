@@ -83,6 +83,13 @@ allow {
     ])
 }
 
+# Allow heartbeats without requiring a spire token
+allow {
+    any([
+        startswith(original_path, "/apis/hbtd/")
+    ])
+}
+
 # This actually checks the the JWT token passed in
 # has access to the endpoint requested
 allow {
@@ -191,10 +198,6 @@ allowed_methods := {
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
     {"method": "HEAD",  "path": `^/apis/v2/cps/.*$`},
     {"method": "POST",  "path": `^/apis/v2/cps/.*$`},
-
-    {"method": "GET",  "path": `^/apis/hbtd/.*$`},
-    {"method": "HEAD",  "path": `^/apis/hbtd/.*$`},
-    {"method": "POST",  "path": `^/apis/hbtd/.*$`},
 
     {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
     {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
