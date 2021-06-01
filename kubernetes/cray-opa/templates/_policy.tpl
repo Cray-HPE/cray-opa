@@ -99,16 +99,14 @@ allow {
 
 # Validate claims for SPIRE issued JWT tokens
 allow {
-    # Parse subject and audience
+    # Parse subject
     s := parsed_spire_token.payload.sub
-    a := parsed_spire_token.payload.aud
 
     # Test subject is valid
     startswith(s, "spiffe://")
 
-    # Test audience is valid and matches destination
-    # NOTE: Only the first audience is used
-    perm := audience_match[a[0]][_]
+    # Test subject matches destination
+    perm := sub_match[s][_]
     perm.method = http_request.method
     re_match(perm.path, original_path)
 }
@@ -266,8 +264,39 @@ role_perms = {
 # List of endpoints we accept based on audience.
 # From https://connect.us.cray.com/confluence/display/SKERN/Shasta+Compute+SPIRE+Security
 # This is an initial set, not yet expected to be complete.
-audience_match = {
-  "system-compute": allowed_methods["system-compute"],
+sub_match = {
+    "spiffe://shasta/compute/workload/cfs-state-reporter": allowed_methods["system-compute"],
+    "spiffe://shasta/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
+    "spiffe://shasta/compute/workload/ckdump": [
+    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`} ],
+    "spiffe://shasta/ncn/workload/ckdump": [
+    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`} ],
+    "spiffe://shasta/compute/workload/ckdump_helper": [
+    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`} ],
+    "spiffe://shasta/ncn/workload/ckdump_helper": [
+    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`} ],
+    "spiffe://shasta/compute/workload/cpsmount": allowed_methods["system-compute"],
+    "spiffe://shasta/ncn/workload/cpsmount": allowed_methods["system-compute"],
+    "spiffe://shasta/compute/workload/cpsmount_helper": allowed_methods["system-compute"],
+    "spiffe://shasta/ncn/workload/cpsmount_helper": allowed_methods["system-compute"],
+    "spiffe://shasta/compute/workload/dvs-hmi": allowed_methods["system-compute"],
+    "spiffe://shasta/ncn/workload/dvs-hmi": allowed_methods["system-compute"],
+    "spiffe://shasta/compute/workload/dvs-map": allowed_methods["system-compute"],
+    "spiffe://shasta/ncn/workload/dvs-map": allowed_methods["system-compute"],
+    "spiffe://shasta/compute/workload/orca": allowed_methods["system-compute"],
+    "spiffe://shasta/ncn/workload/orca": allowed_methods["system-compute"]
 }
 
 {{ end }}
