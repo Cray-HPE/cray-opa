@@ -7,8 +7,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/Masterminds/sprig"
-	"github.com/dgrijalva/jwt-go"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -18,6 +16,9 @@ import (
 	"os"
 	"os/exec"
 	"time"
+
+	"github.com/Masterminds/sprig"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type tokenCreator struct {
@@ -91,10 +92,10 @@ func main() {
 	defer ts.Close()
 
 	keycloakIssuer := "http://keycloak1"
-	spireIssuer := "http://spire1"
+	spireIssuer := "http://spire.local/shasta/vshastaio"
 	shastaAud := "shasta"
 	systemComputeAud := "system-compute"
-	spiffeSub := "spiffe://vshasta.io/x123"
+	var spireSub string
 
 	args := createTokenArgs{
 		role: "admin", issuer: keycloakIssuer, aud: shastaAud}
@@ -134,29 +135,176 @@ func main() {
 	}
 	fmt.Println("wlm token:", wlmToken)
 
+	spireSub = "spiffe://shasta/invalid"
 	args = createTokenArgs{
-		role: "invalid-role", issuer: keycloakIssuer, aud: shastaAud}
-	invalidToken, err := tc.create(args)
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireInvalidSub, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("invalid token:", invalidToken)
+	fmt.Println(spireSub, ":", spireInvalidSub)
 
+	spireSub = "spiffe://shasta/ncn/workload/cfs-state-reporter"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spiffeSub}
-	spireToken, err := tc.create(args)
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireNcnCfsStateReporter, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("spire token:", spireToken)
+	fmt.Println(spireSub, ":", spireNcnCfsStateReporter)
 
+	spireSub = "spiffe://shasta/ncn/workload/ckdump"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: "invalid", sub: spiffeSub}
-	spireInvalidAudToken, err := tc.create(args)
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireNcnCkdump, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("invalid spire token (unexpected aud):", spireInvalidAudToken)
+	fmt.Println(spireSub, ":", spireNcnCkdump)
+
+	spireSub = "spiffe://shasta/ncn/workload/ckdump_helper"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireNcnCkdumpHelper, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireNcnCkdumpHelper)
+
+	spireSub = "spiffe://shasta/ncn/workload/cpsmount"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireNcnCpsmount, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireNcnCpsmount)
+
+	spireSub = "spiffe://shasta/ncn/workload/cpsmount_helper"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireNcnCpsmountHelper, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireNcnCpsmountHelper)
+
+	spireSub = "spiffe://shasta/ncn/workload/dvs-hmi"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireNcnDvsHmi, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireNcnDvsHmi)
+
+	spireSub = "spiffe://shasta/ncn/workload/dvs-map"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireNcnDvsMap, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireNcnDvsMap)
+
+	spireSub = "spiffe://shasta/ncn/workload/heartbeat"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireNcnHeartbeat, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireNcnHeartbeat)
+
+	spireSub = "spiffe://shasta/ncn/workload/orca"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireNcnOrca, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireNcnOrca)
+
+	spireSub = "spiffe://shasta/compute/workload/cfs-state-reporter"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireComputeCfsStateReporter, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeCfsStateReporter)
+
+	spireSub = "spiffe://shasta/compute/workload/ckdump"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireComputeCkdump, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeCkdump)
+
+	spireSub = "spiffe://shasta/compute/workload/ckdump_helper"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireComputeCkdumpHelper, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeCkdumpHelper)
+
+	spireSub = "spiffe://shasta/compute/workload/cpsmount"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireComputeCpsmount, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeCpsmount)
+
+	spireSub = "spiffe://shasta/compute/workload/cpsmount_helper"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireComputeCpsmountHelper, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeCpsmountHelper)
+
+	spireSub = "spiffe://shasta/compute/workload/dvs-hmi"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireComputeDvsHmi, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeDvsHmi)
+
+	spireSub = "spiffe://shasta/compute/workload/dvs-map"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireComputeDvsMap, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeDvsMap)
+
+	spireSub = "spiffe://shasta/compute/workload/heartbeat"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireComputeHeartbeat, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeHeartbeat)
+
+	spireSub = "spiffe://shasta/compute/workload/orca"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireComputeOrca, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeOrca)
 
 	// Reading in the policy template file and generating policy file.
 
@@ -221,14 +369,36 @@ func main() {
 		template.New("base").Funcs(sprig.FuncMap()).Parse(string(dat)))
 
 	values = map[string]interface{}{
-		"userToken":            userToken,
-		"adminToken":           adminToken,
-		"pxeToken":             pxeToken,
-		"computeToken":         computeToken,
-		"wlmToken":             wlmToken,
-		"invalidToken":         invalidToken,
-		"spireToken":           spireToken,
-		"spireInvalidAudToken": spireInvalidAudToken,
+		"userToken":    userToken,
+		"adminToken":   adminToken,
+		"pxeToken":     pxeToken,
+		"computeToken": computeToken,
+		"wlmToken":     wlmToken,
+		"spire": map[string]interface{}{
+			"invalidSub": spireInvalidSub,
+			"ncn": map[string]interface{}{
+				"cfs_state_reporter": spireNcnCfsStateReporter,
+				"ckdump":             spireNcnCkdump,
+				"ckdump_helper":      spireNcnCkdumpHelper,
+				"cpsmount":           spireNcnCpsmount,
+				"cpsmount_helper":    spireNcnCpsmountHelper,
+				"dvs_hmi":            spireNcnDvsHmi,
+				"dvs_map":            spireNcnDvsMap,
+				"heartbeat":          spireNcnHeartbeat,
+				"orca":               spireNcnOrca,
+			},
+			"compute": map[string]interface{}{
+				"cfs_state_reporter": spireComputeCfsStateReporter,
+				"ckdump":             spireComputeCkdump,
+				"ckdump_helper":      spireComputeCkdumpHelper,
+				"cpsmount":           spireComputeCpsmount,
+				"cpsmount_helper":    spireComputeCpsmountHelper,
+				"dvs_hmi":            spireComputeDvsHmi,
+				"dvs_map":            spireComputeDvsMap,
+				"heartbeat":          spireComputeHeartbeat,
+				"orca":               spireComputeOrca,
+			},
+		},
 	}
 
 	f, err = os.Create("test.rego")
