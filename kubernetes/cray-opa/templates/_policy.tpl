@@ -102,9 +102,6 @@ allow {
     # Parse subject
     s := parsed_spire_token.payload.sub
 
-    # Test subject is valid
-    startswith(s, "spiffe://")
-
     # Test subject matches destination
     perm := sub_match[s][_]
     perm.method = http_request.method
@@ -249,6 +246,12 @@ allowed_methods := {
       {"method": "PATCH",  "path": `.*`},
       {"method": "HEAD",  "path": `.*`},
   ],
+  "ckdump": [
+      {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
+      {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
+      {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
+      {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
+  ],
 }
 
 # Our list of endpoints we accept based on roles.
@@ -267,26 +270,10 @@ role_perms = {
 sub_match = {
     "spiffe://shasta/compute/workload/cfs-state-reporter": allowed_methods["system-compute"],
     "spiffe://shasta/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/ckdump": [
-    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`} ],
-    "spiffe://shasta/ncn/workload/ckdump": [
-    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`} ],
-    "spiffe://shasta/compute/workload/ckdump_helper": [
-    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`} ],
-    "spiffe://shasta/ncn/workload/ckdump_helper": [
-    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`} ],
+    "spiffe://shasta/compute/workload/ckdump": allowed_methods["ckdump"],
+    "spiffe://shasta/ncn/workload/ckdump": allowed_methods["ckdump"],
+    "spiffe://shasta/compute/workload/ckdump_helper": allowed_methods["ckdump"],
+    "spiffe://shasta/ncn/workload/ckdump_helper": allowed_methods["ckdump"],
     "spiffe://shasta/compute/workload/cpsmount": allowed_methods["system-compute"],
     "spiffe://shasta/ncn/workload/cpsmount": allowed_methods["system-compute"],
     "spiffe://shasta/compute/workload/cpsmount_helper": allowed_methods["system-compute"],
