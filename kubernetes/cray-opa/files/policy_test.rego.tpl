@@ -88,18 +88,6 @@ test_compute {
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": compute_auth}}}}}
 
-  # HBTB - Allowed
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hbtb_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hbtb_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  # HBTB - Not Allowed
-
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hbtb_mock_path, "headers": {"authorization": compute_auth}}}}}
-
   # NMD - Allowed
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": compute_auth}}}}}
@@ -182,9 +170,9 @@ test_wlm {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/fc/v2/port-sets", "headers": {"authorization": wlm_auth}}}}}
 }
 
-# Tests for unauthorized role for any policy (maps to shasta role 'invalid-role')
+# Tests for denying access to pals mock path for ckdump sub
 
-unauthorized_role_auth = "Bearer {{ .invalidToken }}"
+unauthorized_role_auth = "Bearer {{ .spire.compute.ckdump }}"
 
 test_unauth_role {
 
@@ -193,67 +181,102 @@ test_unauth_role {
 }
 
 # SPIRE Tests
-test_spire_correct_aud {
-  correct_aud_token = "Bearer {{ .spireToken }}"
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/cfs/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/cfs/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/cfs/test", "headers": {"authorization": correct_aud_token}}}}}
+spire_correct_sub(sub) {
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/cps/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/v2/cps/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/test", "headers": {"authorization": correct_aud_token}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/hbtd/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/hbtd/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/hbtd/test", "headers": {"authorization": correct_aud_token}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/v2/nmd/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/test", "headers": {"authorization": correct_aud_token}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/smd/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/smd/test", "headers": {"authorization": correct_aud_token}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_mock_path, "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/hmnfd/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/hmnfd/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/hmnfd/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/hmnfd/test", "headers": {"authorization": correct_aud_token}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/hmnfd/test", "headers": {"authorization": correct_aud_token}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": hmnfd_mock_path, "headers": {"authorization": sub}}}}}
 
   # Validate that we're not allowing any method with a valid aud through
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/cfs/test", "headers": {"authorization": correct_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/cps/test", "headers": {"authorization": correct_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/hbtd/test", "headers": {"authorization": correct_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/v2/nmd/test", "headers": {"authorization": correct_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/smd/test", "headers": {"authorization": correct_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/hmnfd/test", "headers": {"authorization": correct_aud_token}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
 }
 
-test_spire_incorrect_aud {
-  incorrect_aud_token = "Bearer {{ .spireInvalidAudToken }}"
+test_spire_subs {
+  spire_correct_sub("Bearer {{ .spire.ncn.cfs_state_reporter }}")
+  spire_correct_sub("Bearer {{ .spire.ncn.cpsmount }}")
+  spire_correct_sub("Bearer {{ .spire.ncn.cpsmount_helper }}")
+  spire_correct_sub("Bearer {{ .spire.ncn.dvs_hmi }}")
+  spire_correct_sub("Bearer {{ .spire.ncn.dvs_map }}")
+  spire_correct_sub("Bearer {{ .spire.ncn.orca }}")
+  spire_correct_sub("Bearer {{ .spire.compute.cfs_state_reporter }}")
+  spire_correct_sub("Bearer {{ .spire.compute.cpsmount }}")
+  spire_correct_sub("Bearer {{ .spire.compute.cpsmount_helper }}")
+  spire_correct_sub("Bearer {{ .spire.compute.dvs_hmi }}")
+  spire_correct_sub("Bearer {{ .spire.compute.dvs_map }}")
+  spire_correct_sub("Bearer {{ .spire.compute.orca }}")
+}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/cfs/test", "headers": {"authorization": incorrect_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/cfs/test", "headers": {"authorization": incorrect_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/cfs/test", "headers": {"authorization": incorrect_aud_token}}}}}
+spire_ckdump(spire_sub) {
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/cps/test", "headers": {"authorization": incorrect_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/v2/cps/test", "headers": {"authorization": incorrect_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/test", "headers": {"authorization": incorrect_aud_token}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/hbtd/test", "headers": {"authorization": incorrect_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/hbtd/test", "headers": {"authorization": incorrect_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/hbtd/test", "headers": {"authorization": incorrect_aud_token}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/test", "headers": {"authorization": incorrect_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/v2/nmd/test", "headers": {"authorization": incorrect_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/test", "headers": {"authorization": incorrect_aud_token}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/smd/test", "headers": {"authorization": incorrect_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/smd/test", "headers": {"authorization": incorrect_aud_token}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_mock_path, "headers": {"authorization": spire_sub}}}}}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/hmnfd/test", "headers": {"authorization": incorrect_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/hmnfd/test", "headers": {"authorization": incorrect_aud_token}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/hmnfd/test", "headers": {"authorization": incorrect_aud_token}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
+}
+
+test_spire_ckdump {
+  spire_ckdump("Bearer {{ .spire.compute.ckdump }}")
+  spire_ckdump("Bearer {{ .spire.ncn.ckdump }}")
+  spire_ckdump("Bearer {{ .spire.compute.ckdump_helper }}")
+  spire_ckdump("Bearer {{ .spire.ncn.ckdump_helper }}")
+}
+
+test_spire_invalid_sub {
+  spire_sub = "Bearer {{ .spire.invalidSub }}"
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_mock_path, "headers": {"authorization": spire_sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
 }
