@@ -56,7 +56,7 @@ allow {
 
 # Allow cloud-init endpoints, as we do validation based on incoming IP.
 # In the future, these requests will come in via the TOR switches and ideally
-# not through the 'front door'
+# not through the 'front door'.   This is an expansion to BSS. 
 allow {
     any([
         startswith(original_path, "/meta-data"),
@@ -86,7 +86,7 @@ allow {
 # Allow heartbeats without requiring a spire token
 allow {
     any([
-        startswith(original_path, "/apis/hbtd/")
+        startswith(original_path, "/apis/hbtd/hmi/v1/heartbeat")
     ])
 }
 
@@ -181,9 +181,10 @@ allowed_methods := {
       {"method": "PUT", "path": `^/apis/capsules/.*$`}, # All Capsules API Calls - PUT
   ],
   "system-pxe": [
-      {"method": "GET",  "path": `^/apis/bss/.*$`},
-      {"method": "HEAD",  "path": `^/apis/bss/.*$`},
-      {"method": "POST",  "path": `^/apis/bss/.*$`},
+
+   #BSS -> computes need to retrieve boot scripts    
+      {"method": "GET",  "path": `^/apis/bss/boot/v1/bootscript/.*$`},
+      {"method": "HEAD",  "path": `^/apis/bss/boot/v1/bootscript/.*$`},
   ],
   "system-compute": [
     {"method": "GET",  "path": `^/apis/cfs/.*$`},
@@ -198,16 +199,20 @@ allowed_methods := {
     {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
     {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
     {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
-
+    #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus
     {"method": "GET",  "path": `^/apis/smd/.*$`},
     {"method": "HEAD",  "path": `^/apis/smd/.*$`},
-    {"method": "PATCH",  "path": `^/apis/smd/hsm/v1/State/Components/BulkSoftwareStatus$`},
+    {"method": "PATCH",  "path": `^/apis/smd/hsm/v./State/Components/BulkSoftwareStatus$`},
+    #HMNFD -> subscribe only, cannot create state change notifications
+    {"method": "GET",  "path": `^/apis/hmnfd/subscriptions/.*$`},
+    {"method": "HEAD",  "path": `^/apis/hmnfd/subscriptions/.*$`},
+    {"method": "PATCH",  "path": `^/apis/hmnfd/subscribe/.*$`},
+    {"method": "POST",  "path": `^/apis/hmnfd/subscribe/.*$`},
+    {"method": "DELETE",  "path": `^/apis/hmnfd/subscribe/.*$`},
+    #HBTD -> allow a compute to send a heartbeat 
+    {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
 
-    {"method": "GET",  "path": `^/apis/hmnfd/.*$`},
-    {"method": "HEAD",  "path": `^/apis/hmnfd/.*$`},
-    {"method": "PATCH",  "path": `^/apis/hmnfd/.*$`},
-    {"method": "POST",  "path": `^/apis/hmnfd/.*$`},
-    {"method": "DELETE",  "path": `^/apis/hmnfd/.*$`},
+
   ],
   "wlm": [
       # PALS - application launch
@@ -215,10 +220,34 @@ allowed_methods := {
       {"method": "HEAD", "path": `^/apis/pals/.*$`},
       {"method": "POST", "path": `^/apis/pals/.*$`},
       {"method": "DELETE", "path": `^/apis/pals/.*$`},
-      # CAPMC - power capping
-      {"method": "GET", "path": `^/apis/capmc/.*$`},
-      {"method": "HEAD", "path": `^/apis/capmc/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/.*$`},
+
+      # CAPMC - power capping and power control; eventually this will need to add PCS
+        ## CAPMC -> Xnames
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_xname_status/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_reinit/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_on/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_off/.*$`},
+        ## CAPMC -> Nodes
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_node_status/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_on/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_off/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_reinit/.*$`},
+        ## CAPMC -> GROUPS
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_reinit/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_group_status/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_on/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_off/.*$`},
+        ## CAPMC -> Power Capping
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap_capabilities/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/set_power_cap/.*$`},
+        ## CAPMC -> Misc system params
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_nid_map/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_system_parameters/.*$`},
+      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_system_parameters/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_node_rules/.*$`},
+      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_node_rules/.*$`},
+
       # BOS - node boot
       {"method": "GET", "path": `^/apis/bos/.*$`},
       {"method": "HEAD", "path": `^/apis/bos/.*$`},
