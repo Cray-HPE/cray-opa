@@ -200,15 +200,15 @@ allowed_methods := {
     {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
     {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
     #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus
-    {"method": "GET",  "path": `^/apis/smd/.*$`},
-    {"method": "HEAD",  "path": `^/apis/smd/.*$`},
+    {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
+    {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
     {"method": "PATCH",  "path": `^/apis/smd/hsm/v./State/Components/BulkSoftwareStatus$`},
     #HMNFD -> subscribe only, cannot create state change notifications
-    {"method": "GET",  "path": `^/apis/hmnfd/subscriptions/.*$`},
-    {"method": "HEAD",  "path": `^/apis/hmnfd/subscriptions/.*$`},
-    {"method": "PATCH",  "path": `^/apis/hmnfd/subscribe/.*$`},
-    {"method": "POST",  "path": `^/apis/hmnfd/subscribe/.*$`},
-    {"method": "DELETE",  "path": `^/apis/hmnfd/subscribe/.*$`},
+    {"method": "GET",  "path": `^/apis/hmnfd/hmi/v1/subscriptions/.*$`},
+    {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions/.*$`},
+    {"method": "PATCH",  "path": `^/apis/hmnfd/hmi/v1/subscribe/.*$`},
+    {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe/.*$`},
+    {"method": "DELETE",  "path": `^/apis/hmnfd/hmi/v1/subscribe/.*$`},
     #HBTD -> allow a compute to send a heartbeat 
     {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
 
@@ -258,8 +258,8 @@ allowed_methods := {
       {"method": "GET", "path": `^/apis/sls/.*$`},
       {"method": "HEAD", "path": `^/apis/sls/.*$`},
       # SMD - hardware state query
-      {"method": "GET", "path": `^/apis/smd/.*$`},
-      {"method": "HEAD", "path": `^/apis/smd/.*$`},
+      {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
+      {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
       # FC - VNI reservation
       {"method": "GET", "path": `^/apis/fc/.*$`},
       {"method": "HEAD", "path": `^/apis/fc/.*$`},
