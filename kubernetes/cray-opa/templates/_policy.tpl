@@ -223,30 +223,30 @@ allowed_methods := {
 
       # CAPMC - power capping and power control; eventually this will need to add PCS
         ## CAPMC -> Xnames
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_xname_status/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_reinit/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_on/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_off/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_xname_status$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_reinit$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_on$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_off$`},
         ## CAPMC -> Nodes
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_node_status/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_on/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_off/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_reinit/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_node_status$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_on$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_off$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_reinit$`},
         ## CAPMC -> GROUPS
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_reinit/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_group_status/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_on/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_off/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_reinit$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_group_status$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_on$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_off$`},
         ## CAPMC -> Power Capping
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap_capabilities/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/set_power_cap/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap_capabilities$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/set_power_cap$`},
         ## CAPMC -> Misc system params
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_nid_map/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_system_parameters/.*$`},
-      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_system_parameters/.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_node_rules/.*$`},
-      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_node_rules/.*$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_nid_map$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_system_parameters$`},
+      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_system_parameters$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_node_rules$`},
+      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_node_rules$`},
 
       # BOS - node boot
       {"method": "GET", "path": `^/apis/bos/.*$`},
