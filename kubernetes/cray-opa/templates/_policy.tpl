@@ -204,13 +204,13 @@ allowed_methods := {
     {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
     {"method": "PATCH",  "path": `^/apis/smd/hsm/v./State/Components/BulkSoftwareStatus$`},
     #HMNFD -> subscribe only, cannot create state change notifications
-    {"method": "GET",  "path": `^/apis/hmnfd/hmi/v1/subscriptions/.*$`},
-    {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions/.*$`},
-    {"method": "PATCH",  "path": `^/apis/hmnfd/hmi/v1/subscribe/.*$`},
-    {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe/.*$`},
-    {"method": "DELETE",  "path": `^/apis/hmnfd/hmi/v1/subscribe/.*$`},
+    {"method": "GET",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
+    {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
+    {"method": "PATCH",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+    {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+    {"method": "DELETE",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     #HBTD -> allow a compute to send a heartbeat 
-    {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
+    {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
 
 
   ],
