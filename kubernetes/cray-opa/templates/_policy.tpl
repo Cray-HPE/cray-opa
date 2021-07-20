@@ -254,9 +254,6 @@ allowed_methods := {
       {"method": "POST", "path": `^/apis/bos/.*$`},
       {"method": "PATCH", "path": `^/apis/bos/.*$`},
       {"method": "DELETE", "path": `^/apis/bos/.*$`},
-      # SLS - hardware query
-      {"method": "GET", "path": `^/apis/sls/.*$`},
-      {"method": "HEAD", "path": `^/apis/sls/.*$`},
       # SMD - hardware state query
       {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
       {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
@@ -291,6 +288,7 @@ role_perms = {
     "system-compute": allowed_methods["system-compute"],
     "wlm": allowed_methods["wlm"],
     "admin": allowed_methods["admin"],
+    "ckdump": allowed_methods["ckdump"],
 }
 
 # List of endpoints we accept based on audience.
