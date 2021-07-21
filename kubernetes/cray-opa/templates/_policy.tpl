@@ -183,8 +183,8 @@ allowed_methods := {
   "system-pxe": [
 
    #BSS -> computes need to retrieve boot scripts    
-      {"method": "GET",  "path": `^/apis/bss/boot/v1/bootscript/.*$`},
-      {"method": "HEAD",  "path": `^/apis/bss/boot/v1/bootscript/.*$`},
+      {"method": "GET",  "path": `^/apis/bss/boot/v1/bootscript.*$`},
+      {"method": "HEAD",  "path": `^/apis/bss/boot/v1/bootscript.*$`},
   ],
   "system-compute": [
     {"method": "GET",  "path": `^/apis/cfs/.*$`},
@@ -244,9 +244,9 @@ allowed_methods := {
         ## CAPMC -> Misc system params
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_nid_map$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_system_parameters$`},
-      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_system_parameters$`},
+      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_system_parameters.*$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_node_rules$`},
-      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_node_rules$`},
+      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_node_rules.*$`},
 
       # BOS - node boot
       {"method": "GET", "path": `^/apis/bos/.*$`},

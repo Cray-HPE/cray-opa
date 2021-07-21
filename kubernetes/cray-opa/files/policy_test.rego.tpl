@@ -1,7 +1,7 @@
 # Copyright 2021 Hewlett Packard Enterprise Development LP
 
 package istio.authz
-
+## HOW TO DO UNIT TESTING
 # allow.http_status is 403 when the request is rejected due to the default allow.
 # allow.http_status is not present the request is successful because the result is true.
 
@@ -37,21 +37,20 @@ test_admin {
 
 pxe_auth = "Bearer {{ .pxeToken }}"
 
-bss_mock_path = "/apis/bss/mock"
+bss_good_path = "/apis/bss/boot/v1/bootscript"
+bss_bad_path = "/apis/bss/boot/v1/anotherpath"
 
 test_pxe {
 
   # BSS - Allowed
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": bss_mock_path, "headers": {"authorization": pxe_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": bss_mock_path, "headers": {"authorization": pxe_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": bss_mock_path, "headers": {"authorization": pxe_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": bss_good_path, "headers": {"authorization": pxe_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": bss_good_path, "headers": {"authorization": pxe_auth}}}}}
 
   # BSS - Not Allowed
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": bss_mock_path, "headers": {"authorization": pxe_auth}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": bss_bad_path, "headers": {"authorization": pxe_auth}}}}}
+
 }
 
 # Tests for system-compute role
@@ -60,10 +59,12 @@ compute_auth = "Bearer {{ .computeToken }}"
 
 cfs_mock_path = "/apis/cfs/mock"
 cps_mock_path = "/apis/v2/cps/mock"
-hbtb_mock_path = "/apis/hbtd/mock"
+hbtb_heartbeat_path = "/apis/hbtd/hmi/v1/heartbeat"
 nmd_mock_path = "/apis/v2/nmd/mock"
-smd_mock_path = "/apis/smd/mock"
-hmnfd_mock_path = "/apis/hmnfd/mock"
+smd_statecomponents_path = "/apis/smd/hsm/v2/State/Components"
+hmnfd_subscribe_path = "/apis/hmnfd/hmi/v1/subscribe"
+hmnfd_subscriptions_path = "/apis/hmnfd/hmi/v1/subscriptions"
+
 pals_mock_path = "/apis/pals/v1/mock"
 
 test_compute {
@@ -102,31 +103,29 @@ test_compute {
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": nmd_mock_path, "headers": {"authorization": compute_auth}}}}}
 
-  # SMD - Allowed
+  # SMD - allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/smd/hsm/v1/State/Components/BulkSoftwareStatus", "headers": {"authorization": compute_auth}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  # SMD - Not Allowed
-
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": smd_mock_path, "headers": {"authorization": compute_auth}}}}}
-
+  # SMD - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": smd_statecomponents_path, "headers": {"authorization": compute_auth}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": smd_statecomponents_path, "headers": {"authorization": compute_auth}}}}}
+  
   # HMNFD - Allowed
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": hmnfd_mock_path, "headers": {"authorization": compute_auth}}}}}
-
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscribe_path, "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": hmnfd_subscribe_path, "headers": {"authorization": compute_auth}}}}}
   # HMNFD - Not Allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "TRACE", "path": hmnfd_subscribe_path, "headers": {"authorization": compute_auth}}}}}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "TRACE", "path": hmnfd_mock_path, "headers": {"authorization": compute_auth}}}}}
+  # HBTD - Allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": compute_auth}}}}}
+  # HBTD - Not Allowed
+  # there is a global allow all on this path; so nothing can be not allowed;
+
 }
 
 # Tests for wlm role
@@ -139,29 +138,41 @@ test_wlm {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/pals/v1/apps", "headers": {"authorization": wlm_auth}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/pals/v1/apps", "headers": {"authorization": wlm_auth}}}}}
   # CAPMC - allowed
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"authorization": wlm_auth}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_xname_status", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_reinit", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_on", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_off", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_node_status", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/node_on", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/node_off", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/node_reinit", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/group_reinit", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_group_status", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/group_on", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/group_off", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_power_cap", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_power_cap_capabilities", "headers": {"authorization": wlm_auth}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_nid_map", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_system_parameters", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/capmc/capmc/v1/get_system_parameters", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_node_rules", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/capmc/capmc/v1/get_node_rules", "headers": {"authorization": wlm_auth}}}}}
+
   # CAPMC - not allowed
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"authorization": wlm_auth}}}}}
+  #allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"authorization": wlm_auth}}}}}
   # BOS - allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v1/session", "headers": {"authorization": wlm_auth}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/bos/v1/session", "headers": {"authorization": wlm_auth}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v1/session", "headers": {"authorization": wlm_auth}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/bos/v1/session", "headers": {"authorization": wlm_auth}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/bos/v1/session", "headers": {"authorization": wlm_auth}}}}}
-  # SLS - allowed
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/sls/v1/hardware", "headers": {"authorization": wlm_auth}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/sls/v1/hardware", "headers": {"authorization": wlm_auth}}}}}
-  # SLS - not allowed
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/sls/v1/hardware", "headers": {"authorization": wlm_auth}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/sls/v1/hardware", "headers": {"authorization": wlm_auth}}}}}
   # SMD - allowed
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/smd/hsm/v1/State/Components", "headers": {"authorization": wlm_auth}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/smd/hsm/v1/State/Components", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": wlm_auth}}}}}
   # SMD - not allowed
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/smd/hsm/v1/State/Components", "headers": {"authorization": wlm_auth}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/smd/hsm/v1/State/Components", "headers": {"authorization": wlm_auth}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": smd_statecomponents_path, "headers": {"authorization": wlm_auth}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": smd_statecomponents_path, "headers": {"authorization": wlm_auth}}}}}
   # FC - allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/fc/v2/port-sets", "headers": {"authorization": wlm_auth}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/fc/v2/port-sets", "headers": {"authorization": wlm_auth}}}}}
@@ -197,14 +208,14 @@ spire_correct_sub(sub) {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": hmnfd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
 
   # Validate that we're not allowing any method with a valid aud through
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
@@ -242,13 +253,6 @@ spire_ckdump(spire_sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
-
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_mock_path, "headers": {"authorization": spire_sub}}}}}
-
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
 }
 
 test_spire_ckdump {
@@ -273,10 +277,10 @@ test_spire_invalid_sub {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscriptions_path, "headers": {"authorization": spire_sub}}}}}
 }
