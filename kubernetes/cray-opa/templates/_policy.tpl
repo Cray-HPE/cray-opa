@@ -186,9 +186,7 @@ allowed_methods := {
       {"method": "POST",  "path": `^/apis/bss/.*$`},
   ],
   "system-compute": [
-    {"method": "GET",  "path": `^/apis/cfs/.*$`},
-    {"method": "HEAD",  "path": `^/apis/cfs/.*$`},
-    {"method": "PATCH",  "path": `^/apis/cfs/.*$`},
+    {"method": "PATCH",  "path": `^/apis/cfs/components/.*$`},
 
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
     {"method": "HEAD",  "path": `^/apis/v2/cps/.*$`},
