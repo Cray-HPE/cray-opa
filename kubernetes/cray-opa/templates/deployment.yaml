@@ -1,45 +1,46 @@
+{{- range $name, $options:= .Values.ingresses }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "cray-opa.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: cray-opa-{{ $name }}
+  namespace: {{ $.Release.Namespace }}
 spec:
-  replicas: {{ .Values.opa.replicas }}
+  replicas: {{ $.Values.opa.replicas }}
   strategy:
-    {{- .Values.opa.strategy | toYaml | nindent 4}}
+    {{- $.Values.opa.strategy | toYaml | nindent 4}}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "cray-opa.fullname" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
-      app.kubernetes.io/managed-by: {{ .Release.Service }}
+      app.kubernetes.io/name: cray-opa-{{ $name }}
+      app.kubernetes.io/instance: {{ $.Release.Name }}
+      app.kubernetes.io/managed-by: {{ $.Release.Service }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "cray-opa.fullname" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        app.kubernetes.io/name: cray-opa-{{ $name }}
+        app.kubernetes.io/instance: {{ $.Release.Name }}
+        app.kubernetes.io/managed-by: {{ $.Release.Service }}
     spec:
       containers:
-      - image: {{ include "cray-opa.image-prefix" . }}{{ .Values.image }}:{{ .Values.imageTag }}
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
+      - image: {{ $.Values.image }}:{{ $.Values.imageTag }}
+        imagePullPolicy: {{ $.Values.imagePullPolicy }}
         name: opa-istio
         env:
           - name: POLICY_CONFIGMAP_VERSION
             # Change to force opa pods to restart and re-read ConfigMap.
             value: "4"
-          {{- if .Values.opa.httpTimeout }}
+          {{- if $.Values.opa.httpTimeout }}
           - name: HTTP_SEND_TIMEOUT
-            value: {{ .Values.opa.httpTimeout | quote }}
+            value: {{ $.Values.opa.httpTimeout | quote }}
           {{- end }}
         args:
           - run
           - --server
-          {{- if .Values.opa.tls.enabled }}
+          {{- if $.Values.opa.tls.enabled }}
           - --tls-cert-file=/certs/tls.crt
           - --tls-private-key-file=/certs/tls.key
           {{- end }}
-          - --log-level={{ .Values.opa.loglevel }}
+          - --log-level={{ $.Values.opa.loglevel }}
           - --config-file=/config/config.yaml
           - /policy/policy.rego
         volumeMounts:
@@ -47,38 +48,54 @@ spec:
             name: opa-istio-config
           - mountPath: /policy
             name: opa-policy
-          {{- if .Values.opa.tls.enabled }}
+          {{- if $.Values.opa.tls.enabled }}
           - mountPath: /certs
             name: opa-certs
           {{- end }}
           - mountPath: /jwtValidationFetchTls
             name: fetch-jwt-certs-ca-vol
         resources:
-          {{- .Values.opa.resources | toYaml | nindent 10 }}
+          {{- $.Values.opa.resources | toYaml | nindent 10 }}
         ports:
         - name: http
-          containerPort: {{ .Values.opa.containerPort }}
+          containerPort: {{ $.Values.opa.containerPort }}
       volumes:
       - configMap:
-          name: {{ include "cray-opa.fullname" . }}-istio-config
+          name: istio-config-{{ $name }}
         name: opa-istio-config
       - configMap:
-          name: {{ include "cray-opa.fullname" . }}-policy
+          name: opa-policy-{{ $name }}
         name: opa-policy
-      {{- if .Values.opa.tls.enabled }}
+      {{- if $.Values.opa.tls.enabled }}
       - secret:
-          secretName: {{ .Values.opa.tls.secret }}
+          secretName: {{ $.Values.opa.tls.secret }}
         name: opa-certs
       {{- end }}
       - configMap:
           name: cray-configmap-ca-public-key
         name: fetch-jwt-certs-ca-vol
       affinity:
-{{ toYaml .Values.affinity | indent 8 }}
+      {{ if $.Values.affinity.default }}
+        podAntiAffinity:
+           preferredDuringSchedulingIgnoredDuringExecution:
+           - weight: 1
+             podAffinityTerm:
+               labelSelector:
+                 matchExpressions:
+                 - key: app.kubernetes.io/name
+                   operator: In
+                   values:
+                   - {{ $name }}
+               topologyKey: kubernetes.io/hostname
+      {{- end }}
+      {{ if $options.affinity }}
+{{ toYaml $options.affinity | indent 8 }}
+      {{- end }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+{{ toYaml $.Values.nodeSelector | indent 8 }}
       tolerations:
-{{ toYaml .Values.tolerations | indent 8 }}
-{{- if .Values.priorityClassName }}
-      priorityClassName: {{ .Values.priorityClassName }}
+{{ toYaml $.Values.tolerations | indent 8 }}
+{{- if $.Values.priorityClassName }}
+      priorityClassName: {{ $.Values.priorityClassName }}
+{{- end }}
 {{- end }}

@@ -1,17 +1,19 @@
+{{- range $name, $options:= .Values.ingresses }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "cray-opa.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ $name }}
+  namespace: {{ $.Release.Namespace }}
   labels:
-    app.kubernetes.io/name: {{ include "cray-opa.fullname" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/name: {{ $name }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
 spec:
   ports:
   - name: http
-    port: {{ .Values.opa.port }}
+    port: {{ $.Values.opa.port }}
     targetPort: http
   selector:
-    app.kubernetes.io/name: {{ include "cray-opa.fullname" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: {{ $name }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+{{- end }}

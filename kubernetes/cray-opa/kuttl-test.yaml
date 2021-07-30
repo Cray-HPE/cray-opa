@@ -15,7 +15,7 @@ commands:
 - command: helm install --wait -f ../../../cray-istio/kubernetes/cray-istio/tests/kuttl/cray-certmanager-init.yaml --namespace cert-manager-init cray-certmanager-init cray-csm/cray-certmanager-init
 - command: helm install --wait -f ../../../cray-istio/kubernetes/cray-istio/tests/kuttl/cray-certmanager.yaml --namespace cert-manager cray-certmanager cray-csm/cray-certmanager
 - command: helm install --wait -f ../../../cray-istio/kubernetes/cray-istio/tests/kuttl/cray-certmanager-issuers.yaml --namespace cert-manager cray-certmanager-issuers cray-csm/cray-certmanager-issuers
-- command: helm install --wait -f ../../../cray-istio/kubernetes/cray-istio/tests/kuttl/values.yaml --namespace istio-system cray-istio ../../../cray-istio/kubernetes/cray-istio
+- command: helm install -f ../../../cray-istio/kubernetes/cray-istio/tests/kuttl/values.yaml --namespace istio-system cray-istio ../../../cray-istio/kubernetes/cray-istio
 - command: helm install -f ./tests/kuttl/values.yaml --namespace opa cray-opa .
 testDirs:
 - ./tests/kuttl

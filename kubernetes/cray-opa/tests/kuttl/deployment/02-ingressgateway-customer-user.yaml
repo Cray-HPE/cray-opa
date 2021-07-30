@@ -3,10 +3,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    deployment.kubernetes.io/revision: "2"
     meta.helm.sh/release-name: cray-opa
     meta.helm.sh/release-namespace: opa
-  name: cray-opa
+  name: cray-opa-ingressgateway-customer-user
   namespace: opa
 spec:
   progressDeadlineSeconds: 600
@@ -23,7 +22,7 @@ spec:
       labels:
         app.kubernetes.io/instance: cray-opa
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: cray-opa
+        app.kubernetes.io/name: cray-opa-ingressgateway-customer-user
     spec:
       affinity:
         podAntiAffinity:
@@ -34,7 +33,7 @@ spec:
                     - key: app.kubernetes.io/name
                       operator: In
                       values:
-                        - cray-opa
+                        - ingressgateway-customer-user
                 topologyKey: kubernetes.io/hostname
               weight: 1
       containers:
@@ -58,8 +57,8 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: "4"
-              memory: 10Gi
+              cpu: 500m
+              memory: 258Mi
             requests:
               cpu: 250m
               memory: 128Mi
@@ -81,11 +80,11 @@ spec:
       volumes:
         - configMap:
             defaultMode: 420
-            name: cray-opa-istio-config
+            name: istio-config-ingressgateway-customer-user
           name: opa-istio-config
         - configMap:
             defaultMode: 420
-            name: cray-opa-policy
+            name: opa-policy-ingressgateway-customer-user
           name: opa-policy
         - configMap:
             defaultMode: 420

@@ -19,15 +19,3 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 {{- end -}}
-
-
-{{/*
-Get an image prefix
-*/}}
-{{- define "cray-opa.image-prefix" -}}
-{{- if .Values.imagesHost -}}
-{{- printf "%s/" .Values.imagesHost -}}
-{{- else -}}
-{{- printf "" -}}
-{{- end -}}
-{{- end -}}

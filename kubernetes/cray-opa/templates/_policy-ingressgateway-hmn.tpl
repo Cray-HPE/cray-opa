@@ -1,7 +1,7 @@
 {{- /*
 Copyright 2020 Hewlett Packard Enterprise Development LP
 */ -}}
-{{ define "cray-opa.policy" }}
+{{ define "ingressgateway-hmn.policy" }}
 
 # Istio Ingress Gateway OPA Policy
 package istio.authz
@@ -56,7 +56,7 @@ allow {
 
 # Allow cloud-init endpoints, as we do validation based on incoming IP.
 # In the future, these requests will come in via the TOR switches and ideally
-# not through the 'front door'.   This is an expansion to BSS. 
+# not through the 'front door'.   This is an expansion to BSS.
 allow {
     any([
         startswith(original_path, "/meta-data"),
@@ -182,7 +182,7 @@ allowed_methods := {
   ],
   "system-pxe": [
 
-   #BSS -> computes need to retrieve boot scripts    
+   #BSS -> computes need to retrieve boot scripts
       {"method": "GET",  "path": `^/apis/bss/boot/v1/bootscript.*$`},
       {"method": "HEAD",  "path": `^/apis/bss/boot/v1/bootscript.*$`},
   ],
@@ -209,7 +209,7 @@ allowed_methods := {
     {"method": "PATCH",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "DELETE",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
-    #HBTD -> allow a compute to send a heartbeat 
+    #HBTD -> allow a compute to send a heartbeat
     {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
 
 
