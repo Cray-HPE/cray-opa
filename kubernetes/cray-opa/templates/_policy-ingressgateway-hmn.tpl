@@ -187,9 +187,7 @@ allowed_methods := {
       {"method": "HEAD",  "path": `^/apis/bss/boot/v1/bootscript.*$`},
   ],
   "system-compute": [
-    {"method": "GET",  "path": `^/apis/cfs/.*$`},
-    {"method": "HEAD",  "path": `^/apis/cfs/.*$`},
-    {"method": "PATCH",  "path": `^/apis/cfs/.*$`},
+    {"method": "PATCH",  "path": `^/apis/cfs/components/.*$`},
 
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
     {"method": "HEAD",  "path": `^/apis/v2/cps/.*$`},
