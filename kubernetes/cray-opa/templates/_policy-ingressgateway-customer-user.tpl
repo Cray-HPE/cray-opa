@@ -39,15 +39,15 @@ original_path = o_path {
     o_path := http_request.path
 }
 
-# Whitelist Keycloak and tokens service, since those services enable users to
-# login and obtain JWTs. Legacy services to be migrated or removed:
+# Whitelist Keycloak, since those services enable users to login and obtain
+# JWTs. Spire endpoint sand vcs are also enabled here. Legacy services to be
+# migrated or removed:
 #
 #     * VCS/Gitea
 #
 allow {
     any([
         startswith(original_path, "/keycloak"),
-        startswith(original_path, "/apis/tokens"),
         startswith(original_path, "/vcs"),
         startswith(original_path, "/spire-jwks-"),
         startswith(original_path, "/spire-bundle"),
@@ -116,7 +116,7 @@ found_auth = {"type": a_type, "token": a_token} {
 # If the auth type is bearer, decode the JWT
 parsed_kc_token = {"payload": payload} {
     found_auth.type == "Bearer"
-    response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.keycloak.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
+    response := http.send({"method": "get", "url": "{{ .Values.jwtValidation.keycloak.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
     [valid, header, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "shasta"})
 
     # Verify that the issuer is as expected.

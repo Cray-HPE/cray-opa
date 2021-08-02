@@ -39,15 +39,15 @@ original_path = o_path {
     o_path := http_request.path
 }
 
-# Whitelist Keycloak and tokens service, since those services enable users to
-# login and obtain JWTs. Legacy services to be migrated or removed:
+# Whitelist Keycloak, since those services enable users to login and obtain
+# JWTs. Spire endpoint sand vcs are also enabled here. Legacy services to be
+# migrated or removed:
 #
 #     * VCS/Gitea
 #
 allow {
     any([
         startswith(original_path, "/keycloak"),
-        startswith(original_path, "/apis/tokens"),
         startswith(original_path, "/vcs"),
         startswith(original_path, "/spire-jwks-"),
         startswith(original_path, "/spire-bundle"),
