@@ -1,12 +1,13 @@
 current_dir := $(shell pwd)
 tmp_dir := $(shell mktemp -d)
 
-.SILENT: helmlint eval test unittest
-.PHONY: helmlint eval test unittest
+.SILENT: helmlint eval test unittest test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn cray-opa-test
+.PHONY: helmlint eval test unittest test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn cray-opa-test
 
 all: helmlint eval unittest test
 
 lint: helmlint eval unittest
+test-opa: test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn
 
 eval:
 	helm template -n opa cray-opa . > $(tmp_dir)/chart.yaml
@@ -21,13 +22,17 @@ yamale:
 helmlint:
 	helm lint
 
-opa:
+cray-opa-test:
 	docker build -f files/Dockerfile --tag cray-opa-test .
-	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy.tpl /mnt/files/policy_test.rego.tpl
 
-test:
-	kubectl kuttl test --kind-config kind.yaml --artifacts-dir /tmp/kuttl
+test-ingressgateway:
+	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway.tpl /mnt/files/ingressgateway_policy_test.rego.tpl ingressgateway.policy
 
-unittest:
-	docker run -ti --rm -v $(current_dir):/apps quintush/helm-unittest:latest -3 .
+test-ingressgateway-customer-admin:
+	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-admin.tpl /mnt/files/ingressgateway-customer-admin_policy_test.rego.tpl ingressgateway-customer-admin.policy
 
+test-ingressgateway-customer-user:
+	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-user.tpl /mnt/files/ingressgateway-customer-user_policy_test.rego.tpl ingressgateway-customer-user.policy
+
+test-ingressgateway-hmn:
+	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-hmn.tpl /mnt/files/ingressgateway-hmn_policy_test.rego.tpl ingressgateway-hmn.policy
