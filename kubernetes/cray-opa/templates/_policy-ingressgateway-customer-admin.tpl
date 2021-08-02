@@ -295,22 +295,22 @@ role_perms = {
 # From https://connect.us.cray.com/confluence/display/SKERN/Shasta+Compute+SPIRE+Security
 # This is an initial set, not yet expected to be complete.
 sub_match = {
-    "spiffe://shasta/compute/workload/cfs-state-reporter": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://shasta/ncn/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://shasta/compute/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://shasta/ncn/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://shasta/compute/workload/cpsmount": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/cpsmount": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/cpsmount_helper": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/cpsmount_helper": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/dvs-hmi": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/dvs-hmi": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/dvs-map": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/dvs-map": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/orca": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/orca": allowed_methods["system-compute"]
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cfs-state-reporter": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump": allowed_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump": allowed_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump_helper": allowed_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump_helper": allowed_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount_helper": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount_helper": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/dvs-hmi": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/dvs-hmi": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/dvs-map": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/dvs-map": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/orca": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/orca": allowed_methods["system-compute"]
 }
 
 {{ end }}

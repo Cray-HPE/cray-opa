@@ -326,8 +326,9 @@ func main() {
 					"issuers": []string{keycloakIssuer},
 				},
 				"spire": map[string]interface{}{
-					"jwksUri": ts.URL,
-					"issuers": []string{spireIssuer},
+					"jwksUri":     ts.URL,
+					"issuers":     []string{spireIssuer},
+					"trustDomain": "shasta",
 				},
 			},
 		},

@@ -23,7 +23,7 @@ helmlint:
 	helm lint
 
 cray-opa-test:
-	docker build -f files/Dockerfile --tag cray-opa-test .
+	docker build -f tests/opa/Dockerfile --tag cray-opa-test .
 
 test-ingressgateway:
 	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.rego.tpl ingressgateway.policy
