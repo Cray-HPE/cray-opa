@@ -1,0 +1,37 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: opa
+  name: cray-configmap-ca-public-key
+  namespace: opa
+data:
+  certificate_authority.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIEljCCAn4CCQCPfX4c/uJV7jANBgkqhkiG9w0BAQsFADANMQswCQYDVQQGEwJV
+    UzAeFw0yMTAzMTEyMDQyMzVaFw0zMTAzMDkyMDQyMzVaMA0xCzAJBgNVBAYTAlVT
+    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArEi/T7vW0ljzKiK8I9wR
+    8YAJX/9wYl5guL3yge8AQ69BRDn0yrBcpHs33yNugR8QjArN/iEKHJ8nqF18+pFe
+    EkwE7Bjp2nNN0gMNQKghyto02QRWkbyAVvxIg9qVmUNHo7rVuHdxU5xl81ZJmpT5
+    Z4J7pp1OqTAUpdftv8Z0iHOvIrC4cTv+NCRrj8/3pUV00atVno+/ewCe3l4nnnWT
+    TFvu32V3Tv0+Al9eQUdaQUUdVt3by0sltcZ+SQplEc4/eIYtybKs9okkd197HUfH
+    uHjF2MbW+TqEdxNYKBLww/xkYd0ET/rZkstr1Q70aYjz1Hqpw4lTSxqg1h8UEE6Z
+    BjKSYdaCqLZLe6vTuk013H3kqle+omWunlVosqjoY0UvTT5jln5ZNMkemvJT+t0G
+    AFGfThNJxXqyJbxk53arHjkvbHxXXX2wKscvyQaE5oFk/RLhgrB6/8LfILueh8DA
+    8BgExyRAYVvkjAZkPgW7npvdtheicE6JHuRTMmDcYPXNdrdsbZ1ffd4GB+e/Kce4
+    1tar8Vvf32TZwy9RFdb1BkafVpLsi01ts9ateceF7y4UahO2qHB0bY7bBns2iy/z
+    yJ6efSvjSZNgblJQT96tL2YEqkpHNGlpHcSHZ0WxpLv5HozamWAGVBVIQC+dfv4g
+    sY5eX/4hYw/WEDmA3CIso78CAwEAATANBgkqhkiG9w0BAQsFAAOCAgEAP/zflfhO
+    il7xSqildYGyNTgFzq4wYcYQySWMRg5uj+0xclsyHFstkZ512uUIyx8YqJRWicMg
+    St0liB+xRw2IjYF9HPd3Zee2h53gkTfVF3NWddctR/NDoHK5MTBLjmXXl8JqDJKO
+    0Fj9RwSgdAFhPoZMT78paxHP9UWCDNM9lD5OQaV+5eOWk/d8KDMNLF9+DWVjk0E3
+    6yujO844aL1RCzm4lq2zoCdlJz9bF5prRDo+pnEXgUeFlBR8aFfibzVwHDpf3CWQ
+    1UV1ilvFafqFE44XHshRiyqTVcxHRgwi2VyjNKxoNGXYgXB+dXmZHTLyt3Z/hYPW
+    HBgK4e/QGsh15pi0hWBLvq/0ijgzJJpiJcwsltZlB4Dud+Qd1R2DsPPhp5f1jgRy
+    +rWQnZIjbwzZ9WH0tyWADY0knzEqAr7n+WsCTek/dyqOED/Jn0YWwmNbvudNOJ19
+    NWAIuQJ42Sd41HgB1d1ZhdXKjzIKcgvrLn33I0i/ec4Q48O1CX0jqg3Q5GFRsu7a
+    al0Snr+Wh/PgM4CXK6zNZ53xKlABjp2pYKMZbDrTbrddHvv2eRFJf6wWaw1Q1SI+
+    8afThycNbdTrOgSY99AMx1gvG4RP0+kVHUD1ehCE3zPb80uBQKHSt3LqTrPPZx/f
+    l10HNLBFvcQQjBvm0Q2PXy+SDtl6oLZSxIM=
+    -----END CERTIFICATE-----

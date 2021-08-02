@@ -4,7 +4,7 @@ tmp_dir := $(shell mktemp -d)
 .SILENT: helmlint eval test unittest test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn cray-opa-test
 .PHONY: helmlint eval test unittest test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn cray-opa-test
 
-all: helmlint eval unittest test
+all: helmlint eval unittest test test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn
 
 lint: helmlint eval unittest
 test-opa: test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn
@@ -24,6 +24,9 @@ helmlint:
 
 cray-opa-test:
 	docker build -f tests/opa/Dockerfile --tag cray-opa-test .
+
+test:
+	kubectl kuttl test --kind-config kind.yaml --artifacts-dir /tmp/kuttl
 
 test-ingressgateway:
 	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.rego.tpl ingressgateway.policy

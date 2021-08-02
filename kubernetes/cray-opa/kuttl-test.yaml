@@ -10,8 +10,9 @@ commands:
 - command: kubectl create ns services
 - command: kubectl create ns sma
 - command: kubectl create ns spire
+- command: kubectl apply -f ./tests/kuttl/cray-configmap-ca-public-key.yaml
 - command: helm install --wait -f ../../../cray-istio/kubernetes/cray-istio-operator/tests/kuttl/values.yaml --namespace istio-system cray-istio-operator ../../../cray-istio/kubernetes/cray-istio-operator
-- command: helm install --wait -f ../../../cray-istio/kubernetes/cray-istio-deploy/tests/kuttl/values.yaml --namespace istio-system cray-istio-deploy ../../../cray-istio/kubernetes/cray-istio-deploy
+- command: helm install --wait -f ../../../cray-istio/kubernetes/cray-istio-deploy/tests/kuttl/values-disable-prometheus.yaml --namespace istio-system cray-istio-deploy ../../../cray-istio/kubernetes/cray-istio-deploy
 - command: helm install --wait -f ../../../cray-istio/kubernetes/cray-istio/tests/kuttl/cray-certmanager-init.yaml --namespace cert-manager-init cray-certmanager-init cray-csm/cray-certmanager-init
 - command: helm install --wait -f ../../../cray-istio/kubernetes/cray-istio/tests/kuttl/cray-certmanager.yaml --namespace cert-manager cray-certmanager cray-csm/cray-certmanager
 - command: helm install --wait -f ../../../cray-istio/kubernetes/cray-istio/tests/kuttl/cray-certmanager-issuers.yaml --namespace cert-manager cray-certmanager-issuers cray-csm/cray-certmanager-issuers
