@@ -264,14 +264,6 @@ allowed_methods := {
       {"method": "PUT", "path": `^/apis/fc/.*$`},
       {"method": "DELETE", "path": `^/apis/fc/.*$`},
   ],
-  "admin": [
-      {"method": "GET",  "path": `.*`},
-      {"method": "PUT",  "path": `.*`},
-      {"method": "POST",  "path": `.*`},
-      {"method": "DELETE",  "path": `.*`},
-      {"method": "PATCH",  "path": `.*`},
-      {"method": "HEAD",  "path": `.*`},
-  ],
   "ckdump": [
       {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
       {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
@@ -281,13 +273,11 @@ allowed_methods := {
 }
 
 # Our list of endpoints we accept based on roles.
-# The admin roll can make any call.
 role_perms = {
     "user": allowed_methods["user"],
     "system-pxe": allowed_methods["system-pxe"],
     "system-compute": allowed_methods["system-compute"],
     "wlm": allowed_methods["wlm"],
-    "admin": allowed_methods["admin"],
     "ckdump": allowed_methods["ckdump"],
 }
 
