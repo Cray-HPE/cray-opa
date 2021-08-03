@@ -1,4 +1,5 @@
 {{- range $name, $options:= .Values.ingresses }}
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -14,6 +15,6 @@ spec:
     port: {{ $.Values.opa.port }}
     targetPort: http
   selector:
-    app.kubernetes.io/name: {{ $name }}
+    app.kubernetes.io/name: cray-opa-{{ $name }}
     app.kubernetes.io/instance: {{ $.Release.Name }}
 {{- end }}
