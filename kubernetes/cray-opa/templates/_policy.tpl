@@ -291,33 +291,34 @@ role_perms = {
 
 spire_methods := {
   "system-compute": [
-    {"method": "PATCH",  "path": sprintf("^/apis/cfs/components/%v$", [parsed_spire_token.xname])},
+    {"method": "PATCH", "path": sprintf("^/apis/cfs/components/%v$", [parsed_spire_token.xname])},
 
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
-    {"method": "HEAD",  "path": `^/apis/v2/cps/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/cps/.*$`},
+    {"method": "HEAD", "path": `^/apis/v2/cps/.*$`},
+    {"method": "POST", "path": `^/apis/v2/cps/.*$`},
 
     {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
+    {"method": "POST", "path": `^/apis/v2/nmd/.*$`},
     {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
     #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus
-    {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
+    {"method": "GET",   "path": `^/apis/smd/hsm/v./.*$`},
     {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
-    {"method": "PATCH",  "path": `^/apis/smd/hsm/v./State/Components/BulkSoftwareStatus$`},
+    {"method": "PATCH", "path": `^/apis/smd/hsm/v./State/Components/BulkSoftwareStatus$`},
+    {"method": "PATCH", "path": sprintf("^/apis/smd/hsm/v./State/Components/%v/SoftwareStatus$", [parsed_spire_token.xname])},
     #HMNFD -> subscribe only, cannot create state change notifications
-    {"method": "GET",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
+    {"method": "GET",   "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
     {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
-    {"method": "PATCH",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+    {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
-    {"method": "DELETE",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+    {"method": "DELETE","path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     #HBTD -> allow a compute to send a heartbeat
-    {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
+    {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
   ],
   "ckdump": [
       {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-      {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-      {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
+      {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
+      {"method": "POST", "path": `^/apis/v2/nmd/.*$`},
       {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
   ],
 }

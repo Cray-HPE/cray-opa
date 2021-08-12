@@ -64,9 +64,11 @@ cps_mock_path = "/apis/v2/cps/mock"
 hbtb_heartbeat_path = "/apis/hbtd/hmi/v1/heartbeat"
 nmd_mock_path = "/apis/v2/nmd/mock"
 smd_statecomponents_path = "/apis/smd/hsm/v2/State/Components"
+smd_softwarestatus_compute_path = "/apis/smd/hsm/v./State/Components/x1/SoftwareStatus"
+smd_softwarestatus_ncn_path = "/apis/smd/hsm/v./State/Components/ncnw001/SoftwareStatus"
+smd_softwarestatus_invalid_path = "/apis/smd/hsm/v./State/Components/invalid/SoftwareStatus"
 hmnfd_subscribe_path = "/apis/hmnfd/hmi/v1/subscribe"
 hmnfd_subscriptions_path = "/apis/hmnfd/hmi/v1/subscriptions"
-
 pals_mock_path = "/apis/pals/v1/mock"
 
 test_compute {
@@ -210,11 +212,14 @@ spire_correct_ncn_sub(sub) {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
 
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": smd_softwarestatus_ncn_path, "headers": {"authorization": sub}}}}}
+
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
+
 
   # Validate that we're not allowing any method with a valid aud through
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_ncn_mock_path, "headers": {"authorization": sub}}}}}
@@ -225,6 +230,7 @@ spire_correct_ncn_sub(sub) {
 spire_correct_compute_sub(sub) {
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_compute_mock_path, "headers": {"authorization": sub}}}}}
+
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
@@ -237,6 +243,8 @@ spire_correct_compute_sub(sub) {
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
+
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": smd_softwarestatus_compute_path, "headers": {"authorization": sub}}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
@@ -253,6 +261,8 @@ spire_correct_compute_sub(sub) {
 spire_incorrect_xname_sub(sub) {
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": smd_softwarestatus_invalid_path, "headers": {"authorization": sub}}}}}
 
   # Validate that we're not allowing any method with a valid aud through
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
