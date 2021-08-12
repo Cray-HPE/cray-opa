@@ -290,9 +290,10 @@ role_perms = {
 }
 
 spire_methods := {
-  "system-compute": [
+  "cfs": [
     {"method": "PATCH", "path": sprintf("^/apis/cfs/components/%v$", [parsed_spire_token.xname])},
-
+  ],
+  "system-compute": [
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
     {"method": "HEAD", "path": `^/apis/v2/cps/.*$`},
     {"method": "POST", "path": `^/apis/v2/cps/.*$`},
@@ -327,8 +328,8 @@ spire_methods := {
 # From https://connect.us.cray.com/confluence/display/SKERN/Shasta+Compute+SPIRE+Security
 # This is an initial set, not yet expected to be complete.
 sub_match = {
-    "spiffe://shasta/compute/XNAME/workload/cfs-state-reporter": spire_methods["system-compute"],
-    "spiffe://shasta/ncn/XNAME/workload/cfs-state-reporter": spire_methods["system-compute"],
+    "spiffe://shasta/compute/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
+    "spiffe://shasta/ncn/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
     "spiffe://shasta/compute/XNAME/workload/ckdump": spire_methods["ckdump"],
     "spiffe://shasta/ncn/XNAME/workload/ckdump": spire_methods["ckdump"],
     "spiffe://shasta/compute/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
