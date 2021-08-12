@@ -250,6 +250,16 @@ spire_correct_compute_sub(sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_compute_mock_path, "headers": {"authorization": sub}}}}}
 }
 
+spire_incorrect_xname_sub(sub) {
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+
+  # Validate that we're not allowing any method with a valid aud through
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+}
+
 test_spire_subs {
   spire_correct_ncn_sub("Bearer {{ .spire.ncn.cfs_state_reporter }}")
   spire_correct_ncn_sub("Bearer {{ .spire.ncn.cpsmount }}")
@@ -263,6 +273,21 @@ test_spire_subs {
   spire_correct_compute_sub("Bearer {{ .spire.compute.dvs_hmi }}")
   spire_correct_compute_sub("Bearer {{ .spire.compute.dvs_map }}")
   spire_correct_compute_sub("Bearer {{ .spire.compute.orca }}")
+}
+
+test_deny_different_xname {
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.cfs_state_reporter }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.cpsmount }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.cpsmount_helper }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.dvs_hmi }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.dvs_map }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.orca }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.cfs_state_reporter }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.cpsmount }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.cpsmount_helper }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.dvs_hmi }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.dvs_map }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.orca }}")
 }
 
 spire_ckdump(spire_sub) {

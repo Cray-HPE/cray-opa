@@ -291,7 +291,7 @@ role_perms = {
 
 spire_methods := {
   "system-compute": [
-    {"method": "PATCH",  "path": `^/apis/cfs/components/.*$`},
+    {"method": "PATCH",  "path": sprintf("^/apis/cfs/components/%v$", [parsed_spire_token.xname])},
 
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
     {"method": "HEAD",  "path": `^/apis/v2/cps/.*$`},
