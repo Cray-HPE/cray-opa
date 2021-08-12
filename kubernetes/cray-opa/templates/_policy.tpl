@@ -56,7 +56,7 @@ allow {
 
 # Allow cloud-init endpoints, as we do validation based on incoming IP.
 # In the future, these requests will come in via the TOR switches and ideally
-# not through the 'front door'.   This is an expansion to BSS. 
+# not through the 'front door'.   This is an expansion to BSS.
 allow {
     any([
         startswith(original_path, "/meta-data"),
@@ -99,8 +99,7 @@ allow {
 
 # Validate claims for SPIRE issued JWT tokens
 allow {
-    # Parse subject
-    s := parsed_spire_token.payload.sub
+    s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
 
     # Test subject matches destination
     perm := sub_match[s][_]
@@ -129,7 +128,7 @@ parsed_kc_token = {"payload": payload} {
 }
 
 # If the auth type is bearer, decode the JWT
-parsed_spire_token = {"payload": payload} {
+parsed_spire_token = {"payload": payload, "xname": xname} {
     found_auth.type == "Bearer"
     response := http.send({"method": "get", "url": "{{ .Values.jwtValidation.spire.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
     [valid, header, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "system-compute"})
@@ -141,6 +140,8 @@ parsed_spire_token = {"payload": payload} {
 {{- end }}
     ]
     allowed_issuers[_] = payload.iss
+
+    xname := regex.split("/", payload.sub)[4]
 }
 
 # Get the users roles from the JWT token
@@ -182,7 +183,7 @@ allowed_methods := {
   ],
   "system-pxe": [
 
-   #BSS -> computes need to retrieve boot scripts    
+   #BSS -> computes need to retrieve boot scripts
       {"method": "GET",  "path": `^/apis/bss/boot/v1/bootscript.*$`},
       {"method": "HEAD",  "path": `^/apis/bss/boot/v1/bootscript.*$`},
   ],
@@ -207,7 +208,7 @@ allowed_methods := {
     {"method": "PATCH",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "DELETE",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
-    #HBTD -> allow a compute to send a heartbeat 
+    #HBTD -> allow a compute to send a heartbeat
     {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
 
 
@@ -286,29 +287,61 @@ role_perms = {
     "system-compute": allowed_methods["system-compute"],
     "wlm": allowed_methods["wlm"],
     "admin": allowed_methods["admin"],
-    "ckdump": allowed_methods["ckdump"],
+}
+
+spire_methods := {
+  "system-compute": [
+    {"method": "PATCH",  "path": `^/apis/cfs/components/.*$`},
+
+    {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
+    {"method": "HEAD",  "path": `^/apis/v2/cps/.*$`},
+    {"method": "POST",  "path": `^/apis/v2/cps/.*$`},
+
+    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
+    #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus
+    {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
+    {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
+    {"method": "PATCH",  "path": `^/apis/smd/hsm/v./State/Components/BulkSoftwareStatus$`},
+    #HMNFD -> subscribe only, cannot create state change notifications
+    {"method": "GET",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
+    {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
+    {"method": "PATCH",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+    {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+    {"method": "DELETE",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+    #HBTD -> allow a compute to send a heartbeat
+    {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
+  ],
+  "ckdump": [
+      {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
+      {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
+      {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
+      {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
+  ],
 }
 
 # List of endpoints we accept based on audience.
 # From https://connect.us.cray.com/confluence/display/SKERN/Shasta+Compute+SPIRE+Security
 # This is an initial set, not yet expected to be complete.
 sub_match = {
-    "spiffe://shasta/compute/workload/cfs-state-reporter": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://shasta/ncn/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://shasta/compute/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://shasta/ncn/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://shasta/compute/workload/cpsmount": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/cpsmount": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/cpsmount_helper": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/cpsmount_helper": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/dvs-hmi": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/dvs-hmi": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/dvs-map": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/dvs-map": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/orca": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/orca": allowed_methods["system-compute"]
+    "spiffe://shasta/compute/XNAME/workload/cfs-state-reporter": spire_methods["system-compute"],
+    "spiffe://shasta/ncn/XNAME/workload/cfs-state-reporter": spire_methods["system-compute"],
+    "spiffe://shasta/compute/XNAME/workload/ckdump": spire_methods["ckdump"],
+    "spiffe://shasta/ncn/XNAME/workload/ckdump": spire_methods["ckdump"],
+    "spiffe://shasta/compute/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
+    "spiffe://shasta/ncn/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
+    "spiffe://shasta/compute/XNAME/workload/cpsmount": spire_methods["system-compute"],
+    "spiffe://shasta/ncn/XNAME/workload/cpsmount": spire_methods["system-compute"],
+    "spiffe://shasta/compute/XNAME/workload/cpsmount_helper": spire_methods["system-compute"],
+    "spiffe://shasta/ncn/XNAME/workload/cpsmount_helper": spire_methods["system-compute"],
+    "spiffe://shasta/compute/XNAME/workload/dvs-hmi": spire_methods["system-compute"],
+    "spiffe://shasta/ncn/XNAME/workload/dvs-hmi": spire_methods["system-compute"],
+    "spiffe://shasta/compute/XNAME/workload/dvs-map": spire_methods["system-compute"],
+    "spiffe://shasta/ncn/XNAME/workload/dvs-map": spire_methods["system-compute"],
+    "spiffe://shasta/compute/XNAME/workload/orca": spire_methods["system-compute"],
+    "spiffe://shasta/ncn/XNAME/workload/orca": spire_methods["system-compute"]
 }
 
 {{ end }}
