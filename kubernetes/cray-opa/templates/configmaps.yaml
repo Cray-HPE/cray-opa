@@ -23,6 +23,10 @@ data:
     {{- if .Values.policy }}
     {{- .Values.policy | nindent 4 }}
     {{- else }}
+    {{- if .Values.opa.xnamePolicy }}
+    {{- include "cray-opa.xname-workloads.policy" . | nindent 4 }}
+    {{- else }}
     {{- include "cray-opa.policy" . | nindent 4 }}
+    {{- end }}
     {{- end }}
 

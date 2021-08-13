@@ -41,6 +41,7 @@ opa:
   # http.send requests default to 5s timeout. This was failing on a system so
   # increase this to 10s.
   httpTimeout: 10s
+  xnamePolicy: true
 
 
 # To overide the default policy in files/policy.rego follow the example below
