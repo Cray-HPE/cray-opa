@@ -18,6 +18,22 @@ pipeline {
     }
 
     stages {
+        stage("Test") {
+            parallel {
+                stage('Rego') {
+                    steps {
+                        sh "make rego_test"
+                    }
+                }
+
+                stage('Chart') {
+                    steps {
+                        sh "make chart_test"
+                    }
+                }
+            }
+        }
+
         stage("Build") {
             parallel {
                 stage('Chart') {
