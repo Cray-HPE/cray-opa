@@ -4,9 +4,9 @@ CHART_VERSION ?= local
 
 HELM_UNITTEST_IMAGE ?= quintush/helm-unittest:3.3.0-0.2.5
 
-all : chart
-chart: chart_setup chart_package chart_test
-
+all : test chart
+test: chart_test rego_test
+chart: chart_setup chart_package
 
 chart_setup:
 		mkdir -p ${CHART_PATH}/.packaged
@@ -18,3 +18,7 @@ chart_package:
 chart_test:
 		helm lint "${CHART_PATH}/${NAME}"
 		docker run --rm -v ${PWD}/${CHART_PATH}:/apps ${HELM_UNITTEST_IMAGE} -3 ${NAME}
+
+rego_test:
+	docker build -f ${CHART_PATH}/cray-opa/files/Dockerfile --tag cray-opa-test ${CHART_PATH}/cray-opa
+	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy.tpl /mnt/files/policy_test.rego.tpl
