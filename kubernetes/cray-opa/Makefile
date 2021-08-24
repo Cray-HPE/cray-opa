@@ -24,12 +24,16 @@ helmlint:
 
 cray-opa-test:
 	docker build -f tests/opa/Dockerfile --tag cray-opa-test .
+	docker build -f tests/opa/xname/Dockerfile --tag cray-opa-test-xname .
 
 test:
 	kubectl kuttl test --kind-config kind.yaml --artifacts-dir /tmp/kuttl
 
 test-ingressgateway:
 	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.rego.tpl ingressgateway.policy
+
+test-ingressgateway-xname:
+	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test-xname /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.xname_workloads.rego.tpl
 
 test-ingressgateway-customer-admin:
 	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-admin.tpl /mnt/tests/opa/ingressgateway-customer-admin_policy_test.rego.tpl ingressgateway-customer-admin.policy

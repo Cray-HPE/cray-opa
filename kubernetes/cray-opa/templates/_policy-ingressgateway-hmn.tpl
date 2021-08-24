@@ -40,8 +40,7 @@ original_path = o_path {
 }
 
 # Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. Spire endpoint sand vcs are also enabled here. Legacy services to be
-# migrated or removed:
+# JWTs. vcs are also enabled here. Legacy services to be migrated or removed:
 #
 #     * VCS/Gitea
 #
@@ -49,8 +48,6 @@ allow {
     any([
         startswith(original_path, "/keycloak"),
         startswith(original_path, "/vcs"),
-        startswith(original_path, "/spire-jwks-"),
-        startswith(original_path, "/spire-bundle"),
     ])
 }
 
@@ -97,16 +94,6 @@ allow {
     required_roles[r]
 }
 
-# Validate claims for SPIRE issued JWT tokens
-allow {
-    # Parse subject
-    s := parsed_spire_token.payload.sub
-
-    # Test subject matches destination
-    perm := sub_match[s][_]
-    perm.method = http_request.method
-    re_match(perm.path, original_path)
-}
 
 # Check if there is an authorization header and split the type from token
 found_auth = {"type": a_type, "token": a_token} {
@@ -128,20 +115,6 @@ parsed_kc_token = {"payload": payload} {
     allowed_issuers[_] = payload.iss
 }
 
-# If the auth type is bearer, decode the JWT
-parsed_spire_token = {"payload": payload} {
-    found_auth.type == "Bearer"
-    response := http.send({"method": "get", "url": "{{ .Values.jwtValidation.spire.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
-    [valid, header, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "system-compute"})
-
-    # Verify that the issuer is as expected.
-    allowed_issuers := [
-{{- range $key, $value := .Values.jwtValidation.spire.issuers }}
-      "{{ $value }}",
-{{- end }}
-    ]
-    allowed_issuers[_] = payload.iss
-}
 
 # Get the users roles from the JWT token
 roles_for_user[r] {
@@ -277,28 +250,6 @@ role_perms = {
     "system-compute": allowed_methods["system-compute"],
     "wlm": allowed_methods["wlm"],
     "ckdump": allowed_methods["ckdump"],
-}
-
-# List of endpoints we accept based on audience.
-# From https://connect.us.cray.com/confluence/display/SKERN/Shasta+Compute+SPIRE+Security
-# This is an initial set, not yet expected to be complete.
-sub_match = {
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cfs-state-reporter": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount_helper": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount_helper": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/dvs-hmi": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/dvs-hmi": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/dvs-map": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/dvs-map": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/orca": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/orca": allowed_methods["system-compute"]
 }
 
 {{ end }}

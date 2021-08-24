@@ -39,17 +39,18 @@ original_path = o_path {
     o_path := http_request.path
 }
 
-# Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. Spire endpoint sand vcs are also enabled here. Legacy services to be
-# migrated or removed:
+# Whitelist Keycloak and tokens service, since those services enable users to
+# login and obtain JWTs. Legacy services to be migrated or removed:
 #
 #     * VCS/Gitea
 #
 allow {
     any([
         startswith(original_path, "/keycloak"),
+        startswith(original_path, "/apis/tokens"),
         startswith(original_path, "/vcs"),
         startswith(original_path, "/spire-jwks-"),
+        startswith(original_path, "/spire-bundle"),
     ])
 }
 
@@ -82,15 +83,12 @@ allow {
     ])
 }
 
-
-{{- if not .Values.opa.requireHeartbeatToken }}
 # Allow heartbeats without requiring a spire token
 allow {
     any([
         startswith(original_path, "/apis/hbtd/hmi/v1/heartbeat")
     ])
 }
-{{- end }}
 
 # This actually checks the the JWT token passed in
 # has access to the endpoint requested
@@ -99,9 +97,7 @@ allow {
     required_roles[r]
 }
 
-
-{{- if .Values.opa.xnamePolicy }}
-# Validate claims for SPIRE issued JWT tokens with xname support
+# Validate claims for SPIRE issued JWT tokens
 allow {
     s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
 
@@ -110,18 +106,6 @@ allow {
     perm.method = http_request.method
     re_match(perm.path, original_path)
 }
-{{- else }}
-# Validate claims for SPIRE issued JWT tokens
-allow {
-    # Parse subject
-    s := parsed_spire_token.payload.sub
-
-    # Test subject matches destination
-    perm := sub_match[s][_]
-    perm.method = http_request.method
-    re_match(perm.path, original_path)
-}
-{{- end }}
 
 # Check if there is an authorization header and split the type from token
 found_auth = {"type": a_type, "token": a_token} {
@@ -143,7 +127,6 @@ parsed_kc_token = {"payload": payload} {
     allowed_issuers[_] = payload.iss
 }
 
-{{- if .Values.opa.xnamePolicy }}
 # If the auth type is bearer, decode the JWT
 parsed_spire_token = {"payload": payload, "xname": xname} {
     found_auth.type == "Bearer"
@@ -160,23 +143,6 @@ parsed_spire_token = {"payload": payload, "xname": xname} {
 
     xname := regex.split("/", payload.sub)[4]
 }
-{{- else }}
-trace("break")
-# If the auth type is bearer, decode the JWT
-parsed_spire_token = {"payload": payload} {
-    found_auth.type == "Bearer"
-    response := http.send({"method": "get", "url": "{{ .Values.jwtValidation.spire.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
-    [valid, header, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "system-compute"})
-
-    # Verify that the issuer is as expected.
-    allowed_issuers := [
-{{- range $key, $value := .Values.jwtValidation.spire.issuers }}
-      "{{ $value }}",
-{{- end }}
-    ]
-    allowed_issuers[_] = payload.iss
-}
-{{- end }}
 
 # Get the users roles from the JWT token
 roles_for_user[r] {
@@ -323,7 +289,6 @@ role_perms = {
     "admin": allowed_methods["admin"],
 }
 
-{{- if .Values.opa.xnamePolicy }}
 spire_methods := {
   "cfs": [
     {"method": "PATCH", "path": sprintf("^/apis/cfs/components/%v$", [parsed_spire_token.xname])},
@@ -349,6 +314,7 @@ spire_methods := {
     {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "DELETE","path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     #HBTD -> allow a compute to send a heartbeat
+    {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
   ],
   "ckdump": [
       {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
@@ -356,10 +322,11 @@ spire_methods := {
       {"method": "POST", "path": `^/apis/v2/nmd/.*$`},
       {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
   ],
-  "heartbeat": [
-    {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
-  ]
 }
+
+# List of endpoints we accept based on audience.
+# From https://connect.us.cray.com/confluence/display/SKERN/Shasta+Compute+SPIRE+Security
+# This is an initial set, not yet expected to be complete.
 sub_match = {
     "spiffe://shasta/compute/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
     "spiffe://shasta/ncn/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
@@ -376,31 +343,7 @@ sub_match = {
     "spiffe://shasta/compute/XNAME/workload/dvs-map": spire_methods["system-compute"],
     "spiffe://shasta/ncn/XNAME/workload/dvs-map": spire_methods["system-compute"],
     "spiffe://shasta/compute/XNAME/workload/orca": spire_methods["system-compute"],
-    "spiffe://shasta/ncn/XNAME/workload/orca": spire_methods["system-compute"],
-    "spiffe://shasta/compute/XNAME/workload/heartbeat": spire_methods["heartbeat"],
-    "spiffe://shasta/ncn/XNAME/workload/heartbeat": spire_methods["heartbeat"]
+    "spiffe://shasta/ncn/XNAME/workload/orca": spire_methods["system-compute"]
 }
-{{- else }}
-# List of endpoints we accept based on audience.
-# From https://connect.us.cray.com/confluence/display/SKERN/Shasta+Compute+SPIRE+Security
-# This is an initial set, not yet expected to be complete.
-sub_match = {
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cfs-state-reporter": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount_helper": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount_helper": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/dvs-hmi": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/dvs-hmi": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/dvs-map": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/dvs-map": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/orca": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/orca": allowed_methods["system-compute"]
-}
-{{- end }}
+
 {{ end }}
