@@ -16,7 +16,7 @@ test_allow_bypassed_urls_with_no_auth_header {
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/spire-jwks-test/"}}}}
 }
 
-test_deny_tokens_api {
+test_deny_tokens_endpoint {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/apis/tokens"}}}}
 }
 
