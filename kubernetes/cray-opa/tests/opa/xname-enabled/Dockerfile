@@ -6,7 +6,7 @@ ENV GO111MODULE=on \
     GOOS=linux \
     GOARCH=amd64
 
-COPY tests/opa/xname/run_tests src/run_tests
+COPY tests/opa/xname-enabled/run_tests src/run_tests
 
 RUN cd src/run_tests && go mod download
 RUN cd src/run_tests && go build .

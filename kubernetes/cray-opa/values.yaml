@@ -54,8 +54,11 @@ opa:
   # http.send requests default to 5s timeout. This was failing on a system so
   # increase this to 10s.
   httpTimeout: 10s
-  xnamePolicy: True
   requireHeartbeatToken: False
+  xnamePolicy:
+    enabled: True
+    cfs: True
+    heartbeat: True
 
 # To overide the default policy in files/policy.rego follow the example below
 # NOTE: If the policy changes or is overriden, you MUST do a rolling restart of the

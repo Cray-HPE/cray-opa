@@ -100,7 +100,7 @@ allow {
 }
 
 
-{{- if .Values.opa.xnamePolicy }}
+{{- if .Values.opa.xnamePolicy.enabled }}
 # Validate claims for SPIRE issued JWT tokens with xname support
 allow {
     s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
@@ -143,7 +143,7 @@ parsed_kc_token = {"payload": payload} {
     allowed_issuers[_] = payload.iss
 }
 
-{{- if .Values.opa.xnamePolicy }}
+{{- if .Values.opa.xnamePolicy.enabled }}
 # If the auth type is bearer, decode the JWT
 parsed_spire_token = {"payload": payload, "xname": xname} {
     found_auth.type == "Bearer"
@@ -223,6 +223,7 @@ allowed_methods := {
   ],
   "system-compute": [
     {"method": "PATCH",  "path": `^/apis/cfs/components/.*$`},
+    {"method": "PATCH",  "path": `^/apis/cfs/v./components/.*$`},
 
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
     {"method": "HEAD",  "path": `^/apis/v2/cps/.*$`},
@@ -323,10 +324,17 @@ role_perms = {
     "admin": allowed_methods["admin"],
 }
 
-{{- if .Values.opa.xnamePolicy }}
+{{- if .Values.opa.xnamePolicy.enabled }}
 spire_methods := {
   "cfs": [
+  {{- if .Values.opa.xnamePolicy.cfs }}
     {"method": "PATCH", "path": sprintf("^/apis/cfs/components/%v$", [parsed_spire_token.xname])},
+    {"method": "PATCH", "path": sprintf("^/apis/cfs/v./components/%v$", [parsed_spire_token.xname])},
+  {{- else }}
+    {"method": "PATCH", `^/apis/cfs/components/.*$`},
+    {"method": "PATCH", `^/apis/cfs/v./components/.*$`},
+  {{- end }}
+
   ],
   "system-compute": [
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},

@@ -320,7 +320,10 @@ func main() {
 	values := map[string]interface{}{
 		"Values": map[string]interface{}{
 			"opa": map[string]interface{}{
-				"xnamePolicy": "True",
+				"xnamePolicy": map[string]interface{}{
+					"enabled": "False",
+					"cfs":     "False",
+				},
 			},
 			"jwtValidation": map[string]interface{}{
 				"keycloak": map[string]interface{}{
