@@ -39,7 +39,6 @@ original_path = o_path {
     o_path := http_request.path
 }
 
-<<<<<<< HEAD:kubernetes/cray-opa/templates/_policy-ingressgateway.tpl
 # Whitelist Keycloak, since those services enable users to login and obtain
 # JWTs. Spire endpoint sand vcs are also enabled here. Legacy services to be
 # migrated or removed:
