@@ -1,9 +1,9 @@
 {{- /*
-Copyright 2020 Hewlett Packard Enterprise Development LP
+Copyright 2021 Hewlett Packard Enterprise Development LP
 */ -}}
 {{ define "ingressgateway-hmn.policy" }}
 
-# Istio Ingress Gateway OPA Policy
+# Istio Ingress HMN Gateway OPA Policy
 package istio.authz
 
 import input.attributes.request.http as http_request
@@ -40,17 +40,12 @@ original_path = o_path {
 }
 
 # Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. Spire endpoint sand vcs are also enabled here. Legacy services to be
-# migrated or removed:
-#
-#     * VCS/Gitea
-#
+# JWTs. Spire endpoint sand vcs are also enabled here.
 allow {
     any([
         startswith(original_path, "/keycloak"),
         startswith(original_path, "/vcs"),
         startswith(original_path, "/spire-jwks-"),
-        startswith(original_path, "/spire-bundle"),
     ])
 }
 
@@ -90,7 +85,7 @@ allow {
     ])
 }
 
-# This actually checks the the JWT token passed in
+# This actually checks the JWT token passed in
 # has access to the endpoint requested
 allow {
     roles_for_user[r]
@@ -179,6 +174,8 @@ allowed_methods := {
       {"method": "PATCH", "path": `^/apis/capsules/.*$`}, # All Capsules API Calls - PATCH
       {"method": "POST", "path": `^/apis/capsules/.*$`}, # All Capsules API Calls - POST
       {"method": "PUT", "path": `^/apis/capsules/.*$`}, # All Capsules API Calls - PUT
+      # SMA
+      {"method": "GET", "path": `^/apis/sma-telemetry-api/.*$`}, # All SMA telemetry API Calls - GET
   ],
   "system-pxe": [
 
