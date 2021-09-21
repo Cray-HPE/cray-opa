@@ -61,6 +61,7 @@ func main() {
 
 	policyTemplateFilename := flag.Arg(0)
 	testTemplateFilename := flag.Arg(1)
+	policyTemplateName := flag.Arg(2)
 
 	randomKey := make([]byte, 32)
 	rand.Read(randomKey)
@@ -325,8 +326,9 @@ func main() {
 					"issuers": []string{keycloakIssuer},
 				},
 				"spire": map[string]interface{}{
-					"jwksUri": ts.URL,
-					"issuers": []string{spireIssuer},
+					"jwksUri":     ts.URL,
+					"issuers":     []string{spireIssuer},
+					"trustDomain": "shasta",
 				},
 			},
 		},
@@ -340,7 +342,7 @@ func main() {
 	defer f.Close()
 
 	fmt.Println("Rendering policy template to 'policy.rego'")
-	err = tpl.ExecuteTemplate(f, "cray-opa.policy", values)
+	err = tpl.ExecuteTemplate(f, policyTemplateName, values)
 	if err != nil {
 		log.Fatal(err)
 	}

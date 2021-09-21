@@ -1,9 +1,9 @@
 {{- /*
-Copyright 2020 Hewlett Packard Enterprise Development LP
+Copyright 2021 Hewlett Packard Enterprise Development LP
 */ -}}
-{{ define "cray-opa.policy" }}
+{{ define "ingressgateway-customer-user.policy" }}
 
-# Istio Ingress Gateway OPA Policy
+# Istio Ingress Customer User Gateway OPA Policy
 package istio.authz
 
 import input.attributes.request.http as http_request
@@ -40,16 +40,11 @@ original_path = o_path {
 }
 
 # Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. Legacy services to be migrated or removed:
-#
-#     * VCS/Gitea
-#
+# JWTs. vcs are also enabled here.
 allow {
     any([
         startswith(original_path, "/keycloak"),
         startswith(original_path, "/vcs"),
-        startswith(original_path, "/spire-jwks-"),
-        startswith(original_path, "/spire-bundle"),
     ])
 }
 
@@ -82,29 +77,11 @@ allow {
     ])
 }
 
-# Allow heartbeats without requiring a spire token
-allow {
-    any([
-        startswith(original_path, "/apis/hbtd/hmi/v1/heartbeat")
-    ])
-}
-
-# This actually checks the the JWT token passed in
+# This actually checks the JWT token passed in
 # has access to the endpoint requested
 allow {
     roles_for_user[r]
     required_roles[r]
-}
-
-# Validate claims for SPIRE issued JWT tokens
-allow {
-    # Parse subject
-    s := parsed_spire_token.payload.sub
-
-    # Test subject matches destination
-    perm := sub_match[s][_]
-    perm.method = http_request.method
-    re_match(perm.path, original_path)
 }
 
 # Check if there is an authorization header and split the type from token
@@ -127,20 +104,6 @@ parsed_kc_token = {"payload": payload} {
     allowed_issuers[_] = payload.iss
 }
 
-# If the auth type is bearer, decode the JWT
-parsed_spire_token = {"payload": payload} {
-    found_auth.type == "Bearer"
-    response := http.send({"method": "get", "url": "{{ .Values.jwtValidation.spire.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
-    [valid, header, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "system-compute"})
-
-    # Verify that the issuer is as expected.
-    allowed_issuers := [
-{{- range $key, $value := .Values.jwtValidation.spire.issuers }}
-      "{{ $value }}",
-{{- end }}
-    ]
-    allowed_issuers[_] = payload.iss
-}
 
 # Get the users roles from the JWT token
 roles_for_user[r] {
@@ -180,38 +143,6 @@ allowed_methods := {
       {"method": "PUT", "path": `^/apis/capsules/.*$`}, # All Capsules API Calls - PUT
       # SMA
       {"method": "GET", "path": `^/apis/sma-telemetry-api/.*$`}, # All SMA telemetry API Calls - GET
-  ],
-  "system-pxe": [
-
-   #BSS -> computes need to retrieve boot scripts
-      {"method": "GET",  "path": `^/apis/bss/boot/v1/bootscript.*$`},
-      {"method": "HEAD",  "path": `^/apis/bss/boot/v1/bootscript.*$`},
-  ],
-  "system-compute": [
-    {"method": "PATCH",  "path": `^/apis/cfs/components/.*$`},
-
-    {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
-    {"method": "HEAD",  "path": `^/apis/v2/cps/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/cps/.*$`},
-
-    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
-    #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus
-    {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
-    {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
-    {"method": "PATCH",  "path": `^/apis/smd/hsm/v./State/Components/BulkSoftwareStatus$`},
-    #HMNFD -> subscribe only, cannot create state change notifications
-    {"method": "GET",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
-    {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
-    {"method": "PATCH",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
-    {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
-    {"method": "DELETE",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
-    #HBTD -> allow a compute to send a heartbeat
-    {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
-
-
   ],
   "wlm": [
       # PALS - application launch
@@ -263,14 +194,6 @@ allowed_methods := {
       {"method": "PUT", "path": `^/apis/fc/.*$`},
       {"method": "DELETE", "path": `^/apis/fc/.*$`},
   ],
-  "admin": [
-      {"method": "GET",  "path": `.*`},
-      {"method": "PUT",  "path": `.*`},
-      {"method": "POST",  "path": `.*`},
-      {"method": "DELETE",  "path": `.*`},
-      {"method": "PATCH",  "path": `.*`},
-      {"method": "HEAD",  "path": `.*`},
-  ],
   "ckdump": [
       {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
       {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
@@ -280,36 +203,11 @@ allowed_methods := {
 }
 
 # Our list of endpoints we accept based on roles.
-# The admin roll can make any call.
 role_perms = {
     "user": allowed_methods["user"],
-    "system-pxe": allowed_methods["system-pxe"],
-    "system-compute": allowed_methods["system-compute"],
     "wlm": allowed_methods["wlm"],
-    "admin": allowed_methods["admin"],
     "ckdump": allowed_methods["ckdump"],
 }
 
-# List of endpoints we accept based on audience.
-# From https://connect.us.cray.com/confluence/display/SKERN/Shasta+Compute+SPIRE+Security
-# This is an initial set, not yet expected to be complete.
-sub_match = {
-    "spiffe://shasta/compute/workload/cfs-state-reporter": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://shasta/ncn/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://shasta/compute/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://shasta/ncn/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://shasta/compute/workload/cpsmount": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/cpsmount": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/cpsmount_helper": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/cpsmount_helper": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/dvs-hmi": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/dvs-hmi": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/dvs-map": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/dvs-map": allowed_methods["system-compute"],
-    "spiffe://shasta/compute/workload/orca": allowed_methods["system-compute"],
-    "spiffe://shasta/ncn/workload/orca": allowed_methods["system-compute"]
-}
 
 {{ end }}

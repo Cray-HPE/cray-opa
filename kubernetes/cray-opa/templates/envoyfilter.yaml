@@ -1,3 +1,4 @@
+{{- range $name, $options:= .Values.ingresses }}
 ---
 {{- /*
 This file is adapted from this example:
@@ -11,14 +12,14 @@ The non-obvious adjustments are:
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  name: {{ include "cray-opa.fullname" . }}-ext-authz
+  name: {{ $name }}-ext-authz
   # Note that we NEED this to be the namespace of the ingress pods, which is
   # not the same as the OPA pods
-  namespace: {{ .Values.ingress.namespace }}
+  namespace: {{ $options.namespace }}
 spec:
   workloadSelector:
     labels:
-      {{- range $key, $spec := .Values.ingress.labelSelector }}
+      {{- range $key, $spec := $options.labelSelector }}
       {{ $key }}: {{ $spec }}
       {{- end }}
   configPatches:
@@ -41,8 +42,9 @@ spec:
               code: ServiceUnavailable
             grpc_service:
               google_grpc:
-                target_uri: {{ include "cray-opa.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local.:{{ .Values.opa.port }}
+                target_uri: {{ $name }}.{{ $.Release.Namespace }}.svc.cluster.local.:{{ $.Values.opa.port }}
                 stat_prefix: "ext_authz"
-              {{- if .Values.opa.timeout }}
-              timeout: {{ .Values.opa.timeout }}
+              {{- if $.Values.opa.timeout }}
+              timeout: {{ $.Values.opa.timeout }}
               {{- end }}
+{{- end }}

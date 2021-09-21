@@ -1,0 +1,12 @@
+---
+priorityClassName: ""
+
+opa:
+  replicas: 1
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
+      cpu: "100m"

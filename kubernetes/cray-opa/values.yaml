@@ -1,16 +1,29 @@
-
-imagesHost: ""
+---
 image: openpolicyagent/opa
 imageTag: 0.24.0-envoy-1  # When changing this, also update files/Dockerfile.
 imagePullPolicy: IfNotPresent
 priorityClassName: csm-high-priority-service
 
-ingress:
-  # namespace of the ingress containers
-  # this will likely be different than the OPA namespace
-  namespace: istio-system
-  labelSelector:
-    istio: ingressgateway
+ingresses:
+  ingressgateway:
+    # namespace of the ingress containers
+    # this will likely be different than the OPA namespace
+    namespace: istio-system
+    labelSelector:
+      istio: ingressgateway
+  ingressgateway-customer-admin:
+    namespace: istio-system
+    labelSelector:
+      istio: ingressgateway-customer-admin
+  ingressgateway-customer-user:
+    namespace: istio-system
+    labelSelector:
+      istio: ingressgateway-customer-user
+  ingressgateway-hmn:
+    namespace: istio-system
+    labelSelector:
+      istio: ingressgateway-hmn
+
 
 opa:
   replicas: 3
@@ -55,17 +68,7 @@ opa:
 
 # Run each opa pod on a separate worker when possible
 affinity:
-  podAntiAffinity:
-     preferredDuringSchedulingIgnoredDuringExecution:
-     - weight: 1
-       podAffinityTerm:
-         labelSelector:
-           matchExpressions:
-           - key: app.kubernetes.io/name
-             operator: In
-             values:
-             - cray-opa
-         topologyKey: kubernetes.io/hostname
+  default: true
 
 jwtValidation:
   keycloak:
@@ -86,3 +89,4 @@ jwtValidation:
     jwksUri: "https://istio-ingressgateway.istio-system.svc.cluster.local./spire-jwks-vshastaio/keys"
     issuers:
       vshasta.io: "http://spire.local/shasta/vshastaio"
+    trustDomain: shasta
