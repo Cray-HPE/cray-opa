@@ -161,7 +161,6 @@ parsed_spire_token = {"payload": payload, "xname": xname} {
     xname := regex.split("/", payload.sub)[4]
 }
 {{- else }}
-trace("break")
 # If the auth type is bearer, decode the JWT
 parsed_spire_token = {"payload": payload} {
     found_auth.type == "Bearer"
@@ -336,10 +335,12 @@ spire_methods := {
   {{- end }}
 
   ],
-  "system-compute": [
+  "cps": [
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
     {"method": "HEAD", "path": `^/apis/v2/cps/.*$`},
     {"method": "POST", "path": `^/apis/v2/cps/.*$`},
+  ], 
+  "dvs": [
 
     {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
     {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
@@ -375,16 +376,16 @@ sub_match = {
     "spiffe://shasta/ncn/XNAME/workload/ckdump": spire_methods["ckdump"],
     "spiffe://shasta/compute/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
     "spiffe://shasta/ncn/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
-    "spiffe://shasta/compute/XNAME/workload/cpsmount": spire_methods["system-compute"],
-    "spiffe://shasta/ncn/XNAME/workload/cpsmount": spire_methods["system-compute"],
-    "spiffe://shasta/compute/XNAME/workload/cpsmount_helper": spire_methods["system-compute"],
-    "spiffe://shasta/ncn/XNAME/workload/cpsmount_helper": spire_methods["system-compute"],
-    "spiffe://shasta/compute/XNAME/workload/dvs-hmi": spire_methods["system-compute"],
-    "spiffe://shasta/ncn/XNAME/workload/dvs-hmi": spire_methods["system-compute"],
-    "spiffe://shasta/compute/XNAME/workload/dvs-map": spire_methods["system-compute"],
-    "spiffe://shasta/ncn/XNAME/workload/dvs-map": spire_methods["system-compute"],
-    "spiffe://shasta/compute/XNAME/workload/orca": spire_methods["system-compute"],
-    "spiffe://shasta/ncn/XNAME/workload/orca": spire_methods["system-compute"],
+    "spiffe://shasta/compute/XNAME/workload/cpsmount": spire_methods["cps"],
+    "spiffe://shasta/ncn/XNAME/workload/cpsmount": spire_methods["cps"],
+    "spiffe://shasta/compute/XNAME/workload/cpsmount_helper": spire_methods["cps"],
+    "spiffe://shasta/ncn/XNAME/workload/cpsmount_helper": spire_methods["cps"],
+    "spiffe://shasta/compute/XNAME/workload/dvs-hmi": spire_methods["dvs"],
+    "spiffe://shasta/ncn/XNAME/workload/dvs-hmi": spire_methods["dvs"],
+    "spiffe://shasta/compute/XNAME/workload/dvs-map": spire_methods["dvs"],
+    "spiffe://shasta/ncn/XNAME/workload/dvs-map": spire_methods["dvs"],
+    "spiffe://shasta/compute/XNAME/workload/orca": spire_methods["dvs"],
+    "spiffe://shasta/ncn/XNAME/workload/orca": spire_methods["dvs"],
     "spiffe://shasta/compute/XNAME/workload/heartbeat": spire_methods["heartbeat"],
     "spiffe://shasta/ncn/XNAME/workload/heartbeat": spire_methods["heartbeat"]
 }

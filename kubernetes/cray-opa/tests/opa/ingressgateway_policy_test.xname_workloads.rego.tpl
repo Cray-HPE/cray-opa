@@ -199,11 +199,9 @@ test_unauth_role {
 
 # SPIRE Tests
 
+
 spire_correct_ncn_sub(sub) {
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
@@ -233,10 +231,6 @@ spire_correct_ncn_sub(sub) {
 
 
 spire_correct_compute_sub(sub) {
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
@@ -276,16 +270,12 @@ spire_incorrect_xname_sub(sub) {
 }
 
 test_spire_ncn_subs {
-  spire_correct_ncn_sub("Bearer {{ .spire.ncn.cpsmount }}")
-  spire_correct_ncn_sub("Bearer {{ .spire.ncn.cpsmount_helper }}")
   spire_correct_ncn_sub("Bearer {{ .spire.ncn.dvs_hmi }}")
   spire_correct_ncn_sub("Bearer {{ .spire.ncn.dvs_map }}")
   spire_correct_ncn_sub("Bearer {{ .spire.ncn.orca }}")
 }
 
 test_spire_compute_subs {
-  spire_correct_compute_sub("Bearer {{ .spire.compute.cpsmount }}")
-  spire_correct_compute_sub("Bearer {{ .spire.compute.cpsmount_helper }}")
   spire_correct_compute_sub("Bearer {{ .spire.compute.dvs_hmi }}")
   spire_correct_compute_sub("Bearer {{ .spire.compute.dvs_map }}")
   spire_correct_compute_sub("Bearer {{ .spire.compute.orca }}")
@@ -309,6 +299,27 @@ test_deny_different_xname {
   spire_incorrect_xname_sub("Bearer {{ .spire.compute.dvs_hmi }}")
   spire_incorrect_xname_sub("Bearer {{ .spire.compute.dvs_map }}")
   spire_incorrect_xname_sub("Bearer {{ .spire.compute.orca }}")
+}
+
+spire_cps(spire_sub) {
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
+}
+
+test_spire_cps {
+  spire_cps("Bearer {{ .spire.compute.cpsmount }}")
+  spire_cps("Bearer {{ .spire.compute.cpsmount_helper }}")
+  spire_cps("Bearer {{ .spire.ncn.cpsmount_helper }}")
+  spire_cps("Bearer {{ .spire.ncn.cpsmount_helper }}")
 }
 
 spire_ckdump(spire_sub) {
