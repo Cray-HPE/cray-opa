@@ -321,9 +321,12 @@ func main() {
 		"Values": map[string]interface{}{
 			"opa": map[string]interface{}{
 				"xnamePolicy": map[string]interface{}{
-					"enabled": "True",
-					"cfs":     "True",
+					"enabled":    "True",
+					"cfs":        "True",
+          "dvs":       "True",
+          "heartbeat": "True",
 				},
+        "requireHeartbeatToken": "True",
 			},
 			"jwtValidation": map[string]interface{}{
 				"keycloak": map[string]interface{}{

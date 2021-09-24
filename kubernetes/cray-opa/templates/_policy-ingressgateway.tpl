@@ -39,6 +39,10 @@ original_path = o_path {
     o_path := http_request.path
 }
 
+original_body = o_path {
+    o_path := http_request.body
+}
+
 # Whitelist Keycloak, since those services enable users to login and obtain
 # JWTs. Spire endpoint sand vcs are also enabled here. Legacy services to be
 # migrated or removed:
@@ -105,11 +109,51 @@ allow {
 allow {
     s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
 
+    trace(http_request.path)
     # Test subject matches destination
     perm := sub_match[s][_]
     perm.method = http_request.method
     re_match(perm.path, original_path)
 }
+
+# Parse POST requests with xnames
+allow {
+    s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
+    perm := sub_match_dvs[s][_]
+    perm.method = http_request.method
+
+    any([
+      all([
+        re_match(`^/apis/v2/nmd/dumps$`, original_path),
+        {{- if .Values.opa.xnamePolicy.dvs }}
+        re_match(sprintf("\"xname\":[ ]*[[ ]*\"%v\" ]", [parsed_spire_token.xname]), lower(http_request.body)),
+        {{- end }}
+      ]),
+      all([
+        re_match(`^/apis/hmnfd/hmi/v1/subscribe$`, original_path),
+        {{- if .Values.opa.xnamePolicy.dvs }}
+        re_match(sprintf("\"subscriber\": \"[a-z0-9]*@%v\"", [parsed_spire_token.xname]), lower(http_request.body))
+        {{- end }}
+      ]),
+    ])
+}
+
+{{- if .Values.opa.requireHeartbeatToken }}
+# Parse heartbeat token
+allow {
+    s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
+
+    # Test subject matches destination
+    perm := sub_match_heartbeat[s][_]
+    perm.method = http_request.method
+    re_match(perm.path, original_path)
+    {{- if .Values.opa.xnamePolicy.heartbeat }}
+    re_match(sprintf("\"component\": \"%v\"", [parsed_spire_token.xname]), lower(http_request.body))
+    {{- end }}
+}
+{{- end }}
+
+
 {{- else }}
 # Validate claims for SPIRE issued JWT tokens
 allow {
@@ -342,22 +386,37 @@ spire_methods := {
   ], 
   "dvs": [
 
-    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST", "path": `^/apis/v2/nmd/.*$`},
+    {{- if .Values.opa.xnamePolicy.dvs }}
+    {"method": "GET", "path": sprintf("^/apis/v2/nmd/status/%v$", [parsed_spire_token.xname])},
+    {"method": "PUT", "path": sprintf("^/apis/v2/nmd/status/%v$", [parsed_spire_token.xname])},
+    {"method": "GET", "path": `^/apis/v2/nmd/sdf/dump/discovery$`},
+    {"method": "GET", "path": `^/apis/v2/nmd/sdf/dump/targets`},
+    {"method": "GET", "path": `^/apis/v2/nmd/status$`},
+    {"method": "GET", "path": `^/apis/v2/nmd/healthz/live$`},
+    {"method": "GET", "path": `^/apis/v2/nmd/healthz/ready$`},
+    {"method": "GET", "path": `^/apis/v2/nmd/dumps/`},
+    {"method": "GET", "path": sprintf("^/apis/v2/nmd/dumps\\?xname=%v$", [parsed_spire_token.xname])},
+    {{- else }}
+    {"method": "POST", "path": `^/apis/v2/nmd/dumps$`},
     {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+    {{- end }}
+    {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
+
+    {"method": "POST", "path": `^/apis/v2/nmd/artifacts$`},
+
     #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus
     {"method": "GET",   "path": `^/apis/smd/hsm/v./.*$`},
     {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
     {"method": "PATCH", "path": `^/apis/smd/hsm/v./State/Components/BulkSoftwareStatus$`},
     {"method": "PATCH", "path": sprintf("^/apis/smd/hsm/v./State/Components/%v/SoftwareStatus$", [parsed_spire_token.xname])},
+
     #HMNFD -> subscribe only, cannot create state change notifications
     {"method": "GET",   "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
     {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
     {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
-    {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "DELETE","path": `^/apis/hmnfd/hmi/v1/subscribe$`},
-    #HBTD -> allow a compute to send a heartbeat
   ],
   "ckdump": [
       {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
@@ -365,9 +424,11 @@ spire_methods := {
       {"method": "POST", "path": `^/apis/v2/nmd/.*$`},
       {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
   ],
+  {{- if not .Values.opa.requireHeartbeatToken }}
   "heartbeat": [
-    {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
+     {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
   ]
+  {{- end }}
 }
 sub_match = {
     "spiffe://shasta/compute/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
@@ -386,8 +447,25 @@ sub_match = {
     "spiffe://shasta/ncn/XNAME/workload/dvs-map": spire_methods["dvs"],
     "spiffe://shasta/compute/XNAME/workload/orca": spire_methods["dvs"],
     "spiffe://shasta/ncn/XNAME/workload/orca": spire_methods["dvs"],
+    {{- if not .Values.opa.requireHeartbeatToken }}
     "spiffe://shasta/compute/XNAME/workload/heartbeat": spire_methods["heartbeat"],
     "spiffe://shasta/ncn/XNAME/workload/heartbeat": spire_methods["heartbeat"]
+    {{- end }}
+}
+sub_match_dvs = {
+    "spiffe://shasta/compute/XNAME/workload/dvs-hmi": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
+    "spiffe://shasta/ncn/XNAME/workload/dvs-hmi": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
+    "spiffe://shasta/compute/XNAME/workload/dvs-map": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
+    "spiffe://shasta/ncn/XNAME/workload/dvs-map": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
+    "spiffe://shasta/compute/XNAME/workload/orca": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
+    "spiffe://shasta/ncn/XNAME/workload/orca": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}]
+}
+
+sub_match_heartbeat = {
+    "spiffe://shasta/compute/XNAME/workload/heartbeat": [
+       {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`}],
+    "spiffe://shasta/ncn/XNAME/workload/heartbeat": [
+       {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`}],
 }
 {{- else }}
 # List of endpoints we accept based on audience.

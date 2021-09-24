@@ -55,10 +55,13 @@ opa:
   # increase this to 10s.
   httpTimeout: 10s
   requireHeartbeatToken: False
+  logPost: False
   xnamePolicy:
-    enabled: True
-    cfs: True
-    heartbeat: True
+    enabled: False
+    cfs: False
+    # dvs needs logPost to be true in order to function properly
+    dvs: False
+    heartbeat: False
 
 # To overide the default policy in files/policy.rego follow the example below
 # NOTE: If the policy changes or is overriden, you MUST do a rolling restart of the
