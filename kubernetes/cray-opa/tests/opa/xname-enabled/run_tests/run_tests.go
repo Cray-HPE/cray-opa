@@ -61,6 +61,7 @@ func main() {
 
 	policyTemplateFilename := flag.Arg(0)
 	testTemplateFilename := flag.Arg(1)
+	policyTemplateName := flag.Arg(2)
 
 	randomKey := make([]byte, 32)
 	rand.Read(randomKey)
@@ -350,7 +351,7 @@ func main() {
 	defer f.Close()
 
 	fmt.Println("Rendering policy template to 'policy.rego'")
-	err = tpl.ExecuteTemplate(f, "ingressgateway.policy", values)
+	err = tpl.ExecuteTemplate(f, policyTemplateName, values)
 	if err != nil {
 		log.Fatal(err)
 	}
