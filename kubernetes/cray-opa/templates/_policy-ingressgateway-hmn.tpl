@@ -124,15 +124,24 @@ allow {
 
     any([
       all([
-        re_match(`^/apis/v2/nmd/dumps$`, original_path),
-        {{- if .Values.opa.xnamePolicy.dvs }}
-        re_match(sprintf("\"xname\":[ ]*[[ ]*\"%v\" ]", [parsed_spire_token.xname]), lower(http_request.body)),
-        {{- end }}
-      ]),
-      all([
         re_match(`^/apis/hmnfd/hmi/v1/subscribe$`, original_path),
         {{- if .Values.opa.xnamePolicy.dvs }}
         re_match(sprintf("\"subscriber\": \"[a-z0-9]*@%v\"", [parsed_spire_token.xname]), lower(http_request.body))
+        {{- end }}
+      ]),
+    ])
+}
+
+allow {
+    s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
+    perm := sub_match_ckdump[s][_]
+    perm.method = http_request.method
+
+    any([
+      all([
+        re_match(`^/apis/v2/nmd/dumps$`, original_path),
+        {{- if .Values.opa.xnamePolicy.ckdump }}
+        re_match(sprintf("\"xname\":[ ]*[[ ]*\"%v\" ]", [parsed_spire_token.xname]), lower(http_request.body)),
         {{- end }}
       ]),
     ])
@@ -394,8 +403,6 @@ spire_methods := {
     {"method": "GET", "path": `^/apis/v2/nmd/status$`},
     {"method": "GET", "path": `^/apis/v2/nmd/healthz/live$`},
     {"method": "GET", "path": `^/apis/v2/nmd/healthz/ready$`},
-    {"method": "GET", "path": `^/apis/v2/nmd/dumps/`},
-    {"method": "GET", "path": sprintf("^/apis/v2/nmd/dumps\\?xname=%v$", [parsed_spire_token.xname])},
     {{- else }}
     {"method": "POST", "path": `^/apis/v2/nmd/dumps$`},
     {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
@@ -403,7 +410,6 @@ spire_methods := {
     {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {{- end }}
     {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
-
     {"method": "POST", "path": `^/apis/v2/nmd/artifacts$`},
 
     #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus
@@ -419,10 +425,15 @@ spire_methods := {
     {"method": "DELETE","path": `^/apis/hmnfd/hmi/v1/subscribe$`},
   ],
   "ckdump": [
+    {{- if .Values.opa.xnamePolicy.dvs }}
+      {"method": "GET", "path": sprintf("^/apis/v2/nmd/dumps\\?xname=%v$", [parsed_spire_token.xname])},
+      {"method": "GET", "path": `^/apis/v2/nmd/dumps/.*$`},
+      {"method": "GET", "path": `^/apis/v2/nmd/sdf/dump/.*$`},
+      {"method": "PUT", "path": sprintf("^/apis/v2/nmd/status/%v$", [parsed_spire_token.xname])},
+    {{- else }}
       {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
+    {{- end }}
       {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
-      {"method": "POST", "path": `^/apis/v2/nmd/.*$`},
-      {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
   ],
   {{- if not .Values.opa.requireHeartbeatToken }}
   "heartbeat": [
@@ -459,6 +470,13 @@ sub_match_dvs = {
     "spiffe://shasta/ncn/XNAME/workload/dvs-map": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
     "spiffe://shasta/compute/XNAME/workload/orca": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
     "spiffe://shasta/ncn/XNAME/workload/orca": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}]
+}
+
+sub_match_ckdump = {
+    "spiffe://shasta/compute/XNAME/workload/ckdump": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
+    "spiffe://shasta/ncn/XNAME/workload/ckdump": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
+    "spiffe://shasta/compute/XNAME/workload/ckdump_helper": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
+    "spiffe://shasta/ncn/XNAME/workload/ckdump_helper": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
 }
 
 sub_match_heartbeat = {
