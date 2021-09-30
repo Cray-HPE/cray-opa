@@ -80,7 +80,7 @@ allow {
     ])
 }
 
-# This actually checks the the JWT token passed in
+# This actually checks the JWT token passed in
 # has access to the endpoint requested
 allow {
     roles_for_user[r]
