@@ -10,10 +10,10 @@ lint: helmlint eval
 test-opa: test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn test-ingressgateway-xname-enabled test-ingressgateway-xname-disabled test-ingressgateway-hmn-xname-enabled test-ingressgateway-hmn-xname-disabled 
 
 eval:
-	helm kubeval
+	helm kubeval -n opa cray-opa . --ignore-missing-schemas
 
 helmlint:
-	helm kubeval -n opa cray-opa . --ignore-missing-schemas
+	helm lint
 
 cray-opa-test:
 	docker build -f tests/opa/Dockerfile --tag cray-opa-test .
