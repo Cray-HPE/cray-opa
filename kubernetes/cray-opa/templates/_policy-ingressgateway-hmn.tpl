@@ -3,7 +3,7 @@ Copyright 2021 Hewlett Packard Enterprise Development LP
 */ -}}
 {{ define "ingressgateway-hmn.policy" }}
 
-# Istio Ingress Gateway OPA Policy
+# Istio Ingress HMN Gateway OPA Policy
 package istio.authz
 
 import input.attributes.request.http as http_request
@@ -44,7 +44,7 @@ original_body = o_path {
 }
 
 # Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. Spire endpoint sand vcs are also enabled here. Legacy services to be
+# JWTs. Spire endpoints and vcs are also enabled here. Legacy services to be
 # migrated or removed:
 #
 #     * VCS/Gitea

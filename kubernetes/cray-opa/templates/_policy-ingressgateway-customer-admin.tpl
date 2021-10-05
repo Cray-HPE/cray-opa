@@ -40,7 +40,7 @@ original_path = o_path {
 }
 
 # Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. vcs isalso enabled here. Legacy services to be migrated or removed:
+# JWTs. vcs is also enabled here. Legacy services to be migrated or removed:
 #
 #     * VCS/Gitea
 #
