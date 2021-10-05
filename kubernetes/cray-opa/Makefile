@@ -1,26 +1,19 @@
 current_dir := $(shell pwd)
 tmp_dir := $(shell mktemp -d)
 
-.SILENT: helmlint eval test unittest test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn cray-opa-test
-.PHONY: helmlint eval test unittest test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn cray-opa-test
+.SILENT: helmlint eval test test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn test-ingressgateway-xname-enabled test-ingressgateway-xname-disabled test-ingressgateway-hmn-xname-enabled test-ingressgateway-hmn-xname-disabled 
+.PHONY: helmlint eval test test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn test-ingressgateway-xname-enabled test-ingressgateway-xname-disabled test-ingressgateway-hmn-xname-enabled test-ingressgateway-hmn-xname-disabled 
 
-all: helmlint eval unittest test test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn test-ingressgateway-xname-enabled test-ingressgateway-xname-disabled test-ingressgateway-hmn-xname-enabled test-ingressgateway-hmn-xname-disabled 
+all: helmlint eval test test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn test-ingressgateway-xname-enabled test-ingressgateway-xname-disabled test-ingressgateway-hmn-xname-enabled test-ingressgateway-hmn-xname-disabled 
 
-lint: helmlint eval unittest
+lint: helmlint eval 
 test-opa: test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-hmn test-ingressgateway-xname-enabled test-ingressgateway-xname-disabled test-ingressgateway-hmn-xname-enabled test-ingressgateway-hmn-xname-disabled 
 
 eval:
-	helm template -n opa cray-opa . > $(tmp_dir)/chart.yaml
-	docker run -it -v $(tmp_dir):/chart garethr/kubeval:latest --ignore-missing-schemas /chart/chart.yaml
-
-yamllint:
-	docker run -it -v $(current_dir):/chart quay.io/helmpack/chart-testing:latest yamllint -c /etc/ct/lintconf.yaml /chart
-
-yamale:
-	docker run -it -v $(current_dir):/chart quay.io/helmpack/chart-testing:latest yamale -s /etc/ct/chart_schema.yaml /chart
+	helm kubeval
 
 helmlint:
-	helm lint
+	helm kubeval -n opa cray-opa . --ignore-missing-schemas
 
 cray-opa-test:
 	docker build -f tests/opa/Dockerfile --tag cray-opa-test .
