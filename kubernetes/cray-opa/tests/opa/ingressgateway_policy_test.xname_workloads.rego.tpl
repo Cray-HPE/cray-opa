@@ -16,7 +16,7 @@ test_allow_bypassed_urls_with_no_auth_header {
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/spire-jwks-test/"}}}}
 }
 
-test_deny_tokens_endpoint {
+test_deny_tokens_api {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/apis/tokens"}}}}
 }
 
@@ -61,13 +61,17 @@ test_pxe {
 compute_auth = "Bearer {{ .computeToken }}"
 
 cfs_mock_path = "/apis/cfs/components/mock"
+cfs_ncn_mock_path = "/apis/cfs/components/ncnw001"
+cfs_compute_mock_path = "/apis/cfs/components/x1"
 cps_mock_path = "/apis/v2/cps/mock"
 hbtb_heartbeat_path = "/apis/hbtd/hmi/v1/heartbeat"
-nmd_mock_path = "/apis/v2/nmd/mock"
+nmd_mock_path = "/apis/v2/nmd/status"
 smd_statecomponents_path = "/apis/smd/hsm/v2/State/Components"
+smd_softwarestatus_compute_path = "/apis/smd/hsm/v./State/Components/x1/SoftwareStatus"
+smd_softwarestatus_ncn_path = "/apis/smd/hsm/v./State/Components/ncnw001/SoftwareStatus"
+smd_softwarestatus_invalid_path = "/apis/smd/hsm/v./State/Components/invalid/SoftwareStatus"
 hmnfd_subscribe_path = "/apis/hmnfd/hmi/v1/subscribe"
 hmnfd_subscriptions_path = "/apis/hmnfd/hmi/v1/subscriptions"
-
 pals_mock_path = "/apis/pals/v1/mock"
 
 test_compute {
@@ -93,13 +97,15 @@ test_compute {
 
   # NMD - Allowed
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/nmd/status", "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/live", "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/ready", "headers": {"authorization": compute_auth}}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": compute_auth}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": nmd_mock_path, "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/dumps", "headers": {"authorization": compute_auth}, "data": "{ \"xname\": [ \"x1\" ], \"dumplevel\": 32 }"}}}}
 
   # NMD - Not Allowed
 
@@ -195,27 +201,80 @@ test_unauth_role {
 
 # SPIRE Tests
 
-spire_correct_sub(sub) {
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+spire_correct_ncn_sub(sub) {
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+  # NMD - Allowed
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status/ncnw001", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/ncnw001", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/live", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/ready", "headers": {"authorization": sub}}}}}
+
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
 
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": smd_softwarestatus_ncn_path, "headers": {"authorization": sub}}}}}
+
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@ncnw001\"}"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
+
+
+  # Validate that we're not allowing any method with a valid aud through
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_ncn_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": cfs_ncn_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_ncn_mock_path, "headers": {"authorization": sub}}}}}
+
+  # Validate that only CFS can access
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_ncn_mock_path, "headers": {"authorization": sub}}}}}
+}
+
+
+spire_correct_compute_sub(sub) {
+
+  # NMD - Allowed
+
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/live", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/ready", "headers": {"authorization": sub}}}}}
+
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
+
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": smd_softwarestatus_compute_path, "headers": {"authorization": sub}}}}}
+
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@x1\"}"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
+
+  # Validate that we're not allowing any method with a valid aud through
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_compute_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": cfs_compute_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_compute_mock_path, "headers": {"authorization": sub}}}}}
+
+  # Validate that only CFS can access
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_compute_mock_path, "headers": {"authorization": sub}}}}}
+}
+
+spire_incorrect_xname_sub(sub) {
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": smd_softwarestatus_invalid_path, "headers": {"authorization": sub}}}}}
 
   # Validate that we're not allowing any method with a valid aud through
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
@@ -223,41 +282,113 @@ spire_correct_sub(sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
 }
 
-test_spire_subs {
-  spire_correct_sub("Bearer {{ .spire.ncn.cfs_state_reporter }}")
-  spire_correct_sub("Bearer {{ .spire.ncn.cpsmount }}")
-  spire_correct_sub("Bearer {{ .spire.ncn.cpsmount_helper }}")
-  spire_correct_sub("Bearer {{ .spire.ncn.dvs_hmi }}")
-  spire_correct_sub("Bearer {{ .spire.ncn.dvs_map }}")
-  spire_correct_sub("Bearer {{ .spire.ncn.orca }}")
-  spire_correct_sub("Bearer {{ .spire.compute.cfs_state_reporter }}")
-  spire_correct_sub("Bearer {{ .spire.compute.cpsmount }}")
-  spire_correct_sub("Bearer {{ .spire.compute.cpsmount_helper }}")
-  spire_correct_sub("Bearer {{ .spire.compute.dvs_hmi }}")
-  spire_correct_sub("Bearer {{ .spire.compute.dvs_map }}")
-  spire_correct_sub("Bearer {{ .spire.compute.orca }}")
+test_spire_ncn_subs {
+  spire_correct_ncn_sub("Bearer {{ .spire.ncn.dvs_hmi }}")
+  spire_correct_ncn_sub("Bearer {{ .spire.ncn.dvs_map }}")
+  spire_correct_ncn_sub("Bearer {{ .spire.ncn.orca }}")
 }
 
-spire_ckdump(spire_sub) {
+test_spire_compute_subs {
+  spire_correct_compute_sub("Bearer {{ .spire.compute.dvs_hmi }}")
+  spire_correct_compute_sub("Bearer {{ .spire.compute.dvs_map }}")
+  spire_correct_compute_sub("Bearer {{ .spire.compute.orca }}")
+}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
+test_spire_heartbeat {
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": "Bearer {{ .spire.compute.heartbeat }}"}, "body": "{\"Component\": \"x1\",\"Hostname\": \"compute1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": "Bearer {{ .spire.ncn.heartbeat }}"}, "body": "{\"Component\": \"ncnw001\",\"Hostname\": \"ncn1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}}
+}
+
+test_spire_cfs {
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_ncn_mock_path, "headers": {"authorization": "Bearer {{ .spire.ncn.cfs_state_reporter }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_compute_mock_path, "headers": {"authorization": "Bearer {{ .spire.compute.cfs_state_reporter }}" }}}}}
+}
+
+test_deny_different_xname {
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.cfs_state_reporter }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.cpsmount }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.cpsmount_helper }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.dvs_hmi }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.dvs_map }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.ncn.orca }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.cfs_state_reporter }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.cpsmount }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.cpsmount_helper }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.dvs_hmi }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.dvs_map }}")
+  spire_incorrect_xname_sub("Bearer {{ .spire.compute.orca }}")
+}
+
+spire_cps(spire_sub) {
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
-
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
 }
 
-test_spire_ckdump {
-  spire_ckdump("Bearer {{ .spire.compute.ckdump }}")
-  spire_ckdump("Bearer {{ .spire.ncn.ckdump }}")
-  spire_ckdump("Bearer {{ .spire.compute.ckdump_helper }}")
-  spire_ckdump("Bearer {{ .spire.ncn.ckdump_helper }}")
+test_spire_cps {
+  spire_cps("Bearer {{ .spire.compute.cpsmount }}")
+  spire_cps("Bearer {{ .spire.compute.cpsmount_helper }}")
+  spire_cps("Bearer {{ .spire.ncn.cpsmount_helper }}")
+  spire_cps("Bearer {{ .spire.ncn.cpsmount_helper }}")
+}
+
+spire_ckdump_compute(sub) {
+
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/discovery", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/targets", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/dumps?xname=x1", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/dumps", "headers": {"authorization": sub}, "body": "{ \"xname\": [ \"x1\" ] }"}}}}
+
+ # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+ # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+ # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+}
+
+
+spire_ckdump_ncn(sub) {
+
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/discovery", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/targets", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/dumps?xname=ncnw001", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/dumps", "headers": {"authorization": sub}, "body": "{ \"xname\": [ \"ncnw001\" ] }"}}}}
+
+ # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+ # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+ # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+}
+
+test_spire_ckdump_compute {
+  spire_ckdump_compute("Bearer {{ .spire.compute.ckdump }}")
+  spire_ckdump_compute("Bearer {{ .spire.compute.ckdump_helper }}")
+}
+
+test_spire_ckdump_ncn {
+  spire_ckdump_ncn("Bearer {{ .spire.ncn.ckdump }}")
+  spire_ckdump_ncn("Bearer {{ .spire.ncn.ckdump_helper }}")
 }
 
 test_spire_invalid_sub {

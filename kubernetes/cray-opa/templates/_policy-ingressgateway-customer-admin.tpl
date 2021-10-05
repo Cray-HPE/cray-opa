@@ -40,7 +40,10 @@ original_path = o_path {
 }
 
 # Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. vcs is also enabled here.
+# JWTs. vcs is also enabled here. Legacy services to be migrated or removed:
+#
+#     * VCS/Gitea
+#
 allow {
     any([
         startswith(original_path, "/keycloak"),
