@@ -44,7 +44,7 @@ original_body = o_path {
 }
 
 # Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. Spire endpoint sand vcs are also enabled here. Legacy services to be
+# JWTs. Spire endpoints and vcs are also enabled here. Legacy services to be
 # migrated or removed:
 #
 #     * VCS/Gitea
@@ -109,7 +109,6 @@ allow {
 allow {
     s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
 
-    trace(http_request.path)
     # Test subject matches destination
     perm := sub_match[s][_]
     perm.method = http_request.method

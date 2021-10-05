@@ -3,7 +3,7 @@ Copyright 2021 Hewlett Packard Enterprise Development LP
 */ -}}
 {{ define "ingressgateway-customer-admin.policy" }}
 
-# Istio Ingress Gateway OPA Policy
+# Istio Ingress Customer Admin Gateway OPA Policy
 package istio.authz
 
 import input.attributes.request.http as http_request

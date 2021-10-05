@@ -109,7 +109,6 @@ allow {
 allow {
     s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
 
-    trace(http_request.path)
     # Test subject matches destination
     perm := sub_match[s][_]
     perm.method = http_request.method
