@@ -143,6 +143,8 @@ allowed_methods := {
       {"method": "PATCH", "path": `^/apis/capsules/.*$`}, # All Capsules API Calls - PATCH
       {"method": "POST", "path": `^/apis/capsules/.*$`}, # All Capsules API Calls - POST
       {"method": "PUT", "path": `^/apis/capsules/.*$`}, # All Capsules API Calls - PUT
+      # SMA
+      {"method": "GET", "path": `^/apis/sma-telemetry-api/.*$`}, # All SMA telemetry API Calls - GET
   ],
   "wlm": [
       # PALS - application launch
