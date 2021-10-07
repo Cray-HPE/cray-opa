@@ -25,6 +25,7 @@ test:
 
 test-ingressgateway:
 	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.rego.tpl ingressgateway.policy
+	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_xforward_test.rego.tpl ingressgateway.policy
 
 test-ingressgateway-xname-enabled:
 	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test-xname-enabled /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.xname_workloads.rego.tpl ingressgateway.policy
@@ -35,9 +36,11 @@ test-ingressgateway-xname-disabled:
 
 test-ingressgateway-customer-admin:
 	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-admin.tpl /mnt/tests/opa/ingressgateway-customer-admin_policy_test.rego.tpl ingressgateway-customer-admin.policy
+	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-admin.tpl /mnt/tests/opa/ingressgateway-customer-admin_policy_xforward_test.rego.tpl ingressgateway-customer-admin.policy
 
 test-ingressgateway-customer-user:
 	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-user.tpl /mnt/tests/opa/ingressgateway-customer-user_policy_test.rego.tpl ingressgateway-customer-user.policy
+	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-user.tpl /mnt/tests/opa/ingressgateway-customer-user_policy_xforward_test.rego.tpl ingressgateway-customer-user.policy
 
 test-ingressgateway-hmn-xname-enabled:
 	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test-xname-enabled /mnt/templates/_policy-ingressgateway-hmn.tpl /mnt/tests/opa/ingressgateway_policy_test.xname_workloads.rego.tpl ingressgateway-hmn.policy
