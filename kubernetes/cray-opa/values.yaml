@@ -55,14 +55,14 @@ opa:
   # increase this to 10s.
   httpTimeout: 10s
   requireHeartbeatToken: False
-  logPost: True
+  logPost: False
   xnamePolicy:
     enabled: True
     cfs: True
     heartbeat: False
     # ckdump and dvs needs logPost to be true in order to function properly
-    ckdump: True
-    dvs: True
+    ckdump: False
+    dvs: False
 
 # To overide the default policy in files/policy.rego follow the example below
 # NOTE: If the policy changes or is overriden, you MUST do a rolling restart of the
