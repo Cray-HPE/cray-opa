@@ -12,7 +12,8 @@ RUN cd src/run_tests && go mod download
 RUN cd src/run_tests && go build .
 RUN ls src/run_tests
 
-FROM arti.dev.cray.com/third-party-docker-stable-local/openpolicyagent/opa:0.24.0-envoy-1
+#FROM arti.dev.cray.com/third-party-docker-stable-local/openpolicyagent/opa:0.33.1-envoy-4
+FROM openpolicyagent/opa:0.33.1-envoy-4
 
 COPY --from=builder /go/src/run_tests/run_tests .
 COPY tests/opa/certificate_authority.crt /jwtValidationFetchTls/certificate_authority.crt

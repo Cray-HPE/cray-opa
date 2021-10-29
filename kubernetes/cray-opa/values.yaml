@@ -1,6 +1,6 @@
 ---
 image: openpolicyagent/opa
-imageTag: 0.24.0-envoy-1  # When changing this, also update files/Dockerfile.
+imageTag: 0.33.1-envoy-4  # When changing this, also update files/Dockerfile.
 imagePullPolicy: IfNotPresent
 priorityClassName: csm-high-priority-service
 
