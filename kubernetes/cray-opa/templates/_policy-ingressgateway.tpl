@@ -131,20 +131,6 @@ allow {
     ])
 }
 
-allow {
-    s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
-    perm := sub_match_ckdump[s][_]
-    perm.method = http_request.method
-
-    any([
-      all([
-        re_match(`^/apis/v2/nmd/dumps$`, original_path),
-        {{- if .Values.opa.xnamePolicy.ckdump }}
-        re_match(sprintf("\"xname\":[ ]*[[ ]*\"%v\" ]", [parsed_spire_token.xname]), lower(http_request.body)),
-        {{- end }}
-      ]),
-    ])
-}
 
 {{- if .Values.opa.requireHeartbeatToken }}
 # Parse heartbeat token
@@ -465,19 +451,12 @@ sub_match = {
     {{- end }}
 }
 sub_match_dvs = {
-    "spiffe://shasta/compute/XNAME/workload/dvs-hmi": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/ncn/XNAME/workload/dvs-hmi": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/compute/XNAME/workload/dvs-map": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/ncn/XNAME/workload/dvs-map": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/compute/XNAME/workload/orca": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/ncn/XNAME/workload/orca": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}]
-}
-
-sub_match_ckdump = {
-    "spiffe://shasta/compute/XNAME/workload/ckdump": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/ncn/XNAME/workload/ckdump": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/compute/XNAME/workload/ckdump_helper": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/ncn/XNAME/workload/ckdump_helper": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
+    "spiffe://shasta/compute/XNAME/workload/dvs-hmi": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}],
+    "spiffe://shasta/ncn/XNAME/workload/dvs-hmi": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}],
+    "spiffe://shasta/compute/XNAME/workload/dvs-map": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}],
+    "spiffe://shasta/ncn/XNAME/workload/dvs-map": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}],
+    "spiffe://shasta/compute/XNAME/workload/orca": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}],
+    "spiffe://shasta/ncn/XNAME/workload/orca": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}]
 }
 
 sub_match_heartbeat = {
