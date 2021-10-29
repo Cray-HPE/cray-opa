@@ -223,7 +223,7 @@ spire_correct_ncn_sub(sub) {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@ncnw001\"}"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@ncnw001\"}"}}}, "parsed_body": {"subscriber": "handler@ncnw001"}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
 
 
@@ -257,7 +257,7 @@ spire_correct_compute_sub(sub) {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@x1\"}"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@x1\"}"}}}, "parsed_body": { "subscriber": "handler@x1" }}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
 
   # Validate that we're not allowing any method with a valid aud through
@@ -294,8 +294,8 @@ test_spire_compute_subs {
 }
 
 test_spire_heartbeat {
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": "Bearer {{ .spire.compute.heartbeat }}"}, "body": "{\"Component\": \"x1\",\"Hostname\": \"compute1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": "Bearer {{ .spire.ncn.heartbeat }}"}, "body": "{\"Component\": \"ncnw001\",\"Hostname\": \"ncn1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": "Bearer {{ .spire.compute.heartbeat }}"}, "body": "{\"Component\": \"x1\",\"Hostname\": \"compute1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}, "parsed_body":  {"component": "x1", "hostname": "compute1", "nid": "0", "status": "OK", "timestamp": "2021-09-23T22:52:00.955107+00:00"}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": "Bearer {{ .spire.ncn.heartbeat }}"}, "body": "{\"Component\": \"ncnw001\",\"Hostname\": \"ncn1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}, "parsed_body":  {"component": "ncnw001", "hostname": "ncn1", "nid": "0", "status": "OK", "timestamp": "2021-09-23T22:52:00.955107+00:00"}}
 }
 
 test_spire_cfs {

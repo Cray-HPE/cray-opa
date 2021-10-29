@@ -9,8 +9,8 @@ hbtb_heartbeat_path = "/apis/hbtd/hmi/v1/heartbeat"
 hmnfd_subscribe_path = "/apis/hmnfd/hmi/v1/subscribe"
 
 test_spire_heartbeat_wrong_xname {
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": "Bearer {{ .spire.compute.heartbeat }}"}, "body": "{\"Component\": \"invalid\",\"Hostname\": \"compute1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}}
-  allow.http_status  == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": "Bearer {{ .spire.ncn.heartbeat }}"}, "body": "{\"Component\": \"invalid\",\"Hostname\": \"ncn1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": "Bearer {{ .spire.compute.heartbeat }}"}, "body": "{\"Component\": \"valid\",\"Hostname\": \"compute1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}, "parsed_body": { "component": "invalid", "hostname": "compute1", "nid": "0", "status": "OK", "timestamp": "2021-09-23T22:52:00.955107+00:00"}}
+  allow.http_status  == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": "Bearer {{ .spire.ncn.heartbeat }}"}, "body": "{\"Component\": \"invalid\",\"Hostname\": \"ncn1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}, "parsed_body": { "component": "invalid", "hostname": "compute1", "nid": "0", "status": "OK", "timestamp": "2021-09-23T22:52:00.955107+00:00"}}
 }
 
 spire_wrong_xname_sub(sub) {
@@ -19,7 +19,7 @@ spire_wrong_xname_sub(sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/invalid", "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/dumps?xname=invalid", "headers": {"authorization": sub}}}}}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@invalid\"}"}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@invalid\"}"}}}, "parsed_body": {"subscriber": "handler@invalid"}}
 
 }
 

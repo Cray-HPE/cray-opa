@@ -120,12 +120,13 @@ allow {
     s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
     perm := sub_match_dvs[s][_]
     perm.method = http_request.method
+    trace("subscribe")
 
     any([
       all([
         re_match(`^/apis/hmnfd/hmi/v1/subscribe$`, original_path),
         {{- if .Values.opa.xnamePolicy.dvs }}
-        re_match(sprintf("\"subscriber\": \"[a-z0-9]*@%v\"", [parsed_spire_token.xname]), lower(http_request.body))
+        re_match(sprintf("[a-z0-9]*@%v", [parsed_spire_token.xname]), lower(input.parsed_body.subscriber))
         {{- end }}
       ]),
     ])
@@ -142,7 +143,7 @@ allow {
     perm.method = http_request.method
     re_match(perm.path, original_path)
     {{- if .Values.opa.xnamePolicy.heartbeat }}
-    re_match(sprintf("\"component\": \"%v\"", [parsed_spire_token.xname]), lower(http_request.body))
+    lower(input.parsed_body.component) == parsed_spire_token.xname
     {{- end }}
 }
 {{- end }}
