@@ -275,6 +275,8 @@ allowed_methods := {
       {"method": "HEAD",  "path": `^/apis/bss/boot/v1/bootscript.*$`},
   ],
   "system-compute": [
+    {"method": "PATCH",  "path": `^/apis/bos/v./components/.*$`},
+
     {"method": "PATCH",  "path": `^/apis/cfs/components/.*$`},
     {"method": "PATCH",  "path": `^/apis/cfs/v./components/.*$`},
 
@@ -379,6 +381,13 @@ role_perms = {
 
 {{- if .Values.opa.xnamePolicy.enabled }}
 spire_methods := {
+  "bos": [
+  {{- if .Values.opa.xnamePolicy.bos }}
+    {"method": "PATCH", "path": sprintf("^/apis/bos/v./components/%v$", [parsed_spire_token.xname])},
+  {{- else }}
+    {"method": "PATCH", "path": `^/apis/bos/v./components/.*$`},
+  {{- end }}
+  ],
   "cfs": [
   {{- if .Values.opa.xnamePolicy.cfs }}
     {"method": "PATCH", "path": sprintf("^/apis/cfs/components/%v$", [parsed_spire_token.xname])},
@@ -387,7 +396,6 @@ spire_methods := {
     {"method": "PATCH", `^/apis/cfs/components/.*$`},
     {"method": "PATCH", `^/apis/cfs/v./components/.*$`},
   {{- end }}
-
   ],
   "cps": [
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
@@ -443,6 +451,9 @@ spire_methods := {
   {{- end }}
 }
 sub_match = {
+    "spiffe://shasta/compute/XNAME/workload/bos-state-reporter": spire_methods["bos"],
+    "spiffe://shasta/uan/XNAME/workload/bos-state-reporter": spire_methods["bos"],
+    "spiffe://shasta/ncn/XNAME/workload/bos-state-reporter": spire_methods["bos"],
     "spiffe://shasta/compute/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
     "spiffe://shasta/ncn/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
     "spiffe://shasta/compute/XNAME/workload/ckdump": spire_methods["ckdump"],
@@ -491,6 +502,9 @@ sub_match_heartbeat = {
 # From https://connect.us.cray.com/confluence/display/SKERN/Shasta+Compute+SPIRE+Security
 # This is an initial set, not yet expected to be complete.
 sub_match = {
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/bos-state-reporter": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/workload/bos-state-reporter": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/bos-state-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cfs-state-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump": allowed_methods["ckdump"],

@@ -58,6 +58,7 @@ opa:
   logPost: False
   xnamePolicy:
     enabled: True
+    bos: True
     cfs: True
     heartbeat: False
     # ckdump and dvs needs logPost to be true in order to function properly
