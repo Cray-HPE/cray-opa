@@ -117,6 +117,13 @@ func main() {
 	}
 	fmt.Println("user token:", userToken)
 
+	args = createTokenArgs{role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Invalid"}
+	invalidTypAdminToken, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Invalid typ admin token:", invalidTypAdminToken)
+
 	args = createTokenArgs{
 		role: "system-pxe", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
 	pxeToken, err := tc.create(args)
@@ -384,11 +391,12 @@ func main() {
 		template.New("base").Funcs(sprig.FuncMap()).Parse(string(dat)))
 
 	values = map[string]interface{}{
-		"userToken":    userToken,
-		"adminToken":   adminToken,
-		"pxeToken":     pxeToken,
-		"computeToken": computeToken,
-		"wlmToken":     wlmToken,
+		"userToken":            userToken,
+		"adminToken":           adminToken,
+		"invalidTypAdminToken": invalidTypAdminToken,
+		"pxeToken":             pxeToken,
+		"computeToken":         computeToken,
+		"wlmToken":             wlmToken,
 		"spire": map[string]interface{}{
 			"invalidSub": spireInvalidSub,
 			"ncn": map[string]interface{}{

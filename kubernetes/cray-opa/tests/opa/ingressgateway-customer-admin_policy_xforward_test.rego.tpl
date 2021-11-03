@@ -36,6 +36,10 @@ test_admin {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/api1", "headers": {"x-forwarded-access-token": "{{ .adminToken }}"}}}}}
 }
 
+test_admin_wrong_typ {
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/api1", "headers": {"x-forwarded-access-token": "{{ .invalidTypAdminToken }}"}}}}}
+}
+
 # Tests for system-pxe role
 
 pxe_auth = "{{ .pxeToken }}"
