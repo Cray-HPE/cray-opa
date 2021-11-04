@@ -32,6 +32,11 @@ allow {
     ])
 }
 
+# Whitelist traffic to the Neuxs web UI since it uses Keycloak for authentication.
+allow {
+    http_request.headers["x-envoy-decorator-operation"] = "nexus.nexus.svc.cluster.local:80/*"
+}
+
 # The path being requested from the user. When the envoy filter is configured for
 # SIDECAR_INBOUND this is: http_request.headers["x-envoy-original-path"].
 # When configured for GATEWAY this is http_request.path
