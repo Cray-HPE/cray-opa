@@ -30,6 +30,7 @@ type createTokenArgs struct {
 	issuer string
 	aud    string
 	sub    string
+	typ    string
 }
 
 func (t tokenCreator) create(args createTokenArgs) (string, error) {
@@ -47,6 +48,9 @@ func (t tokenCreator) create(args createTokenArgs) (string, error) {
 	}
 	if args.sub != "" {
 		atClaims["sub"] = args.sub
+	}
+	if args.typ != "" {
+		atClaims["typ"] = args.typ
 	}
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	token, err := at.SignedString(t.key)
@@ -99,22 +103,29 @@ func main() {
 	var spireSub string
 
 	args := createTokenArgs{
-		role: "admin", issuer: keycloakIssuer, aud: shastaAud}
+		role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
 	adminToken, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("admin token:", adminToken)
 
-	args = createTokenArgs{role: "user", issuer: keycloakIssuer, aud: shastaAud}
+	args = createTokenArgs{role: "user", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
 	userToken, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("user token:", userToken)
 
+	args = createTokenArgs{role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Invalid"}
+	invalidTypAdminToken, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Invalid typ admin token:", invalidTypAdminToken)
+
 	args = createTokenArgs{
-		role: "system-pxe", issuer: keycloakIssuer, aud: shastaAud}
+		role: "system-pxe", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
 	pxeToken, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -122,14 +133,14 @@ func main() {
 	fmt.Println("pxe token:", pxeToken)
 
 	args = createTokenArgs{
-		role: "system-compute", issuer: keycloakIssuer, aud: shastaAud}
+		role: "system-compute", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
 	computeToken, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("compute token:", computeToken)
 
-	args = createTokenArgs{role: "wlm", issuer: keycloakIssuer, aud: shastaAud}
+	args = createTokenArgs{role: "wlm", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
 	wlmToken, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -377,11 +388,12 @@ func main() {
 		template.New("base").Funcs(sprig.FuncMap()).Parse(string(dat)))
 
 	values = map[string]interface{}{
-		"userToken":    userToken,
-		"adminToken":   adminToken,
-		"pxeToken":     pxeToken,
-		"computeToken": computeToken,
-		"wlmToken":     wlmToken,
+		"userToken":            userToken,
+		"adminToken":           adminToken,
+		"invalidTypAdminToken": invalidTypAdminToken,
+		"pxeToken":             pxeToken,
+		"computeToken":         computeToken,
+		"wlmToken":             wlmToken,
 		"spire": map[string]interface{}{
 			"invalidSub": spireInvalidSub,
 			"ncn": map[string]interface{}{

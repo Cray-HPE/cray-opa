@@ -180,6 +180,13 @@ found_auth = {"type": a_type, "token": a_token} {
     [a_type, a_token] := split(http_request.headers.authorization, " ")
 }
 
+# Check if there is a forwarded access token header and split the type from token
+found_auth = {"type": a_type, "token": a_token} {
+  a_token := http_request.headers["x-forwarded-access-token"]
+  [_, payload, _] := io.jwt.decode(a_token)
+  a_type := payload.typ
+}
+
 # If the auth type is bearer, decode the JWT
 parsed_kc_token = {"payload": payload} {
     found_auth.type == "Bearer"
