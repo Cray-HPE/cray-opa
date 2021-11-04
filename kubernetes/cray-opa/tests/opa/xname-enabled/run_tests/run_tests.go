@@ -117,8 +117,7 @@ func main() {
 	}
 	fmt.Println("user token:", userToken)
 
-	args = createTokenArgs{
-		role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Invalid"}
+	args = createTokenArgs{role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Invalid"}
 	invalidTypAdminToken, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -157,7 +156,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireInvalidSub)
 
-	spireSub = "spiffe://shasta/ncn/workload/cfs-state-reporter"
+	spireSub = "spiffe://shasta/ncn/ncnw001/workload/cfs-state-reporter"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireNcnCfsStateReporter, err := tc.create(args)
@@ -166,7 +165,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnCfsStateReporter)
 
-	spireSub = "spiffe://shasta/ncn/workload/ckdump"
+	spireSub = "spiffe://shasta/ncn/ncnw001/workload/ckdump"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireNcnCkdump, err := tc.create(args)
@@ -175,7 +174,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnCkdump)
 
-	spireSub = "spiffe://shasta/ncn/workload/ckdump_helper"
+	spireSub = "spiffe://shasta/ncn/ncnw001/workload/ckdump_helper"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireNcnCkdumpHelper, err := tc.create(args)
@@ -184,7 +183,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnCkdumpHelper)
 
-	spireSub = "spiffe://shasta/ncn/workload/cpsmount"
+	spireSub = "spiffe://shasta/ncn/ncnw001/workload/cpsmount"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireNcnCpsmount, err := tc.create(args)
@@ -193,7 +192,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnCpsmount)
 
-	spireSub = "spiffe://shasta/ncn/workload/cpsmount_helper"
+	spireSub = "spiffe://shasta/ncn/ncnw001/workload/cpsmount_helper"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireNcnCpsmountHelper, err := tc.create(args)
@@ -202,7 +201,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnCpsmountHelper)
 
-	spireSub = "spiffe://shasta/ncn/workload/dvs-hmi"
+	spireSub = "spiffe://shasta/ncn/ncnw001/workload/dvs-hmi"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireNcnDvsHmi, err := tc.create(args)
@@ -211,7 +210,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnDvsHmi)
 
-	spireSub = "spiffe://shasta/ncn/workload/dvs-map"
+	spireSub = "spiffe://shasta/ncn/ncnw001/workload/dvs-map"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireNcnDvsMap, err := tc.create(args)
@@ -220,7 +219,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnDvsMap)
 
-	spireSub = "spiffe://shasta/ncn/workload/heartbeat"
+	spireSub = "spiffe://shasta/ncn/ncnw001/workload/heartbeat"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireNcnHeartbeat, err := tc.create(args)
@@ -229,7 +228,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnHeartbeat)
 
-	spireSub = "spiffe://shasta/ncn/workload/orca"
+	spireSub = "spiffe://shasta/ncn/ncnw001/workload/orca"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireNcnOrca, err := tc.create(args)
@@ -238,7 +237,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnOrca)
 
-	spireSub = "spiffe://shasta/compute/workload/cfs-state-reporter"
+	spireSub = "spiffe://shasta/compute/x1/workload/cfs-state-reporter"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireComputeCfsStateReporter, err := tc.create(args)
@@ -247,7 +246,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeCfsStateReporter)
 
-	spireSub = "spiffe://shasta/compute/workload/ckdump"
+	spireSub = "spiffe://shasta/compute/x1/workload/ckdump"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireComputeCkdump, err := tc.create(args)
@@ -256,7 +255,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeCkdump)
 
-	spireSub = "spiffe://shasta/compute/workload/ckdump_helper"
+	spireSub = "spiffe://shasta/compute/x1/workload/ckdump_helper"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireComputeCkdumpHelper, err := tc.create(args)
@@ -265,7 +264,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeCkdumpHelper)
 
-	spireSub = "spiffe://shasta/compute/workload/cpsmount"
+	spireSub = "spiffe://shasta/compute/x1/workload/cpsmount"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireComputeCpsmount, err := tc.create(args)
@@ -274,7 +273,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeCpsmount)
 
-	spireSub = "spiffe://shasta/compute/workload/cpsmount_helper"
+	spireSub = "spiffe://shasta/compute/x1/workload/cpsmount_helper"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireComputeCpsmountHelper, err := tc.create(args)
@@ -283,7 +282,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeCpsmountHelper)
 
-	spireSub = "spiffe://shasta/compute/workload/dvs-hmi"
+	spireSub = "spiffe://shasta/compute/x1/workload/dvs-hmi"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireComputeDvsHmi, err := tc.create(args)
@@ -292,7 +291,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeDvsHmi)
 
-	spireSub = "spiffe://shasta/compute/workload/dvs-map"
+	spireSub = "spiffe://shasta/compute/x1/workload/dvs-map"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireComputeDvsMap, err := tc.create(args)
@@ -301,7 +300,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeDvsMap)
 
-	spireSub = "spiffe://shasta/compute/workload/heartbeat"
+	spireSub = "spiffe://shasta/compute/x1/workload/heartbeat"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireComputeHeartbeat, err := tc.create(args)
@@ -310,7 +309,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeHeartbeat)
 
-	spireSub = "spiffe://shasta/compute/workload/orca"
+	spireSub = "spiffe://shasta/compute/x1/workload/orca"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
 	spireComputeOrca, err := tc.create(args)
@@ -332,6 +331,15 @@ func main() {
 
 	values := map[string]interface{}{
 		"Values": map[string]interface{}{
+			"opa": map[string]interface{}{
+				"xnamePolicy": map[string]interface{}{
+					"enabled":   "True",
+					"cfs":       "True",
+					"dvs":       "True",
+					"heartbeat": "True",
+				},
+				"requireHeartbeatToken": "True",
+			},
 			"jwtValidation": map[string]interface{}{
 				"keycloak": map[string]interface{}{
 					"jwksUri": ts.URL,

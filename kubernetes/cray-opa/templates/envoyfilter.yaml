@@ -40,6 +40,11 @@ spec:
             "@type": "type.googleapis.com/envoy.config.filter.http.ext_authz.v2.ExtAuthz"
             status_on_error:
               code: ServiceUnavailable
+            {{- if $.Values.opa.logPost }}
+            with_request_body:
+              max_request_bytes: 8192
+              allow_partial_message: true
+            {{- end }}
             grpc_service:
               google_grpc:
                 target_uri: {{ $name }}.{{ $.Release.Namespace }}.svc.cluster.local.:{{ $.Values.opa.port }}

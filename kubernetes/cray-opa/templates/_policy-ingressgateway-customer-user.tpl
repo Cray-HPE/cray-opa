@@ -45,7 +45,10 @@ original_path = o_path {
 }
 
 # Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. vcs are also enabled here.
+# JWTs. vcs are also enabled here. Legacy services to be migrated or removed:
+#
+#     * VCS/Gitea
+#
 allow {
     any([
         startswith(original_path, "/keycloak"),
@@ -82,7 +85,7 @@ allow {
     ])
 }
 
-# This actually checks the JWT token passed in
+# This actually checks that the JWT token passed in
 # has access to the endpoint requested
 allow {
     roles_for_user[r]
@@ -92,6 +95,13 @@ allow {
 # Check if there is an authorization header and split the type from token
 found_auth = {"type": a_type, "token": a_token} {
     [a_type, a_token] := split(http_request.headers.authorization, " ")
+}
+
+# Check if there is a forwarded access token header and split the type from token
+found_auth = {"type": a_type, "token": a_token} {
+  a_token := http_request.headers["x-forwarded-access-token"]
+  [_, payload, _] := io.jwt.decode(a_token)
+  a_type := payload.typ
 }
 
 # If the auth type is bearer, decode the JWT
