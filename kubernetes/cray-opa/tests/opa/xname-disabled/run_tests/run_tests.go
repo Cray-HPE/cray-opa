@@ -346,10 +346,20 @@ func main() {
 					"cfs":     "False",
 				},
 			},
+			"ingresses": map[string]interface{}{
+        "ingressgateway": map[string]interface{}{
+            "issuers": []string{keycloakIssuer},
+          },
+        "ingressgateway-customer-admin": map[string]interface{}{
+            "issuers": []string{keycloakIssuer},
+          },
+        "ingressgateway-customer-user": map[string]interface{}{
+            "issuers": []string{keycloakIssuer},
+          },
+        },
 			"jwtValidation": map[string]interface{}{
 				"keycloak": map[string]interface{}{
 					"jwksUri": ts.URL,
-					"issuers": []string{keycloakIssuer},
 				},
 				"spire": map[string]interface{}{
 					"jwksUri":     ts.URL,
