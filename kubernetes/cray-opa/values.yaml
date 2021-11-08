@@ -19,11 +19,6 @@ ingresses:
     namespace: istio-system
     labelSelector:
       istio: ingressgateway-customer-user
-  ingressgateway-hmn:
-    namespace: istio-system
-    labelSelector:
-      istio: ingressgateway-hmn
-
 
 opa:
   replicas: 3
