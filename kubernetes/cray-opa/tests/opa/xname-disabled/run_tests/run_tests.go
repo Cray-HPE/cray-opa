@@ -318,6 +318,15 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeOrca)
 
+	spireSub = "spiffe://shasta/compute/x1/workload/wlm"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireComputeWlm, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeWlm)
+
 	// Reading in the policy template file and generating policy file.
 
 	dat, err := ioutil.ReadFile(policyTemplateFilename)
@@ -417,6 +426,7 @@ func main() {
 				"dvs_map":            spireComputeDvsMap,
 				"heartbeat":          spireComputeHeartbeat,
 				"orca":               spireComputeOrca,
+				"wlm":                spireComputeWlm,
 			},
 		},
 	}

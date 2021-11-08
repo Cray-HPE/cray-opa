@@ -321,26 +321,10 @@ allowed_methods := {
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_reinit$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_on$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_off$`},
-        ## CAPMC -> Nodes
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_node_status$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_on$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_off$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_reinit$`},
-        ## CAPMC -> GROUPS
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_reinit$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_group_status$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_on$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_off$`},
         ## CAPMC -> Power Capping
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap_capabilities$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/set_power_cap$`},
-        ## CAPMC -> Misc system params
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_nid_map$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_system_parameters$`},
-      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_system_parameters.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_node_rules$`},
-      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_node_rules.*$`},
 
       # BOS - node boot
       {"method": "GET", "path": `^/apis/bos/.*$`},
@@ -357,6 +341,12 @@ allowed_methods := {
       {"method": "POST", "path": `^/apis/fc/.*$`},
       {"method": "PUT", "path": `^/apis/fc/.*$`},
       {"method": "DELETE", "path": `^/apis/fc/.*$`},
+      # VNID - VNI reservation
+      {"method": "GET", "path": `^/apis/vnid/.*$`},
+      {"method": "HEAD", "path": `^/apis/vnid/.*$`},
+      {"method": "POST", "path": `^/apis/vnid/.*$`},
+      {"method": "PUT", "path": `^/apis/vnid/.*$`},
+      {"method": "DELETE", "path": `^/apis/vnid/.*$`},
   ],
   "admin": [
       {"method": "GET",  "path": `.*`},
@@ -400,7 +390,7 @@ spire_methods := {
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
     {"method": "HEAD", "path": `^/apis/v2/cps/.*$`},
     {"method": "POST", "path": `^/apis/v2/cps/.*$`},
-  ], 
+  ],
   "dvs": [
 
     {{- if .Values.opa.xnamePolicy.dvs }}
@@ -443,6 +433,46 @@ spire_methods := {
     {{- end }}
       {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
   ],
+    "wlm": [
+      # PALS - application launch
+      {"method": "GET", "path": `^/apis/pals/.*$`},
+      {"method": "HEAD", "path": `^/apis/pals/.*$`},
+      {"method": "POST", "path": `^/apis/pals/.*$`},
+      {"method": "DELETE", "path": `^/apis/pals/.*$`},
+
+      # CAPMC - power capping and power control; eventually this will need to add PCS
+        ## CAPMC -> Xnames
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_xname_status$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_reinit$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_on$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_off$`},
+        ## CAPMC -> Power Capping
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap_capabilities$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/set_power_cap$`},
+
+      # BOS - node boot
+      {"method": "GET", "path": `^/apis/bos/.*$`},
+      {"method": "HEAD", "path": `^/apis/bos/.*$`},
+      {"method": "POST", "path": `^/apis/bos/.*$`},
+      {"method": "PATCH", "path": `^/apis/bos/.*$`},
+      {"method": "DELETE", "path": `^/apis/bos/.*$`},
+      # SMD - hardware state query
+      {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
+      {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
+      # FC - VNI reservation
+      {"method": "GET", "path": `^/apis/fc/.*$`},
+      {"method": "HEAD", "path": `^/apis/fc/.*$`},
+      {"method": "POST", "path": `^/apis/fc/.*$`},
+      {"method": "PUT", "path": `^/apis/fc/.*$`},
+      {"method": "DELETE", "path": `^/apis/fc/.*$`},
+      # VNID - VNI reservation
+      {"method": "GET", "path": `^/apis/vnid/.*$`},
+      {"method": "HEAD", "path": `^/apis/vnid/.*$`},
+      {"method": "POST", "path": `^/apis/vnid/.*$`},
+      {"method": "PUT", "path": `^/apis/vnid/.*$`},
+      {"method": "DELETE", "path": `^/apis/vnid/.*$`},
+  ],
   {{- if not .Values.opa.requireHeartbeatToken }}
   "heartbeat": [
      {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
@@ -466,6 +496,7 @@ sub_match = {
     "spiffe://shasta/ncn/XNAME/workload/dvs-map": spire_methods["dvs"],
     "spiffe://shasta/compute/XNAME/workload/orca": spire_methods["dvs"],
     "spiffe://shasta/ncn/XNAME/workload/orca": spire_methods["dvs"],
+    "spiffe://shasta/compute/XNAME/workload/wlm": spire_methods["wlm"],
     {{- if not .Values.opa.requireHeartbeatToken }}
     "spiffe://shasta/compute/XNAME/workload/heartbeat": spire_methods["heartbeat"],
     "spiffe://shasta/ncn/XNAME/workload/heartbeat": spire_methods["heartbeat"]
@@ -513,7 +544,8 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/dvs-map": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/dvs-map": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/orca": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/orca": allowed_methods["system-compute"]
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/orca": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/wlm": allowed_methods["wlm"]
 }
 {{- end }}
 {{ end }}
