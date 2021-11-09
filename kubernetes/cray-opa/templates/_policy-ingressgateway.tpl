@@ -195,7 +195,7 @@ parsed_kc_token = {"payload": payload} {
 
     # Verify that the issuer is as expected.
     allowed_issuers := [
-{{- range $key, $value := .Values.jwtValidation.keycloak.issuers }}
+{{- range $key, $value := .Values.ingresses.ingressgateway.issuers }}
       "{{ $value }}",
 {{- end }}
     ]

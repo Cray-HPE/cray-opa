@@ -11,14 +11,20 @@ ingresses:
     namespace: istio-system
     labelSelector:
       istio: ingressgateway
+    issuers:
+      internal_http: "http://keycloak:8080/keycloak/realms/shasta"
+      gw_http: "http://api-gw-service-nmn.local/keycloak/realms/shasta"
+      gw_https: "https://api-gw-service-nmn.local/keycloak/realms/shasta"
   ingressgateway-customer-admin:
     namespace: istio-system
     labelSelector:
       istio: ingressgateway-customer-admin
+    issuers: []
   ingressgateway-customer-user:
     namespace: istio-system
     labelSelector:
       istio: ingressgateway-customer-user
+    issuers: []
 
 opa:
   replicas: 3
@@ -76,18 +82,6 @@ affinity:
 jwtValidation:
   keycloak:
     jwksUri: "https://istio-ingressgateway.istio-system.svc.cluster.local./keycloak/realms/shasta/protocol/openid-connect/certs"
-    issuers:
-      # These are expected to be overriden via values.yaml customization.
-      # XXX `shasta` is work-around until the CLI can support a separate
-      # XXX URL for auth.
-      shasta: "https://shasta.local/keycloak/realms/shasta"
-      keycloak: "https://auth.local/keycloak/realms/shasta"
-      # The following are deprecated and will be removed in the future
-      gw_http: "http://api-gw-service-nmn.local/keycloak/realms/shasta"
-      gw_https: "https://api-gw-service-nmn.local/keycloak/realms/shasta"
-      internal_http: "http://keycloak:8080/keycloak/realms/shasta"
-      mgmt_http: "http://mgmt-plane-cmn.local/keycloak/realms/shasta"
-      mgmt_https: "https://mgmt-plane-cmn.local/keycloak/realms/shasta"
   spire:
     jwksUri: "https://istio-ingressgateway.istio-system.svc.cluster.local./spire-jwks-vshastaio/keys"
     issuers:
