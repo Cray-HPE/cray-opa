@@ -343,6 +343,7 @@ func main() {
 			"opa": map[string]interface{}{
 				"xnamePolicy": map[string]interface{}{
 					"enabled":   "True",
+          "bos":       "True",
 					"cfs":       "True",
 					"dvs":       "True",
 					"heartbeat": "True",
