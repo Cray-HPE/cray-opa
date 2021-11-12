@@ -258,6 +258,10 @@ allowed_methods := {
     {"method": "PATCH",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "DELETE",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+    {"method": "GET", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "POST", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "DELETE", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     #HBTD -> allow a compute to send a heartbeat
     {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
 
@@ -362,17 +366,26 @@ spire_methods := {
     {"method": "GET", "path": `^/apis/v2/nmd/status$`},
     {"method": "GET", "path": `^/apis/v2/nmd/healthz/live$`},
     {"method": "GET", "path": `^/apis/v2/nmd/healthz/ready$`},
+
+    {"method": "GET", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents$", [parsed_spire_token.xname])},
+    {"method": "POST", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
+    {"method": "PATCH", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
+    {"method": "DELETE", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
     {{- else }}
     {"method": "POST", "path": `^/apis/v2/nmd/dumps$`},
     {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
     {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
     {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+
+    {"method": "GET", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "POST", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "DELETE", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     {{- end }}
     {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
     {"method": "POST", "path": `^/apis/v2/nmd/artifacts$`},
-    # These pass xnames via POST
+    # These pass xnames via POST. This will be removed once the v2 API is being used.
     {"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
-    {"method": "POST", "path": `^/apis/v2/nmd/dumps$`},
 
     #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus
     {"method": "GET",   "path": `^/apis/smd/hsm/v./.*$`},
@@ -440,8 +453,13 @@ spire_methods := {
       {"method": "DELETE", "path": `^/apis/vnid/.*$`},
   ],
   "heartbeat": [
-     # This method passes xname via POST 
+    {{- if .Values.opa.xnamePolicy.heartbeat }}
+     {"method": "POST", "path": sprintf("^/apis/hbtd/v1/heartbeat/%v$", [parsed_spire_token.xname])},
+    {{- else }}
      {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
+     {"method": "POST", "path": `^/apis/hbtd/v1/heartbeat/.*$`},
+    {{- end }}
+
   ]
 }
 sub_match = {
