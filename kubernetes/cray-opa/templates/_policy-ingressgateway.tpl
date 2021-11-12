@@ -507,7 +507,7 @@ sub_match = {
     "spiffe://shasta/ncn/XNAME/workload/dvs-map": spire_methods["dvs"],
     "spiffe://shasta/compute/XNAME/workload/orca": spire_methods["dvs"],
     "spiffe://shasta/ncn/XNAME/workload/orca": spire_methods["dvs"],
-    "spiffe://shasta/ncn/XNAME/workload/wlm": spire_methods["wlm"],
+    "spiffe://shasta/compute/XNAME/workload/wlm": spire_methods["wlm"],
     {{- if not .Values.opa.requireHeartbeatToken }}
     "spiffe://shasta/compute/XNAME/workload/heartbeat": spire_methods["heartbeat"],
     "spiffe://shasta/ncn/XNAME/workload/heartbeat": spire_methods["heartbeat"]
