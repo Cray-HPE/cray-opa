@@ -343,6 +343,7 @@ func main() {
 			"opa": map[string]interface{}{
 				"xnamePolicy": map[string]interface{}{
 					"enabled":   "True",
+					"bos":       "True",
 					"cfs":       "True",
 					"dvs":       "True",
 					"heartbeat": "True",
@@ -350,16 +351,16 @@ func main() {
 				"requireHeartbeatToken": "True",
 			},
 			"ingresses": map[string]interface{}{
-        "ingressgateway": map[string]interface{}{
-            "issuers": []string{keycloakIssuer},
-          },
-        "ingressgateway-customer-admin": map[string]interface{}{
-            "issuers": []string{keycloakIssuer},
-          },
-        "ingressgateway-customer-user": map[string]interface{}{
-            "issuers": []string{keycloakIssuer},
-          },
-        },
+				"ingressgateway": map[string]interface{}{
+					"issuers": []string{keycloakIssuer},
+				},
+				"ingressgateway-customer-admin": map[string]interface{}{
+					"issuers": []string{keycloakIssuer},
+				},
+				"ingressgateway-customer-user": map[string]interface{}{
+					"issuers": []string{keycloakIssuer},
+				},
+			},
 			"jwtValidation": map[string]interface{}{
 				"keycloak": map[string]interface{}{
 					"jwksUri": ts.URL,

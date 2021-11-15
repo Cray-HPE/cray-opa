@@ -342,16 +342,16 @@ func main() {
 	values := map[string]interface{}{
 		"Values": map[string]interface{}{
 			"ingresses": map[string]interface{}{
-        "ingressgateway": map[string]interface{}{
-            "issuers": []string{keycloakIssuer},
-          },
-        "ingressgateway-customer-admin": map[string]interface{}{
-            "issuers": []string{keycloakIssuer},
-          },
-        "ingressgateway-customer-user": map[string]interface{}{
-            "issuers": []string{keycloakIssuer},
-          },
-        },
+				"ingressgateway": map[string]interface{}{
+					"issuers": []string{keycloakIssuer},
+				},
+				"ingressgateway-customer-admin": map[string]interface{}{
+					"issuers": []string{keycloakIssuer},
+				},
+				"ingressgateway-customer-user": map[string]interface{}{
+					"issuers": []string{keycloakIssuer},
+				},
+			},
 			"jwtValidation": map[string]interface{}{
 				"keycloak": map[string]interface{}{
 					"jwksUri": ts.URL,
