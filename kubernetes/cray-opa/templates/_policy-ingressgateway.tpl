@@ -120,53 +120,6 @@ allow {
     re_match(perm.path, original_path)
 }
 
-# Parse POST requests with xnames
-allow {
-    s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
-    perm := sub_match_dvs[s][_]
-    perm.method = http_request.method
-
-    any([
-      all([
-        re_match(`^/apis/hmnfd/hmi/v1/subscribe$`, original_path),
-        {{- if .Values.opa.xnamePolicy.dvs }}
-        re_match(sprintf("\"subscriber\": \"[a-z0-9]*@%v\"", [parsed_spire_token.xname]), lower(http_request.body))
-        {{- end }}
-      ]),
-    ])
-}
-
-allow {
-    s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
-    perm := sub_match_ckdump[s][_]
-    perm.method = http_request.method
-
-    any([
-      all([
-        re_match(`^/apis/v2/nmd/dumps$`, original_path),
-        {{- if .Values.opa.xnamePolicy.ckdump }}
-        re_match(sprintf("\"xname\":[ ]*[[ ]*\"%v\" ]", [parsed_spire_token.xname]), lower(http_request.body)),
-        {{- end }}
-      ]),
-    ])
-}
-
-{{- if .Values.opa.requireHeartbeatToken }}
-# Parse heartbeat token
-allow {
-    s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
-
-    # Test subject matches destination
-    perm := sub_match_heartbeat[s][_]
-    perm.method = http_request.method
-    re_match(perm.path, original_path)
-    {{- if .Values.opa.xnamePolicy.heartbeat }}
-    re_match(sprintf("\"component\": \"%v\"", [parsed_spire_token.xname]), lower(http_request.body))
-    {{- end }}
-}
-{{- end }}
-
-
 {{- else }}
 # Validate claims for SPIRE issued JWT tokens
 allow {
@@ -200,7 +153,7 @@ parsed_kc_token = {"payload": payload} {
 
     # Verify that the issuer is as expected.
     allowed_issuers := [
-{{- range $key, $value := .Values.jwtValidation.keycloak.issuers }}
+{{- range $key, $value := .Values.ingresses.ingressgateway.issuers }}
       "{{ $value }}",
 {{- end }}
     ]
@@ -287,6 +240,8 @@ allowed_methods := {
       {"method": "HEAD",  "path": `^/apis/bss/boot/v1/bootscript.*$`},
   ],
   "system-compute": [
+    {"method": "PATCH",  "path": `^/apis/bos/v./components/.*$`},
+
     {"method": "PATCH",  "path": `^/apis/cfs/components/.*$`},
     {"method": "PATCH",  "path": `^/apis/cfs/v./components/.*$`},
 
@@ -308,6 +263,10 @@ allowed_methods := {
     {"method": "PATCH",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "DELETE",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+    {"method": "GET", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "POST", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "DELETE", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     #HBTD -> allow a compute to send a heartbeat
     {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
 
@@ -326,26 +285,10 @@ allowed_methods := {
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_reinit$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_on$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_off$`},
-        ## CAPMC -> Nodes
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_node_status$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_on$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_off$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/node_reinit$`},
-        ## CAPMC -> GROUPS
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_reinit$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_group_status$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_on$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/group_off$`},
         ## CAPMC -> Power Capping
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap_capabilities$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/set_power_cap$`},
-        ## CAPMC -> Misc system params
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_nid_map$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_system_parameters$`},
-      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_system_parameters.*$`},
-      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_node_rules$`},
-      {"method": "GET", "path": `^/apis/capmc/capmc/v1/get_node_rules.*$`},
 
       # BOS - node boot
       {"method": "GET", "path": `^/apis/bos/.*$`},
@@ -362,6 +305,12 @@ allowed_methods := {
       {"method": "POST", "path": `^/apis/fc/.*$`},
       {"method": "PUT", "path": `^/apis/fc/.*$`},
       {"method": "DELETE", "path": `^/apis/fc/.*$`},
+      # VNID - VNI reservation
+      {"method": "GET", "path": `^/apis/vnid/.*$`},
+      {"method": "HEAD", "path": `^/apis/vnid/.*$`},
+      {"method": "POST", "path": `^/apis/vnid/.*$`},
+      {"method": "PUT", "path": `^/apis/vnid/.*$`},
+      {"method": "DELETE", "path": `^/apis/vnid/.*$`},
   ],
   "admin": [
       {"method": "GET",  "path": `.*`},
@@ -391,6 +340,13 @@ role_perms = {
 
 {{- if .Values.opa.xnamePolicy.enabled }}
 spire_methods := {
+  "bos": [
+  {{- if .Values.opa.xnamePolicy.bos }}
+    {"method": "PATCH", "path": sprintf("^/apis/bos/v./components/%v$", [parsed_spire_token.xname])},
+  {{- else }}
+    {"method": "PATCH", "path": `^/apis/bos/v./components/.*$`},
+  {{- end }}
+  ],
   "cfs": [
   {{- if .Values.opa.xnamePolicy.cfs }}
     {"method": "PATCH", "path": sprintf("^/apis/cfs/components/%v$", [parsed_spire_token.xname])},
@@ -399,13 +355,12 @@ spire_methods := {
     {"method": "PATCH", `^/apis/cfs/components/.*$`},
     {"method": "PATCH", `^/apis/cfs/v./components/.*$`},
   {{- end }}
-
   ],
   "cps": [
     {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
     {"method": "HEAD", "path": `^/apis/v2/cps/.*$`},
     {"method": "POST", "path": `^/apis/v2/cps/.*$`},
-  ], 
+  ],
   "dvs": [
 
     {{- if .Values.opa.xnamePolicy.dvs }}
@@ -416,14 +371,26 @@ spire_methods := {
     {"method": "GET", "path": `^/apis/v2/nmd/status$`},
     {"method": "GET", "path": `^/apis/v2/nmd/healthz/live$`},
     {"method": "GET", "path": `^/apis/v2/nmd/healthz/ready$`},
+
+    {"method": "GET", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents$", [parsed_spire_token.xname])},
+    {"method": "POST", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
+    {"method": "PATCH", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
+    {"method": "DELETE", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
     {{- else }}
     {"method": "POST", "path": `^/apis/v2/nmd/dumps$`},
     {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
     {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
     {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
+
+    {"method": "GET", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "POST", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
+    {"method": "DELETE", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     {{- end }}
     {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
     {"method": "POST", "path": `^/apis/v2/nmd/artifacts$`},
+    # These pass xnames via POST. This will be removed once the v2 API is being used.
+    {"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
 
     #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus
     {"method": "GET",   "path": `^/apis/smd/hsm/v./.*$`},
@@ -447,62 +414,101 @@ spire_methods := {
       {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
     {{- end }}
       {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
+      # This method passes xname via POST
+      {"method": "POST", "path": `^/apis/v2/nmd/dumps$`},
   ],
-  {{- if not .Values.opa.requireHeartbeatToken }}
+  "wlm": [
+      # PALS - application launch
+      {"method": "GET", "path": `^/apis/pals/.*$`},
+      {"method": "HEAD", "path": `^/apis/pals/.*$`},
+      {"method": "POST", "path": `^/apis/pals/.*$`},
+      {"method": "DELETE", "path": `^/apis/pals/.*$`},
+
+      # CAPMC - power capping and power control; eventually this will need to add PCS
+        ## CAPMC -> Xnames
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_xname_status$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_reinit$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_on$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_off$`},
+        ## CAPMC -> Power Capping
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap_capabilities$`},
+      {"method": "POST", "path": `^/apis/capmc/capmc/v1/set_power_cap$`},
+
+      # BOS - node boot
+      {"method": "GET", "path": `^/apis/bos/.*$`},
+      {"method": "HEAD", "path": `^/apis/bos/.*$`},
+      {"method": "POST", "path": `^/apis/bos/.*$`},
+      {"method": "PATCH", "path": `^/apis/bos/.*$`},
+      {"method": "DELETE", "path": `^/apis/bos/.*$`},
+      # SMD - hardware state query
+      {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
+      {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
+      # FC - VNI reservation
+      {"method": "GET", "path": `^/apis/fc/.*$`},
+      {"method": "HEAD", "path": `^/apis/fc/.*$`},
+      {"method": "POST", "path": `^/apis/fc/.*$`},
+      {"method": "PUT", "path": `^/apis/fc/.*$`},
+      {"method": "DELETE", "path": `^/apis/fc/.*$`},
+      # VNID - VNI reservation
+      {"method": "GET", "path": `^/apis/vnid/.*$`},
+      {"method": "HEAD", "path": `^/apis/vnid/.*$`},
+      {"method": "POST", "path": `^/apis/vnid/.*$`},
+      {"method": "PUT", "path": `^/apis/vnid/.*$`},
+      {"method": "DELETE", "path": `^/apis/vnid/.*$`},
+  ],
   "heartbeat": [
+    {{- if .Values.opa.xnamePolicy.heartbeat }}
+     {"method": "POST", "path": sprintf("^/apis/hbtd/v1/heartbeat/%v$", [parsed_spire_token.xname])},
+    {{- else }}
      {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
+     {"method": "POST", "path": `^/apis/hbtd/v1/heartbeat/.*$`},
+    {{- end }}
+
   ]
-  {{- end }}
 }
 sub_match = {
-    "spiffe://shasta/compute/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
-    "spiffe://shasta/ncn/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
-    "spiffe://shasta/compute/XNAME/workload/ckdump": spire_methods["ckdump"],
-    "spiffe://shasta/ncn/XNAME/workload/ckdump": spire_methods["ckdump"],
-    "spiffe://shasta/compute/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
-    "spiffe://shasta/ncn/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
-    "spiffe://shasta/compute/XNAME/workload/cpsmount": spire_methods["cps"],
-    "spiffe://shasta/ncn/XNAME/workload/cpsmount": spire_methods["cps"],
-    "spiffe://shasta/compute/XNAME/workload/cpsmount_helper": spire_methods["cps"],
-    "spiffe://shasta/ncn/XNAME/workload/cpsmount_helper": spire_methods["cps"],
-    "spiffe://shasta/compute/XNAME/workload/dvs-hmi": spire_methods["dvs"],
-    "spiffe://shasta/ncn/XNAME/workload/dvs-hmi": spire_methods["dvs"],
-    "spiffe://shasta/compute/XNAME/workload/dvs-map": spire_methods["dvs"],
-    "spiffe://shasta/ncn/XNAME/workload/dvs-map": spire_methods["dvs"],
-    "spiffe://shasta/compute/XNAME/workload/orca": spire_methods["dvs"],
-    "spiffe://shasta/ncn/XNAME/workload/orca": spire_methods["dvs"],
-    {{- if not .Values.opa.requireHeartbeatToken }}
-    "spiffe://shasta/compute/XNAME/workload/heartbeat": spire_methods["heartbeat"],
-    "spiffe://shasta/ncn/XNAME/workload/heartbeat": spire_methods["heartbeat"]
-    {{- end }}
-}
-sub_match_dvs = {
-    "spiffe://shasta/compute/XNAME/workload/dvs-hmi": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/ncn/XNAME/workload/dvs-hmi": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/compute/XNAME/workload/dvs-map": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/ncn/XNAME/workload/dvs-map": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/compute/XNAME/workload/orca": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/ncn/XNAME/workload/orca": [{"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`}, {"method": "POST", "path": `^/apis/v2/nmd/dumps$`}]
-}
-
-sub_match_ckdump = {
-    "spiffe://shasta/compute/XNAME/workload/ckdump": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/ncn/XNAME/workload/ckdump": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/compute/XNAME/workload/ckdump_helper": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
-    "spiffe://shasta/ncn/XNAME/workload/ckdump_helper": [{"method": "POST", "path": `^/apis/v2/nmd/dumps$`}],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/bos-state-reporter": spire_methods["bos"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/ckdump": spire_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/cpsmount": spire_methods["cps"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/cpsmount_helper": spire_methods["cps"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/dvs-hmi": spire_methods["dvs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/dvs-map": spire_methods["dvs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/heartbeat": spire_methods["heartbeat"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/orca": spire_methods["dvs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/wlm": spire_methods["wlm"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/bos-state-reporter": spire_methods["bos"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/ckdump": spire_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount": spire_methods["cps"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount_helper": spire_methods["cps"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/dvs-hmi": spire_methods["dvs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/dvs-map": spire_methods["dvs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/heartbeat": spire_methods["heartbeat"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/orca": spire_methods["dvs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/bos-state-reporter": spire_methods["bos"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/ckdump": spire_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/cpsmount": spire_methods["cps"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/cpsmount_helper": spire_methods["cps"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/dvs-hmi": spire_methods["dvs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/dvs-map": spire_methods["dvs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/heartbeat": spire_methods["heartbeat"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/orca": spire_methods["dvs"],
 }
 
-sub_match_heartbeat = {
-    "spiffe://shasta/compute/XNAME/workload/heartbeat": [
-       {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`}],
-    "spiffe://shasta/ncn/XNAME/workload/heartbeat": [
-       {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`}],
-}
 {{- else }}
 # List of endpoints we accept based on audience.
 # From https://connect.us.cray.com/confluence/display/SKERN/Shasta+Compute+SPIRE+Security
 # This is an initial set, not yet expected to be complete.
 sub_match = {
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/bos-state-reporter": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/workload/bos-state-reporter": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/bos-state-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cfs-state-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump": allowed_methods["ckdump"],
@@ -518,7 +524,8 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/dvs-map": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/dvs-map": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/orca": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/orca": allowed_methods["system-compute"]
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/orca": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/wlm": allowed_methods["wlm"]
 }
 {{- end }}
 {{ end }}
