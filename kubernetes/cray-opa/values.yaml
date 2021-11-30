@@ -59,9 +59,9 @@ opa:
   httpTimeout: 10s
   requireHeartbeatToken: false
   xnamePolicy:
-    enabled: true
-    bos: true
-    cfs: true
+    enabled: false
+    bos: false
+    cfs: false
     ckdump: false
     dvs: false
     heartbeat: false
