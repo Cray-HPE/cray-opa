@@ -1,7 +1,9 @@
 ---
-image: openpolicyagent/opa
-imageTag: 0.24.0-envoy-1  # When changing this, also update files/Dockerfile.
-imagePullPolicy: IfNotPresent
+image:
+  repository: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa
+  tag: 0.24.0-envoy-1  # When changing this, also update tests/opa//Dockerfile.
+  pullPolicy: IfNotPresent
+
 priorityClassName: csm-high-priority-service
 
 ingresses:
@@ -31,9 +33,9 @@ opa:
   port: 9191
   containerPort: 9191
   loglevel: info
-  query: data.istio.authz.allow # this should never really change
+  query: data.istio.authz.allow  # this should never really change
   tls:
-    enabled: false # TODO once we have cert manager
+    enabled: false  # TODO once we have cert manager
     secret: ""
   strategy:
     rollingUpdate:
@@ -55,14 +57,14 @@ opa:
   # http.send requests default to 5s timeout. This was failing on a system so
   # increase this to 10s.
   httpTimeout: 10s
-  requireHeartbeatToken: False
+  requireHeartbeatToken: false
   xnamePolicy:
-    enabled: True
-    bos: True
-    cfs: True
-    ckdump: False
-    dvs: False
-    heartbeat: False
+    enabled: true
+    bos: true
+    cfs: true
+    ckdump: false
+    dvs: false
+    heartbeat: false
 
 # To overide the default policy in files/policy.rego follow the example below
 # NOTE: If the policy changes or is overriden, you MUST do a rolling restart of the

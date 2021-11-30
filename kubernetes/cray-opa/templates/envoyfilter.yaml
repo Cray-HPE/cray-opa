@@ -8,7 +8,7 @@ The non-obvious adjustments are:
 * Set context to GATEWAY since this applies to the ingressgateway
 * Set the OPA request timeout to avoid failures
 * Removed the `with_request_body` section. Our policy doesn't need the request body and it causes requests to fail.
-*/ -}}
+*/}}
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
