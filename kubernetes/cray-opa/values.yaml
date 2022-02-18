@@ -89,8 +89,8 @@ opa:
     dvs: false
     heartbeat: false
 
-# To overide the default policy in files/policy.rego follow the example below
-# NOTE: If the policy changes or is overriden, you MUST do a rolling restart of the
+# To override the default policy in files/policy.rego follow the example below
+# NOTE: If the policy changes or is overridden, you MUST do a rolling restart of the
 # OPA pods to pick them up until we stop mounting as a configmap.
 
 # policy: |
@@ -101,7 +101,9 @@ opa:
 
 # Run each opa pod on a separate worker when possible
 affinity:
-  default: true
+  # set default to 'preferred' for default preferred anti affinity rule
+  # set default to 'required' for default required anti affinity rule
+  default: required
 
 jwtValidation:
   keycloak:
