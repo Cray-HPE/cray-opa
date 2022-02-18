@@ -102,7 +102,7 @@ spec:
           name: cray-configmap-ca-public-key
         name: fetch-jwt-certs-ca-vol
       affinity:
-      {{ if $.Values.affinity.default }}
+      {{- if eq $.Values.affinity.default "preferred" }}
         podAntiAffinity:
            preferredDuringSchedulingIgnoredDuringExecution:
            - weight: 1
@@ -112,7 +112,18 @@ spec:
                  - key: app.kubernetes.io/name
                    operator: In
                    values:
-                   - {{ $name }}
+                   - cray-opa-{{ $name }}
+               topologyKey: kubernetes.io/hostname
+      {{- end }}
+      {{- if eq $.Values.affinity.default "required" }}
+        podAntiAffinity:
+           requiredDuringSchedulingIgnoredDuringExecution:
+             - labelSelector:
+                 matchExpressions:
+                 - key: app.kubernetes.io/name
+                   operator: In
+                   values:
+                   - cray-opa-{{ $name }}
                topologyKey: kubernetes.io/hostname
       {{- end }}
       {{ if $options.affinity }}
