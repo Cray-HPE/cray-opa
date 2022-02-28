@@ -58,11 +58,12 @@ spec:
       patch:
         operation: INSERT_BEFORE
         value:
-          name: envoy.filters.network.ext_authz
+          name: envoy.filters.http.ext_authz
           typed_config:
-            "@type": "type.googleapis.com/envoy.config.filter.http.ext_authz.v2.ExtAuthz"
+            "@type": "type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz"
             status_on_error:
               code: ServiceUnavailable
+            transport_api_version: V3
             grpc_service:
               google_grpc:
                 target_uri: {{ $name }}.{{ $.Release.Namespace }}.svc.cluster.local.:{{ $.Values.opa.port }}

@@ -70,7 +70,7 @@ spec:
               value: "4"
             - name: HTTP_SEND_TIMEOUT
               value: 10s
-          image: openpolicyagent/opa:0.24.0-envoy-1
+          image: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa:0.26.0-envoy-6
           imagePullPolicy: IfNotPresent
           name: opa-istio
           ports:
