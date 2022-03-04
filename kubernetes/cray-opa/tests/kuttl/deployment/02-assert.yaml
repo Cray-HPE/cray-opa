@@ -67,7 +67,7 @@ spec:
             - /policy/policy.rego
           env:
             - name: POLICY_CONFIGMAP_VERSION
-              value: "4"
+              value: "8"
             - name: HTTP_SEND_TIMEOUT
               value: 10s
           image: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa:0.26.0-envoy-6
