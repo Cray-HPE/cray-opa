@@ -23,16 +23,16 @@
 #
 apiVersion: v2
 name: cray-opa
-version: 1.9.0
+version: 1.10.0
 description: Cray Open Policy Agent
 keywords:
-- opa
+  - opa
 home: https://github.com/Cray-HPE/cray-opa
 sources:
-- https://github.com/Cray-HPE/cray-opa
+  - https://github.com/Cray-HPE/cray-opa
 maintainers:
-- name: kburns-hpe
-- name: brantk-hpe
+  - name: kburns-hpe
+  - name: brantk-hpe
 appVersion: 0.24.0
 annotations:
   artifacthub.io/license: MIT
