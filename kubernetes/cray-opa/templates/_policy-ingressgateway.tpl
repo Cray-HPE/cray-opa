@@ -244,14 +244,16 @@ allowed_methods := {
     {"method": "PATCH",  "path": `^/apis/cfs/components/.*$`},
     {"method": "PATCH",  "path": `^/apis/cfs/v./components/.*$`},
 
-    {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
+    {"method": "GET",  "path": `^/apis/v2/cps/contents$`},
+    {"method": "GET",  "path": `^/apis/v2/cps/transports$`},
     {"method": "HEAD",  "path": `^/apis/v2/cps/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/cps/.*$`},
+    {"method": "POST",  "path": `^/apis/v2/cps/contents$`},
+    {"method": "POST",  "path": `^/apis/v2/cps/transports$`},
 
-    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
+## TODO: check here.  We should be able to remove these
     {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
     {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
+
     #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus
     {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
     {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
@@ -319,11 +321,10 @@ allowed_methods := {
       {"method": "PATCH",  "path": `.*`},
       {"method": "HEAD",  "path": `.*`},
   ],
+## TODO: check here...
   "ckdump": [
-      {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
       {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-      {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
-      {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
+      {"method": "PUT",  "path": `^/apis/v2/nmd/status$`},
   ],
 }
 
@@ -356,38 +357,35 @@ spire_methods := {
   {{- end }}
   ],
   "cps": [
-    {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
+    {"method": "GET",  "path": `^/apis/v2/cps/contents$`},
+    {"method": "GET",  "path": `^/apis/v2/cps/transports$`},
     {"method": "HEAD", "path": `^/apis/v2/cps/.*$`},
-    {"method": "POST", "path": `^/apis/v2/cps/.*$`},
+    {"method": "POST",  "path": `^/apis/v2/cps/contents$`},
+    {"method": "POST",  "path": `^/apis/v2/cps/transports$`},
   ],
   "dvs": [
 
     {{- if .Values.opa.xnamePolicy.dvs }}
-    {"method": "GET", "path": sprintf("^/apis/v2/nmd/status/%v$", [parsed_spire_token.xname])},
-    {"method": "PUT", "path": sprintf("^/apis/v2/nmd/status/%v$", [parsed_spire_token.xname])},
-    {"method": "GET", "path": `^/apis/v2/nmd/sdf/dump/discovery$`},
-    {"method": "GET", "path": `^/apis/v2/nmd/sdf/dump/targets`},
-    {"method": "GET", "path": `^/apis/v2/nmd/status$`},
-    {"method": "GET", "path": `^/apis/v2/nmd/healthz/live$`},
-    {"method": "GET", "path": `^/apis/v2/nmd/healthz/ready$`},
+
+    # I don't think we need nmd here for dvs. REMOVE THIS
 
     {"method": "GET", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents$", [parsed_spire_token.xname])},
     {"method": "POST", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
     {"method": "PATCH", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
     {"method": "DELETE", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
     {{- else }}
-    {"method": "POST", "path": `^/apis/v2/nmd/dumps$`},
-    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
 
+    # I don't think we need nmd here for dvs.  RMOVE THIS
+
+    {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "GET", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     {"method": "POST", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     {"method": "DELETE", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     {{- end }}
-    {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST", "path": `^/apis/v2/nmd/artifacts$`},
+
+    # I don't think we need nmd here for dvs.  REMOVE THIS
+
     # These pass xnames via POST. This will be removed once the v2 API is being used.
     {"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
 
@@ -403,10 +401,25 @@ spire_methods := {
     {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
     {"method": "DELETE","path": `^/apis/hmnfd/hmi/v1/subscribe$`},
   ],
+## TODO: check here...
   "ckdump": [
+    {{- if .Values.opa.xnamePolicy.dvs }}
+      {"method": "PUT", "path": sprintf("^/apis/v2/nmd/status/%v$", [parsed_spire_token.xname])},
+    {{- else }}
+      {"method": "GET", "path": `^/apis/v2/nmd/.*$`},
+      {"method": "PUT", "path": `^/apis/v2/nmd/status$`},
+    {{- end }}
+      {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
+      # This method passes xname via POST
+      # TOD.: check here...  I am not sure we need this here.
+      # {"method": "POST", "path": `^/apis/v2/nmd/dumps$`},
+  ],
+## TODO: check here... is this necessary?
+  "ckdumpNCN": [
     {{- if .Values.opa.xnamePolicy.dvs }}
       {"method": "GET", "path": sprintf("^/apis/v2/nmd/dumps\\?xname=%v$", [parsed_spire_token.xname])},
       {"method": "GET", "path": `^/apis/v2/nmd/dumps/.*$`},
+## This is accessed from SDU only and we don't want others to access these sdf APIs.
       {"method": "GET", "path": `^/apis/v2/nmd/sdf/dump/.*$`},
       {"method": "PUT", "path": sprintf("^/apis/v2/nmd/status/%v$", [parsed_spire_token.xname])},
     {{- else }}
@@ -471,7 +484,6 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/ckdump": spire_methods["ckdump"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/cpsmount": spire_methods["cps"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/cpsmount_helper": spire_methods["cps"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/dvs-hmi": spire_methods["dvs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/dvs-map": spire_methods["dvs"],
@@ -480,9 +492,9 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/wlm": spire_methods["wlm"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/bos-state-reporter": spire_methods["bos"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/ckdump": spire_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount": spire_methods["cps"],
+# TODO: check here... I am not sure if we need to have these.  From NCN craycli is the only thing needs to access.  right now, craycli can access all interfaces and I am not sure how this works.  REMOVE THIS
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/ckdump": spire_methods["ckdumpNCN"],
+# TODO: check here... we don't use ckdump_helper in NCN.  REMOVE THIS
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount_helper": spire_methods["cps"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/dvs-hmi": spire_methods["dvs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/dvs-map": spire_methods["dvs"],
@@ -493,7 +505,6 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/ckdump": spire_methods["ckdump"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/cpsmount": spire_methods["cps"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/cpsmount_helper": spire_methods["cps"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/dvs-hmi": spire_methods["dvs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/dvs-map": spire_methods["dvs"],
@@ -516,8 +527,7 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump": allowed_methods["ckdump"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump_helper": allowed_methods["ckdump"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount": allowed_methods["system-compute"],
+# I don't think we need these.  REMOVE THIS
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount_helper": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount_helper": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/dvs-hmi": allowed_methods["system-compute"],
