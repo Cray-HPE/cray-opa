@@ -1,4 +1,4 @@
-# Copyright 2021 Hewlett Packard Enterprise Development LP
+# Copyright 2021,2022 Hewlett Packard Enterprise Development LP
 
 package istio.authz
 ## HOW TO DO UNIT TESTING
@@ -95,19 +95,18 @@ test_compute {
 
   # NMD - Allowed
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": compute_auth}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": compute_auth}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/nmd/status", "headers": {"authorization": compute_auth}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/live", "headers": {"authorization": compute_auth}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/ready", "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/dumps", "headers": {"authorization": compute_auth}, "data": "{ \"xname\": [ \"x1\" ], \"dumplevel\": 32 }"}}}}
 
   # NMD - Not Allowed
 
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": compute_auth}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/nmd/status", "headers": {"authorization": compute_auth}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/live", "headers": {"authorization": compute_auth}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/ready", "headers": {"authorization": compute_auth}}}}}
+  allow.http_status == 403  with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": compute_auth}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": nmd_mock_path, "headers": {"authorization": compute_auth}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/dumps", "headers": {"authorization": compute_auth}}}}}
 
   # SMD - allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": compute_auth}}}}}
@@ -191,15 +190,15 @@ spire_correct_ncn_sub(sub) {
 
   # NMD - Allowed
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status/ncnw001", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/ncnw001", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/live", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/ready", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status/ncnw001", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/ncnw001", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/live", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/ready", "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
@@ -231,13 +230,13 @@ spire_correct_compute_sub(sub) {
 
   # NMD - Allowed
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/live", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/ready", "headers": {"authorization": sub}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/status", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/live", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/healthz/ready", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
@@ -313,6 +312,7 @@ spire_cps(spire_sub) {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
 
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
@@ -331,14 +331,16 @@ test_spire_cps {
 
 spire_ckdump_compute(sub) {
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/discovery", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/targets", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/dumps?xname=x1", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/dumps", "headers": {"authorization": sub}, "body": "{ \"xname\": [ \"x1\" ] }"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": sub}}}}}
 
- # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
- # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
- # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/dumps?xname=x1", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/dumps", "headers": {"authorization": sub}, "body": "{ \"xname\": [ \"x1\" ] }"}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/discovery", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/targets", "headers": {"authorization": sub}}}}}
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
@@ -352,14 +354,16 @@ spire_ckdump_compute(sub) {
 
 spire_ckdump_ncn(sub) {
 
+  allow.http_status == 403  with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": sub}}}}}
+
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/discovery", "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/targets", "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/dumps?xname=ncnw001", "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/dumps", "headers": {"authorization": sub}, "body": "{ \"xname\": [ \"ncnw001\" ] }"}}}}
-
- # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
- # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
- # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
