@@ -356,14 +356,14 @@ spire_ckdump_ncn(sub) {
 
   allow.http_status == 403  with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/discovery", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/targets", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/dumps?xname=ncnw001", "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/dumps", "headers": {"authorization": sub}, "body": "{ \"xname\": [ \"ncnw001\" ] }"}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/discovery", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/sdf/dump/targets", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/dumps?xname=ncnw001", "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/dumps", "headers": {"authorization": sub}, "body": "{ \"xname\": [ \"ncnw001\" ] }"}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}

@@ -320,12 +320,6 @@ allowed_methods := {
   "ckdump": [
       {"method": "PUT",  "path": `^/apis/v2/nmd/status/.*$`},
   ],
-  "ckdumpNCN": [
-      {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-      {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-      {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
-      {"method": "DELETE", "path": `^/apis/v2/nmd/.*$`},
-  ]
 }
 
 # Our list of endpoints we accept based on roles.
@@ -396,12 +390,6 @@ spire_methods := {
       {"method": "PUT", "path": `^/apis/v2/nmd/status/.*$`},
     {{- end }}
   ],
-  "ckdumpNCN": [
-      {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-      {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
-      {"method": "POST", "path": `^/apis/v2/nmd/.*$`},
-      {"method": "DELETE", "path": `^/apis/v2/nmd/.*$`},
-  ],
   "wlm": [
       # PALS - application launch
       {"method": "GET", "path": `^/apis/pals/.*$`},
@@ -466,8 +454,6 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/wlm": spire_methods["wlm"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/bos-state-reporter": spire_methods["bos"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/ckdump": spire_methods["ckdumpNCN"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/ckdump_helper": spire_methods["ckdumpNCN"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount": spire_methods["cps"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount_helper": spire_methods["cps"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/dvs-hmi": spire_methods["dvs"],
@@ -500,10 +486,8 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump": allowed_methods["ckdump"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump": allowed_methods["ckdumpNCN"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump_helper": allowed_methods["ckdump"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump_helper": allowed_methods["ckdumpNCN"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount_helper": allowed_methods["system-compute"],
