@@ -244,9 +244,9 @@ allowed_methods := {
     {"method": "PATCH",  "path": `^/apis/cfs/components/.*$`},
     {"method": "PATCH",  "path": `^/apis/cfs/v./components/.*$`},
 
-    {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
-    {"method": "HEAD",  "path": `^/apis/v2/cps/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/cps/.*$`},
+    {"method": "GET",  "path": `^/apis/v2/cps/transports`},
+    {"method": "POST",  "path": `^/apis/v2/cps/contents$`},
+    {"method": "POST",  "path": `^/apis/v2/cps/transports$`},
 
     {"method": "PUT",  "path": `^/apis/v2/nmd/status/.*$`},
 
@@ -351,9 +351,9 @@ spire_methods := {
   {{- end }}
   ],
   "cps": [
-    {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
-    {"method": "HEAD", "path": `^/apis/v2/cps/.*$`},
-    {"method": "POST", "path": `^/apis/v2/cps/.*$`},
+    {"method": "GET",  "path": `^/apis/v2/cps/transports`},
+    {"method": "POST",  "path": `^/apis/v2/cps/contents$`},
+    {"method": "POST",  "path": `^/apis/v2/cps/transports$`},
   ],
   "dvs": [
 
