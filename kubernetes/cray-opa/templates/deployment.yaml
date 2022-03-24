@@ -49,9 +49,9 @@ spec:
         imagePullPolicy: {{ $.Values.image.pullPolicy }}
         name: opa-istio
         env:
-          - name: POLICY_CONFIGMAP_VERSION
-            # Change to force opa pods to restart and re-read ConfigMap.
-            value: "8"
+          # Only used to cause OPA pods to restart when chart is updated
+          - name: RELEASE_REVISION
+            value: "{{ $.Release.Revision }}"
           {{- if $.Values.opa.httpTimeout }}
           - name: HTTP_SEND_TIMEOUT
             value: {{ $.Values.opa.httpTimeout | quote }}
