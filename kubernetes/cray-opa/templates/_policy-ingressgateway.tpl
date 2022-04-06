@@ -58,7 +58,6 @@ allow {
     any([
         startswith(original_path, "/keycloak"),
         startswith(original_path, "/vcs"),
-        startswith(original_path, "/spire-jwks-"),
     ])
 }
 
