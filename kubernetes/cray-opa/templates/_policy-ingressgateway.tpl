@@ -384,7 +384,7 @@ spire_methods := {
     {"method": "DELETE","path": `^/apis/hmnfd/hmi/v1/subscribe$`},
   ],
   "ckdump": [
-    {{- if .Values.opa.xnamePolicy.dvs }}
+    {{- if .Values.opa.xnamePolicy.ckdump }}
       {"method": "PUT", "path": sprintf("^/apis/v2/nmd/status/%v$", [parsed_spire_token.xname])},
     {{- else }}
       {"method": "PUT", "path": `^/apis/v2/nmd/status/.*$`},
