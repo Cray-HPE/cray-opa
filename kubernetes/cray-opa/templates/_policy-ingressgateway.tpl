@@ -251,10 +251,10 @@ allowed_methods := {
     {"method": "PUT",  "path": `^/apis/v2/nmd/status/.*$`},
 
     #SMD -> GET everything, DVS needs SoftwareStatus.  REVOKED permission to update BulkSoftwareStatus
-    {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
-    {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
+    {"method": "GET",  "path": `^/apis/smd/hsm/v2/.*$`},
+    {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},
     #very naieve xname regex: [a-zA-Z0-9]* #make sure someone cant redirect the path with a /
-    {"method": "PATCH",  "path": `^/apis/smd/hsm/v./State/Components/[a-zA-Z0-9]*/SoftwareStatus$`},
+    {"method": "PATCH",  "path": `^/apis/smd/hsm/v2/State/Components/[a-zA-Z0-9]*/SoftwareStatus$`},
     #HMNFD -> subscribe only, cannot create state change notifications
     {"method": "GET",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
     {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
@@ -295,8 +295,8 @@ allowed_methods := {
       {"method": "PATCH", "path": `^/apis/bos/.*$`},
       {"method": "DELETE", "path": `^/apis/bos/.*$`},
       # SMD - hardware state query
-      {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
-      {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
+      {"method": "GET",  "path": `^/apis/smd/hsm/v2/.*$`},
+      {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},
       # FC - VNI reservation
       {"method": "GET", "path": `^/apis/fc/.*$`},
       {"method": "HEAD", "path": `^/apis/fc/.*$`},
@@ -373,9 +373,9 @@ spire_methods := {
     {"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
 
     #SMD -> GET everything,  DVS needs SoftwareStatus.  REVOKED permission to update BulkSoftwareStatus
-    {"method": "GET",   "path": `^/apis/smd/hsm/v./.*$`},
-    {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
-    {"method": "PATCH", "path": sprintf("^/apis/smd/hsm/v./State/Components/%v/SoftwareStatus$", [parsed_spire_token.xname])},
+    {"method": "GET",   "path": `^/apis/smd/hsm/v2/.*$`},
+    {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},
+    {"method": "PATCH", "path": sprintf("^/apis/smd/hsm/v2/State/Components/%v/SoftwareStatus$", [parsed_spire_token.xname])},
 
     #HMNFD -> subscribe only, cannot create state change notifications
     {"method": "GET",   "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
@@ -415,8 +415,8 @@ spire_methods := {
       {"method": "PATCH", "path": `^/apis/bos/.*$`},
       {"method": "DELETE", "path": `^/apis/bos/.*$`},
       # SMD - hardware state query
-      {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
-      {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
+      {"method": "GET",  "path": `^/apis/smd/hsm/v2/.*$`},
+      {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},
       # FC - VNI reservation
       {"method": "GET", "path": `^/apis/fc/.*$`},
       {"method": "HEAD", "path": `^/apis/fc/.*$`},

@@ -183,8 +183,8 @@ allowed_methods := {
       {"method": "PATCH", "path": `^/apis/bos/.*$`},
       {"method": "DELETE", "path": `^/apis/bos/.*$`},
       # SMD - hardware state query
-      {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
-      {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
+      {"method": "GET",  "path": `^/apis/smd/hsm/v2/.*$`},
+      {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},
       # FC - VNI reservation
       {"method": "GET", "path": `^/apis/fc/.*$`},
       {"method": "HEAD", "path": `^/apis/fc/.*$`},
