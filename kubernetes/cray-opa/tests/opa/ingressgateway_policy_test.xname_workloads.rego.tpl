@@ -226,6 +226,10 @@ spire_correct_ncn_sub(sub) {
 
   # Validate that only CFS can access
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_ncn_mock_path, "headers": {"authorization": sub}}}}}
+
+  #validate that DVS can access SoftwareStatus
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/smd/hsm/v1/State/Components/ncnw001/SoftwareStatus", "headers": {"authorization": sub}}}}}
+
 }
 
 
@@ -259,6 +263,10 @@ spire_correct_compute_sub(sub) {
 
   # Validate that only CFS can access
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_compute_mock_path, "headers": {"authorization": sub}}}}}
+
+  #validate that DVS can access SoftwareStatus
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/smd/hsm/v1/State/Components/x1/SoftwareStatus", "headers": {"authorization": sub}}}}}
+
 }
 
 spire_incorrect_xname_sub(sub) {

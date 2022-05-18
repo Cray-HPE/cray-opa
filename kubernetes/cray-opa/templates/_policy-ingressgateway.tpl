@@ -253,7 +253,8 @@ allowed_methods := {
     #SMD -> GET everything, DVS needs SoftwareStatus.  REVOKED permission to update BulkSoftwareStatus
     {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
     {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
-    {"method": "PATCH", "path": sprintf("^/apis/smd/hsm/v./State/Components/%v/SoftwareStatus$", [parsed_spire_token.xname])},
+    #very naieve xname regex: [a-zA-Z0-9]* #make sure someone cant redirect the path with a /
+    {"method": "PATCH",  "path": `^/apis/smd/hsm/v./State/Components/[a-zA-Z0-9]*/SoftwareStatus$`},
 
     #HMNFD -> subscribe only, cannot create state change notifications
     {"method": "GET",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
