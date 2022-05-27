@@ -321,6 +321,10 @@ allowed_methods := {
   "ckdump": [
       {"method": "PUT",  "path": `^/apis/v2/nmd/status/.*$`},
   ],
+  "monitor-ro": [
+      # SMA
+      {"method": "GET", "path": `^/apis/sma-telemetry-api/.*$`}, # All SMA telemetry API Calls - GET
+  ],
 }
 
 # Our list of endpoints we accept based on roles.
@@ -331,6 +335,7 @@ role_perms = {
     "system-compute": allowed_methods["system-compute"],
     "wlm": allowed_methods["wlm"],
     "admin": allowed_methods["admin"],
+    "monitor-ro": allowed_methods["monitor-ro"],
 }
 
 {{- if .Values.opa.xnamePolicy.enabled }}
