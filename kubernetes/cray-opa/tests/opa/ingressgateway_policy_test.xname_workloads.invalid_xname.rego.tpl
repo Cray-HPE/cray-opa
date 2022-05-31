@@ -32,3 +32,17 @@ test_spire_wrong_xname_subs {
   spire_wrong_xname_sub("Bearer {{ .spire.ncn.dvs_map }}")
   spire_wrong_xname_sub("Bearer {{ .spire.ncn.orca }}")
 }
+
+test_tpm {
+  # invalid Xname
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=invalid&type=compute", "headers": {"authorization": "Bearer {{ .spire.compute.tpm }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=invalid&type=storage", "headers": {"authorizatio": "Bearer {{ .spire.storage.tpm }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=invalid&type=ncn", "headers": {"authorization": "Bearer {{ .spire.ncn.tpm }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=invalid&type=uan", "headers": {"authorization": "Bearer {{ .spire.uan.tpm }}" }}}}}
+
+  # invalid type
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=x1&type=invalid", "headers": {"authorization": "Bearer {{ .spire.compute.tpm }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=ncns1&type=invalid", "headers": {"authorization": "Bearer {{ .spire.storage.tpm }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=ncnw001&type=invalid", "headers": {"authorization": "Bearer {{ .spire.ncn.tpm }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=uan1&type=invalid", "headers": {"authorization": "Bearer {{ .spire.uan.tpm }}" }}}}}
+}

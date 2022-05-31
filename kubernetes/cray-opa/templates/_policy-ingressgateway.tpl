@@ -320,6 +320,11 @@ allowed_methods := {
   "ckdump": [
       {"method": "PUT",  "path": `^/apis/v2/nmd/status/.*$`},
   ],
+  "tpm": [
+      {"method": "GET",  "path": `^/apis/tpm/authorize`},
+      {"method": "POST",  "path": `^/apis/tpm/challenge/request$`},
+      {"method": "POST",  "path": `^/apis/tpm/challenge/submit$`},
+  ],
 }
 
 # Our list of endpoints we accept based on roles.
@@ -438,7 +443,27 @@ spire_methods := {
      {"method": "POST", "path": `^/apis/hbtd/v1/heartbeat/.*$`},
     {{- end }}
 
-  ]
+  ],
+  "tpmCompute": [
+      {"method": "GET",  "path": sprintf("^/apis/tpm/authorize\\?xname=%v&type=compute$", [parsed_spire_token.xname])},
+      {"method": "POST",  "path": `^/apis/tpm/challenge/request`},
+      {"method": "POST",  "path": `^/apis/tpm/challenge/submit`},
+  ],
+  "tpmNcn": [
+      {"method": "GET",  "path": sprintf("^/apis/tpm/authorize\\?xname=%v&type=ncn$", [parsed_spire_token.xname])},
+      {"method": "POST",  "path": `^/apis/tpm/challenge/request`},
+      {"method": "POST",  "path": `^/apis/tpm/challenge/submit`},
+  ],
+  "tpmStorage": [
+      {"method": "GET",  "path": sprintf("^/apis/tpm/authorize\\?xname=%v&type=storage$", [parsed_spire_token.xname])},
+      {"method": "POST",  "path": `^/apis/tpm/challenge/request`},
+      {"method": "POST",  "path": `^/apis/tpm/challenge/submit`},
+  ],
+  "tpmUan": [
+      {"method": "GET",  "path": sprintf("^/apis/tpm/authorize\\?xname=%v&type=uan$", [parsed_spire_token.xname])},
+      {"method": "POST",  "path": `^/apis/tpm/challenge/request`},
+      {"method": "POST",  "path": `^/apis/tpm/challenge/submit`},
+  ],
 }
 sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/bos-state-reporter": spire_methods["bos"],
@@ -471,6 +496,10 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/dvs-map": spire_methods["dvs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/heartbeat": spire_methods["heartbeat"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/orca": spire_methods["dvs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/tpm-provisioner": spire_methods["tpmCompute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/tpm-provisioner": spire_methods["tpmNcn"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/tpm-provisioner": spire_methods["tpmStorage"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/tpm-provisioner": spire_methods["tpmUan"],
 }
 
 {{- else }}
@@ -498,7 +527,11 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/dvs-map": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/orca": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/orca": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/wlm": allowed_methods["wlm"]
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/wlm": allowed_methods["wlm"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/tpm-provisioner": allowed_methods["tpm"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/tpm-provisioner": allowed_methods["tpm"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/storage/workload/tpm-provisioner": allowed_methods["tpm"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/workload/tpm-provisioner": allowed_methods["tpm"],
 }
 {{- end }}
 {{ end }}

@@ -423,3 +423,14 @@ test_nexus {
   # Not allowed
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "nexus_mock_path", "headers": {"x-envoy-decorator-operation": "invalid"}}}}}
 }
+
+test_tpm {
+  # Allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=x1&type=compute", "headers": {"authorization": "Bearer {{ .spire.compute.tpm }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=ncns001&type=storage", "headers": {"authorization": "Bearer {{ .spire.storage.tpm }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=ncnw001&type=ncn", "headers": {"authorization": "Bearer {{ .spire.ncn.tpm }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm/authorize?xname=uan1&type=uan", "headers": {"authorization": "Bearer {{ .spire.uan.tpm }}" }}}}}
+
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/tpm/challenge/request", "headers": {"authorization": "Bearer {{ .spire.uan.tpm }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/tpm/challenge/submit", "headers": {"authorization": "Bearer {{ .spire.uan.tpm }}" }}}}}
+}

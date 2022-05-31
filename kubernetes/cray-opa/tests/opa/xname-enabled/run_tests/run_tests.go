@@ -258,6 +258,15 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnOrca)
 
+	spireSub = "spiffe://shasta/ncn/ncnw001/workload/tpm-provisioner"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireNcnTpm, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireNcnTpm)
+
 	spireSub = "spiffe://shasta/compute/x1/workload/cfs-state-reporter"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
@@ -348,6 +357,33 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeWlm)
 
+	spireSub = "spiffe://shasta/compute/x1/workload/tpm-provisioner"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireComputeTpm, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeTpm)
+
+	spireSub = "spiffe://shasta/storage/ncns001/workload/tpm-provisioner"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireStorageTpm, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireStorageTpm)
+
+	spireSub = "spiffe://shasta/uan/uan1/workload/tpm-provisioner"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+	spireUanTpm, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireUanTpm)
+
 	// Reading in the policy template file and generating policy file.
 
 	dat, err := ioutil.ReadFile(policyTemplateFilename)
@@ -426,7 +462,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Read the test template file %v", string(dat))
+	fmt.Printf("Read the test template file %v", string(dat))
 
 	tpl = template.Must(
 		template.New("base").Funcs(sprig.FuncMap()).Parse(string(dat)))
@@ -450,6 +486,7 @@ func main() {
 				"dvs_map":            spireNcnDvsMap,
 				"heartbeat":          spireNcnHeartbeat,
 				"orca":               spireNcnOrca,
+				"tpm":                spireNcnTpm,
 			},
 			"compute": map[string]interface{}{
 				"cfs_state_reporter": spireComputeCfsStateReporter,
@@ -462,6 +499,13 @@ func main() {
 				"heartbeat":          spireComputeHeartbeat,
 				"orca":               spireComputeOrca,
 				"wlm":                spireComputeWlm,
+				"tpm":                spireComputeTpm,
+			},
+			"storage": map[string]interface{}{
+				"tpm": spireStorageTpm,
+			},
+			"uan": map[string]interface{}{
+				"tpm": spireUanTpm,
 			},
 		},
 	}
