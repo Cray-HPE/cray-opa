@@ -24,7 +24,7 @@
 ---
 image:
   repository: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa
-  tag: 0.24.0-envoy-1  # When changing this, also update tests/opa//Dockerfile.
+  tag: 0.24.0-envoy-1 # When changing this, also update tests/opa//Dockerfile.
   pullPolicy: IfNotPresent
 
 priorityClassName: csm-high-priority-service
@@ -56,9 +56,9 @@ opa:
   port: 9191
   containerPort: 9191
   loglevel: info
-  query: data.istio.authz.allow  # this should never really change
+  query: data.istio.authz.allow # this should never really change
   tls:
-    enabled: false  # TODO once we have cert manager
+    enabled: false # TODO once we have cert manager
     secret: ""
   strategy:
     rollingUpdate:
@@ -103,7 +103,7 @@ opa:
 affinity:
   # set default to 'preferred' for default preferred anti affinity rule
   # set default to 'required' for default required anti affinity rule
-  default: required
+  default: preferred
 
 jwtValidation:
   keycloak:
