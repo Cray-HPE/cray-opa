@@ -127,10 +127,6 @@ spec:
                   operator: In
                   values:
                   - {{ $uuid }}
-                - key: app.kubernetes.io/name
-                  operator: In
-                  values:
-                  - cray-opa-{{ $name }}
                topologyKey: kubernetes.io/hostname
       {{- end }}
       {{ if $options.affinity }}
