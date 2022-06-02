@@ -1,5 +1,5 @@
 {{- /*
-Copyright 2021 Hewlett Packard Enterprise Development LP
+Copyright 2021,2022 Hewlett Packard Enterprise Development LP
 */ -}}
 {{ define "ingressgateway.policy" }}
 
@@ -244,14 +244,12 @@ allowed_methods := {
     {"method": "PATCH",  "path": `^/apis/cfs/components/.*$`},
     {"method": "PATCH",  "path": `^/apis/cfs/v./components/.*$`},
 
-    {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
-    {"method": "HEAD",  "path": `^/apis/v2/cps/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/cps/.*$`},
+    {"method": "GET",  "path": `^/apis/v2/cps/transports`},
+    {"method": "POST",  "path": `^/apis/v2/cps/contents$`},
+    {"method": "POST",  "path": `^/apis/v2/cps/transports$`},
 
-    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
+    {"method": "PUT",  "path": `^/apis/v2/nmd/status/.*$`},
+
     #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus
     {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
     {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
@@ -320,10 +318,7 @@ allowed_methods := {
       {"method": "HEAD",  "path": `.*`},
   ],
   "ckdump": [
-      {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-      {"method": "HEAD",  "path": `^/apis/v2/nmd/.*$`},
-      {"method": "POST",  "path": `^/apis/v2/nmd/.*$`},
-      {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
+      {"method": "PUT",  "path": `^/apis/v2/nmd/status/.*$`},
   ],
 }
 
@@ -356,38 +351,23 @@ spire_methods := {
   {{- end }}
   ],
   "cps": [
-    {"method": "GET",  "path": `^/apis/v2/cps/.*$`},
-    {"method": "HEAD", "path": `^/apis/v2/cps/.*$`},
-    {"method": "POST", "path": `^/apis/v2/cps/.*$`},
+    {"method": "GET",  "path": `^/apis/v2/cps/transports`},
+    {"method": "POST",  "path": `^/apis/v2/cps/contents$`},
+    {"method": "POST",  "path": `^/apis/v2/cps/transports$`},
   ],
   "dvs": [
 
     {{- if .Values.opa.xnamePolicy.dvs }}
-    {"method": "GET", "path": sprintf("^/apis/v2/nmd/status/%v$", [parsed_spire_token.xname])},
-    {"method": "PUT", "path": sprintf("^/apis/v2/nmd/status/%v$", [parsed_spire_token.xname])},
-    {"method": "GET", "path": `^/apis/v2/nmd/sdf/dump/discovery$`},
-    {"method": "GET", "path": `^/apis/v2/nmd/sdf/dump/targets`},
-    {"method": "GET", "path": `^/apis/v2/nmd/status$`},
-    {"method": "GET", "path": `^/apis/v2/nmd/healthz/live$`},
-    {"method": "GET", "path": `^/apis/v2/nmd/healthz/ready$`},
-
     {"method": "GET", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents$", [parsed_spire_token.xname])},
     {"method": "POST", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
     {"method": "PATCH", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
     {"method": "DELETE", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
     {{- else }}
-    {"method": "POST", "path": `^/apis/v2/nmd/dumps$`},
-    {"method": "PUT",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST",  "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
-
     {"method": "GET", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     {"method": "POST", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     {"method": "DELETE", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     {{- end }}
-    {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
-    {"method": "POST", "path": `^/apis/v2/nmd/artifacts$`},
     # These pass xnames via POST. This will be removed once the v2 API is being used.
     {"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
 
@@ -404,17 +384,11 @@ spire_methods := {
     {"method": "DELETE","path": `^/apis/hmnfd/hmi/v1/subscribe$`},
   ],
   "ckdump": [
-    {{- if .Values.opa.xnamePolicy.dvs }}
-      {"method": "GET", "path": sprintf("^/apis/v2/nmd/dumps\\?xname=%v$", [parsed_spire_token.xname])},
-      {"method": "GET", "path": `^/apis/v2/nmd/dumps/.*$`},
-      {"method": "GET", "path": `^/apis/v2/nmd/sdf/dump/.*$`},
+    {{- if .Values.opa.xnamePolicy.ckdump }}
       {"method": "PUT", "path": sprintf("^/apis/v2/nmd/status/%v$", [parsed_spire_token.xname])},
     {{- else }}
-      {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
+      {"method": "PUT", "path": `^/apis/v2/nmd/status/.*$`},
     {{- end }}
-      {"method": "HEAD", "path": `^/apis/v2/nmd/.*$`},
-      # This method passes xname via POST
-      {"method": "POST", "path": `^/apis/v2/nmd/dumps$`},
   ],
   "wlm": [
       # PALS - application launch
@@ -480,8 +454,6 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/wlm": spire_methods["wlm"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/bos-state-reporter": spire_methods["bos"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/ckdump": spire_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount": spire_methods["cps"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount_helper": spire_methods["cps"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/dvs-hmi": spire_methods["dvs"],
@@ -513,9 +485,9 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/storage/workload/cfs-state-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump": allowed_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/workload/ckdump": allowed_methods["ckdump"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump_helper": allowed_methods["ckdump"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/ckdump_helper": allowed_methods["ckdump"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/workload/ckdump_helper": allowed_methods["ckdump"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cpsmount_helper": allowed_methods["system-compute"],
