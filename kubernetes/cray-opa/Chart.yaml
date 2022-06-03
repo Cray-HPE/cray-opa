@@ -21,18 +21,17 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-apiVersion: v2
-name: cray-opa
-version: 1.10.0
-description: Cray Open Policy Agent
-keywords:
-  - opa
-home: https://github.com/Cray-HPE/cray-opa
-sources:
-  - https://github.com/Cray-HPE/cray-opa
-maintainers:
-  - name: kburns-hpe
-  - name: brantk-hpe
-appVersion: 0.24.0
 annotations:
   artifacthub.io/license: MIT
+apiVersion: v2
+appVersion: 0.24.0
+description: Cray Open Policy Agent
+home: https://github.com/Cray-HPE/cray-opa
+keywords:
+- opa
+maintainers:
+- name: kburns-hpe
+name: cray-opa
+sources:
+- https://github.com/Cray-HPE/cray-opa
+version: 1.10.5

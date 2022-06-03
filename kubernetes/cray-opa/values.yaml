@@ -103,7 +103,7 @@ opa:
 affinity:
   # set default to 'preferred' for default preferred anti affinity rule
   # set default to 'required' for default required anti affinity rule
-  default: required
+  default: preferred
 
 jwtValidation:
   keycloak:
