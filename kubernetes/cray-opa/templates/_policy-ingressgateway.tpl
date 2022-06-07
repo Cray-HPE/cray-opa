@@ -213,7 +213,7 @@ parsed_spire_token = {"payload": payload} {
 # Get the users roles from the JWT token
 roles_for_user[r] {
     r := parsed_kc_token.payload.resource_access.shasta.roles[_]
-    # add the role header for Grafana v8.1.x and above, see https://github.com/grafana/grafana/issues/8816
+    # Add the role header for Grafana v8.1.x and above, see https://github.com/grafana/grafana/issues/8816
     headers["X-WEBAUTH-ROLE"] := r
 }
 
