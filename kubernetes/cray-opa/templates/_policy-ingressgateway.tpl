@@ -37,6 +37,21 @@ allow {
     http_request.headers["x-envoy-decorator-operation"] = "nexus.nexus.svc.cluster.local:80/*"
 }
 
+# Whitelist traffic to the Grafana web UI since it uses Keycloak for authentication.
+allow {
+    http_request.headers["x-envoy-decorator-operation"] = "grafana.sysmgmt-health.svc.cluster.local:80/*"
+}
+
+# Whitelist traffic to SMA Grafana web UI since it uses Keycloak for authentication.
+allow {
+    http_request.headers["x-envoy-decorator-operation"] = "sma-grafana.services.svc.cluster.local:3000/*"
+}
+
+# Whitelist traffic to SMA Kibana web UI since it uses Keycloak for authentication.
+allow {
+    http_request.headers["x-envoy-decorator-operation"] = "sma-kibana.services.svc.cluster.local:5601/*"
+}
+
 # The path being requested from the user. When the envoy filter is configured for
 # SIDECAR_INBOUND this is: http_request.headers["x-envoy-original-path"].
 # When configured for GATEWAY this is http_request.path
@@ -157,6 +172,8 @@ parsed_kc_token = {"payload": payload} {
 {{- end }}
     ]
     allowed_issuers[_] = payload.iss
+    # Add the username to the header for Grafana
+    headers["X-WEBAUTH-USER"] := payload.preferred_username
 }
 
 {{- if .Values.opa.xnamePolicy.enabled }}
@@ -196,6 +213,8 @@ parsed_spire_token = {"payload": payload} {
 # Get the users roles from the JWT token
 roles_for_user[r] {
     r := parsed_kc_token.payload.resource_access.shasta.roles[_]
+    # add the role header for Grafana v8.1.x and above, see https://github.com/grafana/grafana/issues/8816
+    headers["X-WEBAUTH-ROLE"] := r
 }
 
 # Determine if the path/verb requests is authorized based on the JWT roles
@@ -322,8 +341,12 @@ allowed_methods := {
       {"method": "PUT",  "path": `^/apis/v2/nmd/status/.*$`},
   ],
   "monitor-ro": [
+      # Grafana web access
+      {"method": "GET", "path": `^/grafana.*$`},
       # SMA
       {"method": "GET", "path": `^/apis/sma-telemetry-api/.*$`}, # All SMA telemetry API Calls - GET
+      {"method": "GET", "path": `^/sma-grafana.*$`},
+      {"method": "GET", "path": `^/sma-kibana.*$`},
   ],
 }
 
