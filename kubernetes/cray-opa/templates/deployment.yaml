@@ -22,6 +22,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */}}
 {{- range $name, $options:= .Values.ingresses }}
+{{ $uuid := uuidv4 }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -43,6 +44,7 @@ spec:
         app.kubernetes.io/name: cray-opa-{{ $name }}
         app.kubernetes.io/instance: {{ $.Release.Name }}
         app.kubernetes.io/managed-by: {{ $.Release.Service }}
+        deployment/uuid: {{ $uuid }}
     spec:
       containers:
       - image: {{ $.Values.image.repository }}:{{ $.Values.image.tag }}
@@ -120,10 +122,10 @@ spec:
            requiredDuringSchedulingIgnoredDuringExecution:
              - labelSelector:
                  matchExpressions:
-                 - key: app.kubernetes.io/name
+                 - key: deployment/uuid
                    operator: In
                    values:
-                   - cray-opa-{{ $name }}
+                   - {{ $uuid }}
                topologyKey: kubernetes.io/hostname
       {{- end }}
       {{ if $options.affinity }}
