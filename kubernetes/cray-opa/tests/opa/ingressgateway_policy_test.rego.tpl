@@ -284,3 +284,18 @@ test_nexus {
   # Not allowed
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "nexus_mock_path", "headers": {"x-envoy-decorator-operation": "invalid"}}}}}
 }
+
+test_argo_server{
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "argo_mock_path", "headers": {"authorization": "Bearer {{ .adminToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
+
+  # Not allowed: User/No token
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "argo_mock_path", "headers": {"authorization": "Bearer {{ .userToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "argo_mock_path", "headers": {"x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
+
+  # Not allowed: POST/PUT/DELETE/PATCH/HEAD
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "argo_mock_path", "headers": {"authorization": "Bearer {{ .adminToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "argo_mock_path", "headers": {"authorization": "Bearer {{ .adminToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "argo_mock_path", "headers": {"authorization": "Bearer {{ .adminToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "argo_mock_path", "headers": {"authorization": "Bearer {{ .adminToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "argo_mock_path", "headers": {"authorization": "Bearer {{ .adminToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
+}
