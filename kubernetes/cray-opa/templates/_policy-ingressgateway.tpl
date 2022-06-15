@@ -114,7 +114,7 @@ allow {
 #   - Block access for all other users
 allow {
   http_request.headers["x-envoy-decorator-operation"] = "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"
-  argo_admin_role
+  parsed_kc_token.payload.resource_access.shasta.roles[_] = "admin"
   http_request.method = "GET"
 }
 
@@ -207,10 +207,6 @@ parsed_spire_token = {"payload": payload} {
 # Get the users roles from the JWT token
 roles_for_user[r] {
     r := parsed_kc_token.payload.resource_access.shasta.roles[_]
-}
-
-argo_admin_role {
-  parsed_kc_token.payload.resource_access.shasta.roles[_] = "admin"
 }
 
 # Determine if the path/verb requests is authorized based on the JWT roles
