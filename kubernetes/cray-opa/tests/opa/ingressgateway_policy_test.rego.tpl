@@ -289,8 +289,8 @@ test_argo_server{
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "argo_mock_path", "headers": {"x-forwarded-access-token": "{{ .adminToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
 
   # Not allowed: User/No token
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "argo_mock_path", "headers": {"x-forwarded-access-token": "{{ .userToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "argo_mock_path", "headers": {"x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "argo_mock_path", "headers": {"x-forwarded-access-token": "{{ .userToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "argo_mock_path", "headers": {"x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
 
   # Not allowed: POST/PUT/DELETE/PATCH/HEAD
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "argo_mock_path", "headers": {"x-forwarded-access-token": "{{ .adminToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
