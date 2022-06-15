@@ -105,6 +105,17 @@ allow {
 allow {
     roles_for_user[r]
     required_roles[r]
+    # exclude argo ui server
+    not http_request.headers["x-envoy-decorator-operation"] = "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"
+}
+
+# Handle argo UI server
+#   - READ-only for admin
+#   - Block access for all other users
+allow {
+  http_request.headers["x-envoy-decorator-operation"] = "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"
+  parsed_kc_token.payload.resource_access.shasta.roles[_] = "admin"
+  http_request.method = "GET"
 }
 
 
