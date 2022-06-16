@@ -37,6 +37,21 @@ allow {
     http_request.headers["x-envoy-decorator-operation"] = "nexus.nexus.svc.cluster.local:80/*"
 }
 
+# Whitelist traffic to the Grafana web UI since it uses Keycloak for authentication.
+allow {
+    http_request.headers["x-envoy-decorator-operation"] = "cray-sysmgmt-health-grafana.sysmgmt-health.svc.cluster.local:80/*"
+}
+
+# Whitelist traffic to SMA Grafana web UI since it uses Keycloak for authentication.
+allow {
+    http_request.headers["x-envoy-decorator-operation"] = "sma-grafana.services.svc.cluster.local:3000/*"
+}
+
+# Whitelist traffic to SMA Kibana web UI since it uses Keycloak for authentication.
+allow {
+    http_request.headers["x-envoy-decorator-operation"] = "sma-kibana.services.svc.cluster.local:5601/*"
+}
+
 # The path being requested from the user. When the envoy filter is configured for
 # SIDECAR_INBOUND this is: http_request.headers["x-envoy-original-path"].
 # When configured for GATEWAY this is http_request.path
@@ -333,6 +348,10 @@ allowed_methods := {
   "ckdump": [
       {"method": "PUT",  "path": `^/apis/v2/nmd/status/.*$`},
   ],
+  "monitor-ro": [
+      # SMA
+      {"method": "GET", "path": `^/apis/sma-telemetry-api/.*$`}, # All SMA telemetry API Calls - GET
+  ],
 }
 
 # Our list of endpoints we accept based on roles.
@@ -343,6 +362,7 @@ role_perms = {
     "system-compute": allowed_methods["system-compute"],
     "wlm": allowed_methods["wlm"],
     "admin": allowed_methods["admin"],
+    "monitor-ro": allowed_methods["monitor-ro"],
 }
 
 {{- if .Values.opa.xnamePolicy.enabled }}
