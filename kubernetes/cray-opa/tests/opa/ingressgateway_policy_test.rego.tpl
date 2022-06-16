@@ -285,6 +285,21 @@ test_nexus {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "nexus_mock_path", "headers": {"x-envoy-decorator-operation": "invalid"}}}}}
 }
 
+test_grafana {
+  # Allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "grafana_mock_path", "headers": {"x-envoy-decorator-operation": "cray-sysmgmt-health-grafana.sysmgmt-health.svc.cluster.local:80/*"}}}}}
+}
+
+test_sma_grafana {
+  # Allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "sma_grafana_mock_path", "headers": {"x-envoy-decorator-operation": "sma-grafana.services.svc.cluster.local:3000/*"}}}}}
+}
+
+test_sma_kibana {
+  # Allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "sma_kibana_mock_path", "headers": {"x-envoy-decorator-operation": "sma-kibana.services.svc.cluster.local:5601/*"}}}}}
+}
+
 test_argo_server{
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "argo_mock_path", "headers": {"x-forwarded-access-token": "{{ .adminToken }}", "x-envoy-decorator-operation": "cray-nls-argo-workflows-server.argo.svc.cluster.local:2746/*"}}}}}
 
