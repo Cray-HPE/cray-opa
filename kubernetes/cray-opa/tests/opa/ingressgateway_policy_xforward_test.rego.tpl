@@ -12,6 +12,8 @@ test_allow_bypassed_urls_with_no_auth_header {
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/v2"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/service/rest"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/capsules/"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/spire-jwks-token/"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/spire-jwks-test/"}}}}
 }
 
 test_deny_tokens_endpoint {

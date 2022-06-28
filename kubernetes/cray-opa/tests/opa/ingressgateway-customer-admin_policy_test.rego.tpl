@@ -16,6 +16,8 @@ test_allow_bypassed_urls_with_no_auth_header {
 
 test_deny_tokens_api {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/apis/tokens"}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/spire-jwks-token/"}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/spire-jwks-test/"}}}}
 }
 
 test_deny_apis_with_no_auth_header {
@@ -270,3 +272,4 @@ test_nexus {
   # Not allowed
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "nexus_mock_path", "headers": {"x-envoy-decorator-operation": "invalid"}}}}}
 }
+
