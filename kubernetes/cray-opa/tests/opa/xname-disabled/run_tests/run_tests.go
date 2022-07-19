@@ -39,7 +39,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/sprig"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 )
 
 type tokenCreator struct {
