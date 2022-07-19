@@ -22,7 +22,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 
-FROM arti.dev.cray.com/baseos-docker-master-local/golang:1.14.9-alpine3.12 AS builder
+FROM artifactory.algol60.net/csm-docker/stable/docker.io/library/golang:1.17.3-alpine3.15 AS builder
 
 ENV GO111MODULE=on \
   CGO_ENABLED=0 \
