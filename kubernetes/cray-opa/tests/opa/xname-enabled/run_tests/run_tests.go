@@ -528,6 +528,9 @@ func main() {
 
 	fmt.Printf("%s", greeting)
 	fmt.Println("*****")
+	fmt.Printf("Policy File: %s\n", policyTemplateFilename)
+	fmt.Printf("Test File: %s\n", testTemplateFilename)
+	fmt.Printf("Template: %s\n", policyTemplateName)
 
 	fmt.Println("Executing ./opa_envoy_linux_amd64 check -S ./policy.rego ./test.rego")
 
