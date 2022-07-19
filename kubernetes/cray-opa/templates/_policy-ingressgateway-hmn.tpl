@@ -86,10 +86,14 @@ required_roles[r] {
     re_match(perm.path, original_path)
 }
 
+# Our list of endpoints we accept based on roles.
+role_perms = {
+    "admin": allowed_methods["fabric"],
+}
 
 allowed_methods := {
   "fabric": [
-      # PALS - application launch
+      # Fabric Manager API access
       {"method": "GET", "path": `^/apis/fabric-manager/.*$`},
       {"method": "HEAD", "path": `^/apis/fabric-manager/.*$`},
       {"method": "POST", "path": `^/apis/fabric-manager/.*$`},
@@ -97,8 +101,4 @@ allowed_methods := {
   ],
 }
 
-# Our list of endpoints we accept based on roles.
-role_perms = {
-    "admin": allowed_methods["fabric"],
-}
 {{ end }}
