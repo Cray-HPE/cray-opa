@@ -124,7 +124,8 @@ func main() {
 	var spireSub string
 
 	args := createTokenArgs{
-		role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
+		role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer",
+	}
 	adminToken, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -139,7 +140,8 @@ func main() {
 	fmt.Println("user token:", userToken)
 
 	args = createTokenArgs{
-		role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Invalid"}
+		role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Invalid",
+	}
 	invalidTypAdminToken, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -147,7 +149,8 @@ func main() {
 	fmt.Println("Invalid typ admin token:", invalidTypAdminToken)
 
 	args = createTokenArgs{
-		role: "system-pxe", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
+		role: "system-pxe", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer",
+	}
 	pxeToken, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -155,7 +158,8 @@ func main() {
 	fmt.Println("pxe token:", pxeToken)
 
 	args = createTokenArgs{
-		role: "system-compute", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
+		role: "system-compute", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer",
+	}
 	computeToken, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -171,7 +175,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/invalid"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireInvalidSub, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -180,7 +185,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/ncn/workload/cfs-state-reporter"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireNcnCfsStateReporter, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -189,7 +195,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/ncn/workload/ckdump"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireNcnCkdump, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -198,7 +205,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/ncn/workload/ckdump_helper"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireNcnCkdumpHelper, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -207,7 +215,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/ncn/workload/cpsmount"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireNcnCpsmount, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -216,7 +225,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/ncn/workload/cpsmount_helper"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireNcnCpsmountHelper, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -225,7 +235,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/ncn/workload/dvs-hmi"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireNcnDvsHmi, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -234,7 +245,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/ncn/workload/dvs-map"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireNcnDvsMap, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -243,7 +255,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/ncn/workload/heartbeat"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireNcnHeartbeat, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -252,7 +265,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/ncn/workload/orca"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireNcnOrca, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -261,7 +275,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/compute/workload/cfs-state-reporter"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireComputeCfsStateReporter, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -270,7 +285,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/compute/workload/ckdump"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireComputeCkdump, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -279,7 +295,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/compute/workload/ckdump_helper"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireComputeCkdumpHelper, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -288,7 +305,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/compute/workload/cpsmount"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireComputeCpsmount, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -297,7 +315,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/compute/workload/cpsmount_helper"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireComputeCpsmountHelper, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -306,7 +325,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/compute/workload/dvs-hmi"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireComputeDvsHmi, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -315,7 +335,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/compute/workload/dvs-map"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireComputeDvsMap, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -324,7 +345,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/compute/workload/heartbeat"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireComputeHeartbeat, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -333,7 +355,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/compute/workload/orca"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireComputeOrca, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -342,7 +365,8 @@ func main() {
 
 	spireSub = "spiffe://shasta/compute/workload/wlm"
 	args = createTokenArgs{
-		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub}
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
 	spireComputeWlm, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
@@ -417,7 +441,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Read the test template file %v", string(dat))
+	fmt.Printf("Read the test template file %v", string(dat))
 
 	tpl = template.Must(
 		template.New("base").Funcs(sprig.FuncMap()).Parse(string(dat)))
@@ -497,9 +521,20 @@ func main() {
 	fmt.Printf("%s", greeting)
 	fmt.Println("*****")
 
+	fmt.Println("Executing ./opa_envoy_linux_amd64 check -S ./policy.rego ./test.rego")
+
+	cmd := exec.Command("./opa_envoy_linux_amd64", "check", "-S", "./policy.rego")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err = cmd.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	fmt.Println("Executing ./opa_envoy_linux_amd64 test ./policy.rego ./test.rego -v")
 
-	cmd := exec.Command("./opa_envoy_linux_amd64", "test", "./policy.rego", "./test.rego", "-v")
+	cmd = exec.Command("./opa_envoy_linux_amd64", "test", "./policy.rego", "./test.rego", "-v")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
