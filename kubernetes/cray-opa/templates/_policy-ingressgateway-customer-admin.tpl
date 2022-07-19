@@ -22,14 +22,22 @@ allow {
     # Limit scope to hmcollector to prevent unauthenticated access to other
     # management services.
     http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
-    any([
-        # HMN subnet (River)
-        net.cidr_contains("10.254.0.0/17", source_address.Address.SocketAddress.address),
-        # HMN subnet (Mountain)
-        net.cidr_contains("10.100.106.0/23", source_address.Address.SocketAddress.address),
-        # pod subnet
-        net.cidr_contains("10.32.0.0/12", source_address.Address.SocketAddress.address),
-    ])
+    # HMN subnet (River)
+    net.cidr_contains("10.254.0.0/17", source_address.Address.SocketAddress.address)
+}
+allow {
+    # Limit scope to hmcollector to prevent unauthenticated access to other
+    # management services.
+    http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
+    # HMN subnet (Mountain)
+    net.cidr_contains("10.100.106.0/23", source_address.Address.SocketAddress.address)
+}
+allow {
+    # Limit scope to hmcollector to prevent unauthenticated access to other
+    # management services.
+    http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
+    # pod subnet
+    net.cidr_contains("10.32.0.0/12", source_address.Address.SocketAddress.address)
 }
 
 # Whitelist traffic to the Neuxs web UI since it uses Keycloak for authentication.
@@ -64,41 +72,25 @@ original_path = o_path {
 #
 #     * VCS/Gitea
 #
-allow {
-    any([
-        startswith(original_path, "/keycloak"),
-        startswith(original_path, "/vcs"),
-    ])
-}
+allow { startswith(original_path, "/keycloak") }
+allow { startswith(original_path, "/vcs") }
 
 # Allow cloud-init endpoints, as we do validation based on incoming IP.
 # In the future, these requests will come in via the TOR switches and ideally
 # not through the 'front door'.   This is an expansion to BSS.
-allow {
-    any([
-        startswith(original_path, "/meta-data"),
-        startswith(original_path, "/user-data"),
-        startswith(original_path, "/phone-home"),
-    ])
-}
+allow { startswith(original_path, "/meta-data") }
+allow { startswith(original_path, "/user-data") }
+allow { startswith(original_path, "/phone-home") }
 
 # Whitelist Nexus repository pods. Nexus uses it's own RBAC so open
 # all commands. Keycloak Gatekeeper is used to pass the tokens through
-allow {
-    any([
-        startswith(original_path, "/repository"),
-        startswith(original_path, "/v2"),
-        startswith(original_path, "/service/rest"),
-    ])
-}
+allow { startswith(original_path, "/repository") }
+allow { startswith(original_path, "/v2") }
+allow { startswith(original_path, "/service/rest") }
 
 # Whitelist Capsules UI. The Capsules UI starts at a login page which validates user access by retrieving a valid
 # token from keycloak with the provided credentials.
-allow {
-    any([
-        startswith(original_path, "/capsules/")
-    ])
-}
+allow { startswith(original_path, "/capsules/") }
 
 # This actually checks the JWT token passed in
 # has access to the endpoint requested
@@ -123,7 +115,7 @@ found_auth = {"type": a_type, "token": a_token} {
 parsed_kc_token = {"payload": payload} {
     found_auth.type == "Bearer"
     response := http.send({"method": "get", "url": "{{ .Values.jwtValidation.keycloak.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
-    [valid, header, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "shasta"})
+    [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "shasta"})
 
     # Verify that the issuer is as expected.
     allowed_issuers := [

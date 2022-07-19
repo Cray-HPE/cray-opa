@@ -24,7 +24,7 @@
 ---
 image:
   repository: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa
-  tag: 0.26.0-envoy-6  # When changing this, also update tests/opa//Dockerfile.
+  tag: 0.42.1-envoy  # When changing this, also update tests/opa//Dockerfile.
   pullPolicy: IfNotPresent
 
 priorityClassName: csm-high-priority-service

@@ -23,7 +23,7 @@
 #
 apiVersion: v2
 name: cray-opa
-version: 1.17.0
+version: 1.18.0
 description: Cray Open Policy Agent
 keywords:
   - opa
@@ -31,7 +31,10 @@ home: https://github.com/Cray-HPE/cray-opa
 sources:
   - https://github.com/Cray-HPE/cray-opa
 maintainers:
-- name: kburns-hpe
-appVersion: 0.26.0
+  - name: kburns-hpe
+appVersion: 0.42.0
 annotations:
+  artifacthub.io/images: |-
+    - name: cray-opa
+      image: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa:0.42.1-envoy
   artifacthub.io/license: MIT
