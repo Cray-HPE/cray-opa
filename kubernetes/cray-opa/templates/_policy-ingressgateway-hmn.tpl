@@ -1,0 +1,106 @@
+{{- /*
+Copyright 2022 Hewlett Packard Enterprise Development LP
+*/ -}}
+{{ define "ingressgateway-hmn.policy" }}
+
+# Istio Ingress Customer User Gateway OPA Policy
+package istio.authz
+
+import input.attributes.request.http as http_request
+import input.attributes.source.address as source_address
+
+# Default return a 403 unless any of the allows are true
+default allow = {
+  "allowed": false,
+  "headers": {"x-ext-auth-allow": "no"},
+  "body": "Unauthorized Request",
+  "http_status": 403
+}
+
+# Whitelist traffic to HMS hmcollector from the HMN and pod subnets
+allow {
+    # Limit scope to hmcollector to prevent unauthenticated access to other
+    # management services.
+    http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
+    # HMN subnet (River)
+    net.cidr_contains("10.254.0.0/17", source_address.Address.SocketAddress.address)
+}
+allow {
+    # Limit scope to hmcollector to prevent unauthenticated access to other
+    # management services.
+    http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
+    # HMN subnet (Mountain)
+    net.cidr_contains("10.100.106.0/23", source_address.Address.SocketAddress.address)
+}
+allow {
+    # Limit scope to hmcollector to prevent unauthenticated access to other
+    # management services.
+    http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
+    # pod subnet
+    net.cidr_contains("10.32.0.0/12", source_address.Address.SocketAddress.address)
+}
+
+
+# The path being requested from the user. When the envoy filter is configured for
+# SIDECAR_INBOUND this is: http_request.headers["x-envoy-original-path"].
+# When configured for GATEWAY this is http_request.path
+original_path = o_path {
+    o_path := http_request.path
+}
+
+allow {
+    roles_for_user[r]
+    required_roles[r]
+}
+
+# Check if there is an authorization header and split the type from token
+found_auth = {"type": a_type, "token": a_token} {
+    [a_type, a_token] := split(http_request.headers.authorization, " ")
+}
+
+# If the auth type is bearer, decode the JWT
+parsed_kc_token = {"payload": payload} {
+    found_auth.type == "Bearer"
+    response := http.send({"method": "get", "url": "{{ .Values.jwtValidation.keycloak.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
+    [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "shasta"})
+
+    # Verify that the issuer is as expected.
+    allowed_issuers := [
+{{- range $key, $value := index .Values "ingresses" "ingressgateway-hmn" "issuers" }}
+      "{{ $value }}",
+{{- end }}
+    ]
+    allowed_issuers[_] = payload.iss
+}
+
+
+# Get the users roles from the JWT token
+roles_for_user[r] {
+    r := parsed_kc_token.payload.resource_access.shasta.roles[_]
+}
+
+# Determine if the path/verb requests is authorized based on the JWT roles
+required_roles[r] {
+    perm := role_perms[r][_]
+    perm.method = http_request.method
+    re_match(perm.path, original_path)
+}
+
+# Our list of endpoints we accept based on roles.
+role_perms = {
+    "admin": allowed_methods["fabric"],
+}
+
+allowed_methods := {
+  "fabric": [
+      # Fabric Manager API access
+      {"method": "DELETE", "path": `^/apis/fabric-manager/.*$`},
+      {"method": "GET", "path": `^/apis/fabric-manager/.*$`},
+      {"method": "HEAD", "path": `^/apis/fabric-manager/.*$`},
+      {"method": "PATCH", "path": `^/apis/fabric-manager/.*$`},
+      {"method": "POST", "path": `^/apis/fabric-manager/.*$`},
+      {"method": "PUT", "path": `^/apis/fabric-manager/.*$`},
+  ],
+}
+
+{{ end }}

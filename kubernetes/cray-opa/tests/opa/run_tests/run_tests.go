@@ -396,6 +396,9 @@ func main() {
 				"ingressgateway-customer-user": map[string]interface{}{
 					"issuers": []string{keycloakIssuer},
 				},
+				"ingressgateway-hmn": map[string]interface{}{
+					"issuers": []string{keycloakIssuer},
+				},
 			},
 			"jwtValidation": map[string]interface{}{
 				"keycloak": map[string]interface{}{

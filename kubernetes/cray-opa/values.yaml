@@ -50,6 +50,11 @@ ingresses:
     labelSelector:
       istio: ingressgateway-customer-user
     issuers: []
+  ingressgateway-hmn:
+    namespace: istio-system
+    labelSelector:
+      istio: istio-ingressgateway-hmn
+    issuers: []
 
 opa:
   replicas: 3
