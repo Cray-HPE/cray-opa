@@ -53,7 +53,7 @@ ingresses:
   ingressgateway-hmn:
     namespace: istio-system
     labelSelector:
-      istio: ingressgateway-hmn
+      istio: istio-ingressgateway-hmn
     issuers: []
 
 opa:
