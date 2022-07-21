@@ -94,10 +94,12 @@ role_perms = {
 allowed_methods := {
   "fabric": [
       # Fabric Manager API access
+      {"method": "DELETE", "path": `^/apis/fabric-manager/.*$`},
       {"method": "GET", "path": `^/apis/fabric-manager/.*$`},
       {"method": "HEAD", "path": `^/apis/fabric-manager/.*$`},
+      {"method": "PATCH", "path": `^/apis/fabric-manager/.*$`},
       {"method": "POST", "path": `^/apis/fabric-manager/.*$`},
-      {"method": "DELETE", "path": `^/apis/fabric-manager/.*$`},
+      {"method": "PUT", "path": `^/apis/fabric-manager/.*$`},
   ],
 }
 

@@ -37,15 +37,17 @@ compute_auth = "Bearer {{ .computeToken }}"
 
 fabric_mock_path = "/apis/fabric-manager/mock"
 
-allow_fabric_when_admin {
+test_allow_fabric_when_admin {
   # Deny random api path
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/api/api1", "headers": {"authorization": "Bearer {{ .adminToken }}" }}}}}
 
   # Allow fabric path
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .adminToken }}" }}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .adminToken }}" }}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .adminToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .adminToken }}" }}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .adminToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .adminToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .adminToken }}" }}}}}
 }
 
 compute_auth = "Bearer {{ .computeToken }}"
