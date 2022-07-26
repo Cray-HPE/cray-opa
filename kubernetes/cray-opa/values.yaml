@@ -85,7 +85,7 @@ opa:
   # http.send requests default to 5s timeout. This was failing on a system so
   # increase this to 10s.
   httpTimeout: 10s
-  requireHeartbeatToken: false
+  requireHeartbeatToken: true
   xnamePolicy:
     enabled: false
     bos: false
