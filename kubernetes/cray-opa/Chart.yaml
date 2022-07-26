@@ -34,4 +34,4 @@ maintainers:
 name: cray-opa
 sources:
 - https://github.com/Cray-HPE/cray-opa
-version: 1.10.6
+version: 1.10.7
