@@ -7,8 +7,8 @@ package istio.authz
 
 
 test_spire_heartbeat_wrong_xname {
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/hbtd/v1/heartbeat/invalid", "headers": {"authorization": "Bearer {{ .spire.compute.heartbeat }}"}, "body": "{\"Component\": \"invalid\",\"Hostname\": \"compute1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}}
-  allow.http_status  == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/hbtd/v1/heartbeat/invalid", "headers": {"authorization": "Bearer {{ .spire.ncn.heartbeat }}"}, "body": "{\"Component\": \"invalid\",\"Hostname\": \"ncn1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/hbtd/hmi/v1/heartbeat/invalid", "headers": {"authorization": "Bearer {{ .spire.compute.heartbeat }}"}, "body": "{\"Component\": \"invalid\",\"Hostname\": \"compute1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}}
+  allow.http_status  == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/hbtd/hmi/v1/heartbeat/invalid", "headers": {"authorization": "Bearer {{ .spire.ncn.heartbeat }}"}, "body": "{\"Component\": \"invalid\",\"Hostname\": \"ncn1\",\"NID\": \"0\",\"Status\": \"OK\",\"Timestamp\": \"2021-09-23T22:52:00.955107+00:00\"}" }}}}
 }
 
 spire_wrong_xname_sub(sub) {
