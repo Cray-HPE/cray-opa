@@ -480,6 +480,7 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/heartbeat": spire_methods["heartbeat"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/orca": spire_methods["dvs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/heartbeat": spire_methods["heartbeat"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/bos-state-reporter": spire_methods["bos"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/ckdump": spire_methods["ckdump"],
@@ -517,7 +518,11 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/dvs-map": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/orca": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/orca": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/wlm": allowed_methods["wlm"]
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/wlm": allowed_methods["wlm"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/heartbeat": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/heartbeat": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/storage/workload/heartbeat": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/workload/heartbeat": allowed_methods["system-compute"],
 }
 {{- end }}
 {{ end }}
