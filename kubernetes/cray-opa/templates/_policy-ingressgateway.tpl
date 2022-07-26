@@ -279,7 +279,8 @@ allowed_methods := {
     {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     {"method": "DELETE", "path": `^/apis/hmnfd/hmi/v2/subscriptions/.*$`},
     #HBTD -> allow a compute to send a heartbeat
-    {"method": "POST",  "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
+    {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
+    {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
 
 
   ],
@@ -450,10 +451,10 @@ spire_methods := {
   ],
   "heartbeat": [
     {{- if .Values.opa.xnamePolicy.heartbeat }}
-     {"method": "POST", "path": sprintf("^/apis/hbtd/v1/heartbeat/%v$", [parsed_spire_token.xname])},
+     {"method": "POST", "path": sprintf("^/apis/hbtd/hmi/v1/heartbeat/%v$", [parsed_spire_token.xname])},
     {{- else }}
      {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
-     {"method": "POST", "path": `^/apis/hbtd/v1/heartbeat/.*$`},
+     {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
     {{- end }}
 
   ]
