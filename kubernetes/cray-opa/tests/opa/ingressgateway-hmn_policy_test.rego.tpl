@@ -12,6 +12,7 @@ test_deny_bypassed_urls_with_no_auth_header {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/v2"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/service/rest"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/capsules/"}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/apis/gozerd/"}}}}
 }
 
 test_deny_tokens_api {

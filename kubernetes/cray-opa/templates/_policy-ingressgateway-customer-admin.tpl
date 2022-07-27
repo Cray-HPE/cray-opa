@@ -92,6 +92,9 @@ allow { startswith(original_path, "/service/rest") }
 # token from keycloak with the provided credentials.
 allow { startswith(original_path, "/capsules/") }
 
+# Whitelist gozerd (does its own MUNGE auth)
+allow { startswith(original_path, "/apis/gozerd/") }
+
 # This actually checks the JWT token passed in
 # has access to the endpoint requested
 allow {
@@ -166,12 +169,6 @@ allowed_methods := {
       {"method": "GET", "path": `^/apis/sma-telemetry-api/.*$`}, # All SMA telemetry API Calls - GET
   ],
   "wlm": [
-      # PALS - application launch
-      {"method": "GET", "path": `^/apis/pals/.*$`},
-      {"method": "HEAD", "path": `^/apis/pals/.*$`},
-      {"method": "POST", "path": `^/apis/pals/.*$`},
-      {"method": "DELETE", "path": `^/apis/pals/.*$`},
-
       # CAPMC - power capping and power control; eventually this will need to add PCS
         ## CAPMC -> Xnames
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_xname_status$`},
@@ -182,7 +179,6 @@ allowed_methods := {
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap_capabilities$`},
       {"method": "POST", "path": `^/apis/capmc/capmc/v1/set_power_cap$`},
-
       # BOS - node boot
       {"method": "GET", "path": `^/apis/bos/.*$`},
       {"method": "HEAD", "path": `^/apis/bos/.*$`},
@@ -192,12 +188,16 @@ allowed_methods := {
       # SMD - hardware state query
       {"method": "GET",  "path": `^/apis/smd/hsm/v2/.*$`},
       {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},
-      # FC - VNI reservation
-      {"method": "GET", "path": `^/apis/fc/.*$`},
-      {"method": "HEAD", "path": `^/apis/fc/.*$`},
-      {"method": "POST", "path": `^/apis/fc/.*$`},
-      {"method": "PUT", "path": `^/apis/fc/.*$`},
-      {"method": "DELETE", "path": `^/apis/fc/.*$`},
+      # VNID - VNI reservation
+      {"method": "GET", "path": `^/apis/vnid/.*$`},
+      {"method": "HEAD", "path": `^/apis/vnid/.*$`},
+      {"method": "POST", "path": `^/apis/vnid/.*$`},
+      {"method": "DELETE", "path": `^/apis/vnid/.*$`},
+      # jackaloped - scalable startup
+      {"method": "GET", "path": `^/apis/jackaloped/.*$`},
+      {"method": "HEAD", "path": `^/apis/jackaloped/.*$`},
+      {"method": "POST", "path": `^/apis/jackaloped/.*$`},
+      {"method": "DELETE", "path": `^/apis/jackaloped/.*$`},
   ],
   "admin": [
       {"method": "GET",  "path": `.*`},
