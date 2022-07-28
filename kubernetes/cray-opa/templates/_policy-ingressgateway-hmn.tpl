@@ -3,7 +3,7 @@ Copyright 2022 Hewlett Packard Enterprise Development LP
 */ -}}
 {{ define "ingressgateway-hmn.policy" }}
 
-# Istio Ingress Customer User Gateway OPA Policy
+# Istio Ingress HMN Gateway OPA Policy
 package istio.authz
 
 import input.attributes.request.http as http_request
@@ -22,23 +22,11 @@ allow {
     # Limit scope to hmcollector to prevent unauthenticated access to other
     # management services.
     http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
-    # HMN subnet (River)
-    net.cidr_contains("10.254.0.0/17", source_address.Address.SocketAddress.address)
 }
-allow {
-    # Limit scope to hmcollector to prevent unauthenticated access to other
-    # management services.
-    http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
-    # HMN subnet (Mountain)
-    net.cidr_contains("10.100.106.0/23", source_address.Address.SocketAddress.address)
-}
-allow {
-    # Limit scope to hmcollector to prevent unauthenticated access to other
-    # management services.
-    http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
-    # pod subnet
-    net.cidr_contains("10.32.0.0/12", source_address.Address.SocketAddress.address)
-}
+
+# Whitelist Keycloak, since those services enable users to login and obtain
+# JWTs.
+allow { startswith(original_path, "/keycloak") }
 
 
 # The path being requested from the user. When the envoy filter is configured for
