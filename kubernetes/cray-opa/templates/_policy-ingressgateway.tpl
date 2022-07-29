@@ -268,6 +268,7 @@ allowed_methods := {
     #HBTD -> allow a compute to send a heartbeat
     {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
     {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
+    {"method": "GET", "path": `^/apis/hbtd/hmi/v1/params$`},
 
 
   ],
@@ -435,9 +436,11 @@ spire_methods := {
   "heartbeat": [
     {{- if .Values.opa.xnamePolicy.heartbeat }}
      {"method": "POST", "path": sprintf("^/apis/hbtd/hmi/v1/heartbeat/%v$", [parsed_spire_token.xname])},
+     {"method": "GET", "path": `^/apis/hbtd/hmi/v1/params$`},
     {{- else }}
      {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
      {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
+     {"method": "GET", "path": `^/apis/hbtd/hmi/v1/params$`},
     {{- end }}
 
   ]
