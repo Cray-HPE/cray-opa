@@ -3,7 +3,7 @@ Copyright 2022 Hewlett Packard Enterprise Development LP
 */ -}}
 {{ define "ingressgateway-hmn.policy" }}
 
-# Istio Ingress Customer User Gateway OPA Policy
+# Istio Ingress HMN OPA Policy
 package istio.authz
 
 import input.attributes.request.http as http_request
@@ -47,6 +47,9 @@ allow {
 original_path = o_path {
     o_path := http_request.path
 }
+
+# Whitelist Keycloak, since those services enable users to login and obtain JWTs.
+allow { startswith(original_path, "/keycloak") }
 
 allow {
     roles_for_user[r]

@@ -5,8 +5,11 @@ package istio.authz
 # allow.http_status is 403 when the request is rejected due to the default allow.
 # allow.http_status is not present the request is successful because the result is true.
 
+test_allow_bypassed_urls_with_no_auth_header {
+  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/keycloak"}}}}
+}
+
 test_deny_bypassed_urls_with_no_auth_header {
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/keycloak"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/vcs"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/repository"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/v2"}}}}
