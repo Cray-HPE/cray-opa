@@ -283,6 +283,7 @@ allowed_methods := {
     #HBTD -> allow a compute to send a heartbeat
     {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
     {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
+    {"method": "GET", "path": `^/apis/hbtd/hmi/v1/params$`},
 
 
   ],
@@ -446,6 +447,7 @@ spire_methods := {
      {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
      {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
     {{- end }}
+     {"method": "GET", "path": `^/apis/hbtd/hmi/v1/params$`},
 
   ]
 }
