@@ -123,6 +123,7 @@ test_compute {
 
   # HBTD - Allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hbtb_heartbeat_path, "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/hbtd/hmi/v1/params", "headers": {"authorization": "Bearer {{ .spire.compute.heartbeat }}"}}}}}
   # HBTD - Not Allowed
   # there is a global allow all on this path; so nothing can be not allowed;
 
