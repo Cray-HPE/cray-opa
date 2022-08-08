@@ -16,7 +16,7 @@ default allow = {
   "http_status": 403
 }
 
-# Whitelist traffic to HMS hmcollector from the HMN and pod subnets
+# Whitelist traffic to HMS hmcollector
 allow {
     http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
 }
