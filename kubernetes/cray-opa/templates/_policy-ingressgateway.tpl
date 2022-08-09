@@ -354,7 +354,7 @@ spire_methods := {
   "dvs": [
 
     {{- if .Values.opa.xnamePolicy.dvs }}
-    {"method": "GET", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents$", [parsed_spire_token.xname])},
+    {"method": "GET", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v$", [parsed_spire_token.xname])},
     {"method": "POST", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
     {"method": "PATCH", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},
     {"method": "DELETE", "path": sprintf("^/apis/hmnfd/hmi/v2/subscriptions/%v/agents/", [parsed_spire_token.xname])},

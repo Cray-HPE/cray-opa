@@ -18,7 +18,7 @@ spire_wrong_xname_sub(sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/nmd/dumps", "headers": {"authorization": sub}, "body": "{ \"xname\": [ \"invalid\" ] }"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/nmd/dumps?xname=invalid", "headers": {"authorization": sub}}}}}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/hmnfd/hmi/v2/subscriptions/invalid/agents", "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@invalid\"}"}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/hmnfd/hmi/v2/subscriptions/invalid", "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@invalid\"}"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/hmnfd/hmi/v2/subscriptions/invalid/agents/agent1", "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@invalid\"}"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/hmnfd/hmi/v2/subscriptions/invalid/agents/agent1", "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@invalid\"}"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/hmnfd/hmi/v2/subscriptions/invalid/agents/agent1", "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@invalid\"}"}}}}

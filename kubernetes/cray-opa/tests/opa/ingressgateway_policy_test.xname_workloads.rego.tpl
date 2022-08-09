@@ -217,7 +217,7 @@ spire_correct_ncn_sub(sub) {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@ncnw001\"}"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/hmnfd/hmi/v2/subscriptions/ncnw001/agents", "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@ncnw001\"}"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/hmnfd/hmi/v2/subscriptions/ncnw001", "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@ncnw001\"}"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/hmnfd/hmi/v2/subscriptions/ncnw001/agents/agent1", "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@ncnw001\"}"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/hmnfd/hmi/v2/subscriptions/ncnw001/agents/agent1", "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@ncnw001\"}"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/hmnfd/hmi/v2/subscriptions/ncnw001/agents/agent1", "headers": {"authorization": sub}, "body": "{\"Subscriber\": \"handler@ncnw001\"}"}}}}
