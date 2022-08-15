@@ -67,12 +67,13 @@ spec:
           {{- end }}
           - --log-level={{ $.Values.opa.loglevel }}
           - --config-file=/config/config.yaml
-          - /policy/policy.rego
+          - -b
+          - /policies/..data/
         volumeMounts:
           - mountPath: /config
             name: opa-istio-config
-          - mountPath: /policy
-            name: opa-policy
+          - mountPath: /policies
+            name: opa-policies
           {{- if $.Values.opa.tls.enabled }}
           - mountPath: /certs
             name: opa-certs
@@ -92,9 +93,46 @@ spec:
       - configMap:
           name: istio-config-{{ $name }}
         name: opa-istio-config
-      - configMap:
-          name: opa-policy-{{ $name }}
-        name: opa-policy
+      - name: opa-policies
+        projected:
+          sources:
+          - configMap:
+              name: opa-policy-{{ $name }}-base
+              items:
+                - key: policy.rego
+                  path: base.rego
+          {{- if $options.policies.hmn }}
+          - configMap:
+              name: opa-policy-{{ $name }}-hmn
+              items:
+                - key: policy.rego
+                  path: hmn.rego
+          {{- end}}
+          {{- if $options.policies.spire }}
+          - configMap:
+              name: opa-policy-{{ $name }}-spire
+              items:
+                - key: policy.rego
+                  path: spire.rego
+          {{- end}}
+          {{- if $options.policies.keycloak.admin }}
+          - configMap:
+              name: opa-policy-{{ $name }}-keycloak-admin
+              items:
+                - key: policy.rego
+                  path: keycloakadmin.rego
+          {{- end}}
+          {{- if $options.policies.keycloak.user }}
+          - configMap:
+              name: opa-policy-{{ $name }}-keycloak-user
+              items:
+                - key: policy.rego
+                  path: keycloakuser.rego
+          {{- end}}
+          {{- range $customConfigMap := $options.policies.custom }}
+          - configMap:
+              name: $customConfigMap
+          {{- end}}
       {{- if $.Values.opa.tls.enabled }}
       - secret:
           secretName: {{ $.Values.opa.tls.secret }}
