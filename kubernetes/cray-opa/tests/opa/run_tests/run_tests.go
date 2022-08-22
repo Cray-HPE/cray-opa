@@ -402,6 +402,19 @@ func main() {
 	}
 	tSplit = tSplit[l : len(tSplit)-2]
 	tSplit = append([]string{"{{ define \"test.policy\" }}"}, tSplit...)
+
+	// Add missing default deny from base policy
+	for i, v := range tSplit {
+		if v == "" {
+			l = i
+			break
+		}
+	}
+
+	tSplit = append(tSplit[:l+1], tSplit[l:]...)
+	tSplit[l] = "    default allow = { \"allowed\": false, \"headers\": {\"x-ext-auth-allow\": \"no\"}, \"body\": \"Unauthorized Request\", \"http_status\": 403 }"
+
+	// Fix variables
 	dat := []byte(strings.Join(tSplit, "\n"))
 	changeOptions := regexp.MustCompile(".options.issuers")
 	dat = changeOptions.ReplaceAll(dat, []byte(".Values.issuers"))

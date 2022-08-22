@@ -15,10 +15,5 @@ data:
     import input.attributes.request.http as http_request
 
     # Default return a 403 unless any of the allows are true
-    default allow = {
-      "allowed": false,
-      "headers": {"x-ext-auth-allow": "no"},
-      "body": "Unauthorized Request",
-      "http_status": 403
-    }
+    default allow = { "allowed": false, "headers": {"x-ext-auth-allow": "no"}, "body": "Unauthorized Request", "http_status": 403 }
 {{- end }}

@@ -20,6 +20,9 @@ data:
         http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
     }
 
+    # Whitelist Keycloak, since it allows users to login and obtain JWTs.
+    allow { startswith(original_path, "/keycloak") }
+
     # The path being requested from the user. When the envoy filter is configured for
     # SIDECAR_INBOUND this is: http_request.headers["x-envoy-original-path"].
     # When configured for GATEWAY this is http_request.path
