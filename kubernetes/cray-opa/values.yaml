@@ -24,7 +24,7 @@
 ---
 image:
   repository: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa
-  tag: 0.42.1-envoy # When changing this, also update tests/opa//Dockerfile.
+  tag: 0.42.1-envoy  # When changing this, also update tests/opa//Dockerfile.
   pullPolicy: IfNotPresent
 
 priorityClassName: csm-high-priority-service
@@ -38,7 +38,6 @@ ingresses:
         admin: true
         user: true
       spire: true
-      xname: false
     # namespace of the ingress containers
     # this will likely be different than the OPA namespace
     namespace: istio-system
@@ -90,9 +89,9 @@ opa:
   port: 9191
   containerPort: 9191
   loglevel: info
-  query: data.istio.authz.allow # this should never really change
+  query: data.istio.authz.allow  # this should never really change
   tls:
-    enabled: false # TODO once we have cert manager
+    enabled: false  # TODO once we have cert manager
     secret: ""
   strategy:
     rollingUpdate:
@@ -123,17 +122,6 @@ opa:
     dvs: false
     heartbeat: false
 
-# To override the default policy in files/policy.rego follow the example below
-# NOTE: If the policy changes or is overridden, you MUST do a rolling restart of the
-# OPA pods to pick them up until we stop mounting as a configmap.
-
-# policy: |
-#   # Istio Ingress Gateway OPA Policy
-#   package istio.authz
-
-#   default allow = true
-
-# Run each opa pod on a separate worker when possible
 affinity:
   # set default to 'preferred' for default preferred anti affinity rule
   # set default to 'required' for default required anti affinity rule
