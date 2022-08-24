@@ -46,58 +46,16 @@ spec:
                     operator: In
               topologyKey: kubernetes.io/hostname
       containers:
-        - args:
-            - run
-            - --server
-            - --log-level=info
-            - --config-file=/config/config.yaml
-            - /policy/bundle.tar.gz
-          env:
-            - name: RELEASE_REVISION
-              value: "1"
-            - name: HTTP_SEND_TIMEOUT
-              value: 10s
-          imagePullPolicy: IfNotPresent
-          name: opa-istio
+        - name: opa-istio
           ports:
             - containerPort: 9191
               name: http
               protocol: TCP
-          resources:
-            limits:
-              cpu: 100m
-              memory: 128Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
           securityContext:
             runAsGroup: 65534
             runAsNonRoot: true
             runAsUser: 65534
-          volumeMounts:
-            - mountPath: /config
-              name: opa-istio-config
-            - mountPath: /policy
-              name: opa-bundle
-            - mountPath: /jwtValidationFetchTls
-              name: fetch-jwt-certs-ca-vol
-      initContainers:
-        - args:
-            - build
-            - -b
-            - /policies
-            - -o
-            - /bundle/bundle.tar.gz
-          imagePullPolicy: IfNotPresent
-          name: create-opa-bundle
-          volumeMounts:
-            - mountPath: /policies
-              name: opa-policies
-            - mountPath: /bundle
-              name: opa-bundle
       volumes:
-        - emptyDir: {}
-          name: opa-bundle
         - configMap:
             defaultMode: 420
             name: istio-config-ingressgateway
@@ -106,12 +64,26 @@ spec:
           projected:
             defaultMode: 420
             sources:
-              - configMap:
-                  name: opa-policy-ingressgateway-spire
-              - configMap:
-                  name: opa-policy-ingressgateway-keycloak-admin
-              - configMap:
-                  name: opa-policy-ingressgateway-keycloak-user
+            - configMap:
+                items:
+                - key: policy.rego
+                  path: base.rego
+                name: opa-policy-ingressgateway-base
+            - configMap:
+                items:
+                - key: policy.rego
+                  path: spire.rego
+                name: opa-policy-ingressgateway-spire
+            - configMap:
+                items:
+                - key: policy.rego
+                  path: keycloakadmin.rego
+                name: opa-policy-ingressgateway-keycloak-admin
+            - configMap:
+                items:
+                - key: policy.rego
+                  path: keycloakuser.rego
+                name: opa-policy-ingressgateway-keycloak-user
         - configMap:
             defaultMode: 420
             name: cray-configmap-ca-public-key
