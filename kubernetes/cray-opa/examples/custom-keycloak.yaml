@@ -1,0 +1,79 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opa-policy-custom-keycloak
+  namespace: opa
+data:
+  custom-keycloak.rego: |-
+    # Custom Keycloak Policy
+    package istio.authz
+    import input.attributes.request.http as http_request
+
+    # Whitelist Keycloak, since it allows users to login and obtain JWTs.
+    allow { startswith(original_path, "/keycloak") }
+
+    # The path being requested from the user. When the envoy filter is configured for
+    # SIDECAR_INBOUND this is: http_request.headers["x-envoy-original-path"].
+    # When configured for GATEWAY this is http_request.path
+    original_path = o_path {
+        o_path := http_request.path
+    }
+
+
+    allow {
+        roles_for_user[r]
+        required_roles[r]
+    }
+
+    # Check if there is an authorization header and split the type from token
+    found_auth = {"type": a_type, "token": a_token} {
+        [a_type, a_token] := split(http_request.headers.authorization, " ")
+    }
+
+    # If the auth type is bearer, decode the JWT
+    parsed_kc_token = {"payload": payload} {
+        found_auth.type == "Bearer"
+        response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.keycloak.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
+        [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "shasta"})
+
+        # Verify that the issuer is as expected.
+        allowed_issuers := [
+        {{- range $key, $value := $options.issuers }}
+          "{{ $value }}",
+        {{- end }}
+        ]
+        allowed_issuers[_] = payload.iss
+    }
+
+
+    # Get the users roles from the JWT token
+    roles_for_user[r] {
+        r := parsed_kc_token.payload.resource_access.shasta.roles[_]
+    }
+
+    # Determine if the path/verb requests is authorized based on the JWT roles
+    required_roles[r] {
+        perm := role_perms[r][_]
+        perm.method = http_request.method
+        re_match(perm.path, original_path)
+    }
+
+    # Our list of endpoints we accept based on roles.
+    role_perms = {
+        "custom": allowed_methods["custom"],
+    }
+
+    allowed_methods := {
+      "fabric": [
+          # Custom API Access
+          {"method": "DELETE", "path": `^/custom/api.*$`},
+          {"method": "GET", "path": `^/custom/api.*$`},
+          {"method": "HEAD", "path": `^/custom/api.*$`},
+          {"method": "PATCH", "path": `^/custom/api.*$`},
+          {"method": "POST", "path": `^/custom/api.*$`},
+          {"method": "PUT", "path": `^/custom/api.*$`},
+      ],
+    }
+{{- end }}
+{{- end }}

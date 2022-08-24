@@ -1,15 +1,23 @@
-# Copyright 2021 Hewlett Packard Enterprise Development LP
+# cray-opa
 
-TODO: We should be taring up our policies and serving them up using
-OPA's bundles. We should then configure OPA to fetch the bundles.
-However, since we only have one policy and we have a lot of missing
-pieces to accommodate this, it makes sense to just use a config map for now.
+This chart installs the [OPA Envoy Plugin](https://github.com/open-policy-agent/opa-envoy-plugin)
+used to secure API endpoints in CSM.
 
-Running unit tests: From the cray-opa directory,
+## Custom OPA Policies
 
-```
-$ make cray-opa-test
-$ make test-opa
-```
+It's possible to set custom OPA policy modules per OPA Gateway. This is done by
+setting `.spec.ingresses.[INGRESS GATEWAY].custom` to a list containing the
+ConfigMaps that hold the policy modules you wish to apply. Each module needs
+to have the package name `istio.authz`. Do not set the configmap data file name
+to 'policy.rego' or else it may replace an existing policy. See the examples
+directory for policy samples.
 
-Note: Make sure the image in the Dockerfile matches the actual OPA image used, check the version.
+## Testing
+
+Tests are run via `make test`.
+
+### Requirements
+
+Tests use [Docker](docker.io), [kuttl](https://kuttl.dev), and
+[kind](https://kind.sigs.k8s.io). You will need each of these applications
+installed in order for `make test` to run properly.
