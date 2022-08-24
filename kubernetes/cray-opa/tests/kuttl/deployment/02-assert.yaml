@@ -64,17 +64,19 @@ spec:
           projected:
             defaultMode: 420
             sources:
-            - configMap:
-                items:
-                - key: policy.rego
-                  path: base.rego
-                name: opa-policy-ingressgateway-customer-user-base
-            - configMap:
-                items:
-                - key: policy.rego
-                  path: keycloakuser.rego
-                name: opa-policy-ingressgateway-customer-user-keycloak-user
+              - configMap:
+                  items:
+                    - key: policy.rego
+                      path: base.rego
+                  name: opa-policy-ingressgateway-customer-user-base
+              - configMap:
+                  items:
+                    - key: policy.rego
+                      path: keycloakuser.rego
+                  name: opa-policy-ingressgateway-customer-user-keycloak-user
         - configMap:
             defaultMode: 420
             name: cray-configmap-ca-public-key
           name: fetch-jwt-certs-ca-vol
+status:
+  readyReplicas: 1

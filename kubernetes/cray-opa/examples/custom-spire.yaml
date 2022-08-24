@@ -5,7 +5,7 @@ metadata:
   name: custom-spire
   namespace: opa
 data:
-  custom-spire.rego: |-
+  policy.rego: |-
     # Custom Spire Policy
     package istio.authz
     import input.attributes.request.http as http_request
@@ -37,7 +37,7 @@ data:
     # If the auth type is bearer, decode the JWT
     parsed_spire_token = {"payload": payload, "xname": xname} {
         found_auth.type == "Bearer"
-        response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.spire.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
+        response := http.send({"method": "get", "url": "https://istio-ingressgateway.istio-system.svc.cluster.local./keycloak/realms/shasta/protocol/openid-connect/certs", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
         [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "system-compute"})
 
         # Verify that the issuer is as expected.

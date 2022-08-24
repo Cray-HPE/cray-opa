@@ -131,7 +131,10 @@ spec:
           {{- end}}
           {{- range $customConfigMap := $options.policies.custom }}
           - configMap:
-              name: $customConfigMap
+              name: {{ $customConfigMap }}
+              items:
+                - key: policy.rego
+                  path: {{ $customConfigMap }}.rego
           {{- end}}
       {{- if $.Values.opa.tls.enabled }}
       - secret:

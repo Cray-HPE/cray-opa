@@ -28,6 +28,7 @@ commands:
   - command: kubectl create ns opa
   - command: kubectl apply -f ./tests/kuttl/cray-configmap-ca-public-key.yaml
   - command: kubectl apply -f ./tests/kuttl/envoyfilters.crd.yaml
+  - command: kubectl apply -f ./tests/kuttl/custompolicy.yaml
   - command: helm install -f ./tests/kuttl/values.yaml --namespace opa --wait cray-opa .
 testDirs:
   - ./tests/kuttl

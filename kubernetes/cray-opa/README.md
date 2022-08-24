@@ -8,9 +8,8 @@ used to secure API endpoints in CSM.
 It's possible to set custom OPA policy modules per OPA Gateway. To configure
 this, set `.spec.ingresses.[INGRESS GATEWAY].custom` to a list containing the
 ConfigMaps that hold the policy modules you wish to apply. Each module needs
-to have the package name `istio.authz`. Do not set the configmap data file name
-to 'policy.rego' or else it may replace an existing policy. See the examples
-directory for policy samples.
+to have the package name `istio.authz`. The file name in the ConfigMap should be
+named `policy.rego`.
 
 ## Testing
 

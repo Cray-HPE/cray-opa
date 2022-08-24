@@ -24,7 +24,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cray-opa-ingressgateway-hmn
+  name: cray-opa-custom
   namespace: opa
 spec:
   progressDeadlineSeconds: 600
@@ -51,14 +51,35 @@ spec:
             - containerPort: 9191
               name: http
               protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           securityContext:
             runAsGroup: 65534
             runAsNonRoot: true
             runAsUser: 65534
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /config
+              name: opa-istio-config
+            - mountPath: /policies
+              name: opa-policies
+            - mountPath: /jwtValidationFetchTls
+              name: fetch-jwt-certs-ca-vol
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
       volumes:
         - configMap:
             defaultMode: 420
-            name: istio-config-ingressgateway-hmn
+            name: istio-config-custom
           name: opa-istio-config
         - name: opa-policies
           projected:
@@ -68,12 +89,17 @@ spec:
                   items:
                     - key: policy.rego
                       path: base.rego
-                  name: opa-policy-ingressgateway-hmn-base
+                  name: opa-policy-custom-base
               - configMap:
                   items:
                     - key: policy.rego
-                      path: hmn.rego
-                  name: opa-policy-ingressgateway-hmn-hmn
+                      path: keycloakuser.rego
+                  name: opa-policy-custom-keycloak-user
+              - configMap:
+                  items:
+                    - key: policy.rego
+                      path: custom-keycloak.rego
+                  name: custom-keycloak
         - configMap:
             defaultMode: 420
             name: cray-configmap-ca-public-key

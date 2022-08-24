@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: opa-policy-custom-keycloak
+  name: custom-keycloak
   namespace: opa
 data:
   policy.rego: |-
@@ -39,7 +39,9 @@ data:
 
         # Verify that the issuer is as expected.
         allowed_issuers := [
-          "https://keycloak1"
+          "http://api-gw-service-nmn.local/keycloak/realms/shasta",
+          "https://api-gw-service-nmn.local/keycloak/realms/shasta",
+          "http://keycloak:8080/keycloak/realms/shasta",
         ]
         allowed_issuers[_] = payload.iss
     }
