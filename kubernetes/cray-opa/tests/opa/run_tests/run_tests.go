@@ -284,6 +284,16 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnOrca)
 
+	spireSub = spireSubNCNPrefix + "tpm-provisioner"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
+	spireNcnTPMProvisioner, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireNcnTPMProvisioner)
+
 	spireSub = spireSubComputePrefix + "cfs-state-reporter"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
@@ -383,6 +393,16 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(spireSub, ":", spireComputeWlm)
+
+	spireSub = spireSubComputePrefix + "tpm-provisioner"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
+	spireComputeTPMProvisioner, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeTPMProvisioner)
 
 	// Reading in the policy template file and generating policy file.
 
@@ -525,6 +545,7 @@ func main() {
 				"dvs_map":            spireNcnDvsMap,
 				"heartbeat":          spireNcnHeartbeat,
 				"orca":               spireNcnOrca,
+				"tpm_provisioner":    spireNcnTPMProvisioner,
 			},
 			"compute": map[string]interface{}{
 				"cfs_state_reporter": spireComputeCfsStateReporter,
@@ -536,6 +557,7 @@ func main() {
 				"dvs_map":            spireComputeDvsMap,
 				"heartbeat":          spireComputeHeartbeat,
 				"orca":               spireComputeOrca,
+				"tpm_provisioner":    spireComputeTPMProvisioner,
 				"wlm":                spireComputeWlm,
 			},
 		},
