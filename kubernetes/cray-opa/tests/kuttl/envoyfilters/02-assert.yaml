@@ -24,36 +24,9 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  annotations:
-    meta.helm.sh/release-name: cray-opa
-    meta.helm.sh/release-namespace: opa
   name: ingressgateway-ext-authz
   namespace: istio-system
 spec:
-  configPatches:
-    - applyTo: HTTP_FILTER
-      match:
-        context: GATEWAY
-        listener:
-          filterChain:
-            filter:
-              name: envoy.filters.network.http_connection_manager
-              subFilter:
-                name: envoy.filters.http.router
-      patch:
-        operation: INSERT_BEFORE
-        value:
-          name: envoy.filters.http.ext_authz
-          typed_config:
-            '@type': type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
-            transport_api_version: V3
-            grpc_service:
-              google_grpc:
-                stat_prefix: ext_authz
-                target_uri: ingressgateway.opa.svc.cluster.local.:9191
-              timeout: 25s
-            status_on_error:
-              code: ServiceUnavailable
   workloadSelector:
     labels:
       istio: ingressgateway

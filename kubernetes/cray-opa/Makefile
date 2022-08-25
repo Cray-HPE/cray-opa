@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2022 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -20,47 +20,27 @@
 # OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-#
+
+HELM_UNITTEST_IMAGE ?= quintush/helm-unittest:3.7.1-0.2.8
 current_dir := $(shell pwd)
-tmp_dir := $(shell mktemp -d)
 
-.SILENT: helmlint eval test test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-xname-enabled test-ingressgateway-xname-disabled 
-.PHONY: helmlint eval test test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-xname-enabled test-ingressgateway-xname-disabled 
+.SILENT: kuttl_test chart_test rego_test
+.PHONY: kuttl_test chart_test rego_test
 
-all: helmlint eval test test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-xname-enabled test-ingressgateway-xname-disabled 
+test: chart_test rego_test kuttl_test
 
-lint: helmlint eval 
-test-opa: test-ingressgateway test-ingressgateway-customer-admin test-ingressgateway-customer-user test-ingressgateway-xname-enabled test-ingressgateway-xname-disabled 
+chart_test:
+		helm lint
+		docker run --rm -v $(current_dir):/apps ${HELM_UNITTEST_IMAGE} -3 .
 
-eval:
-	helm kubeval -n opa cray-opa . --ignore-missing-schemas
-
-helmlint:
-	helm lint
-
-cray-opa-test:
-	docker build -f tests/opa/Dockerfile --tag cray-opa-test .
-	docker build -f tests/opa/xname-enabled/Dockerfile --tag cray-opa-test-xname-enabled .
-	docker build -f tests/opa/xname-disabled/Dockerfile --tag cray-opa-test-xname-disabled .
-
-test:
+kuttl_test:
 	kubectl kuttl test --kind-config kind.yaml --artifacts-dir /tmp/kuttl
 
-test-ingressgateway:
-	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.rego.tpl ingressgateway.policy
-	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_xforward_test.rego.tpl ingressgateway.policy
-
-test-ingressgateway-xname-enabled:
-	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test-xname-enabled /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.xname_workloads.rego.tpl ingressgateway.policy
-	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test-xname-enabled /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.xname_workloads.invalid_xname.rego.tpl ingressgateway.policy
-
-test-ingressgateway-xname-disabled:
-	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test-xname-disabled /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.xname_workloads.rego.tpl ingressgateway.policy
-
-test-ingressgateway-customer-admin:
-	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-admin.tpl /mnt/tests/opa/ingressgateway-customer-admin_policy_test.rego.tpl ingressgateway-customer-admin.policy
-	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-admin.tpl /mnt/tests/opa/ingressgateway-customer-admin_policy_xforward_test.rego.tpl ingressgateway-customer-admin.policy
-
-test-ingressgateway-customer-user:
-	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-user.tpl /mnt/tests/opa/ingressgateway-customer-user_policy_test.rego.tpl ingressgateway-customer-user.policy
-	docker run --rm -v $(current_dir):/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-user.tpl /mnt/tests/opa/ingressgateway-customer-user_policy_xforward_test.rego.tpl ingressgateway-customer-user.policy
+rego_test:
+	docker build -f $(current_dir)/tests/opa/Dockerfile --tag cray-opa-test $(current_dir)
+	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/hmn.yaml /mnt/tests/opa/hmn_test.rego.tpl
+	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/keycloak-admin.yaml /mnt/tests/opa/keycloak-admin_test.rego.tpl
+	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/keycloak-user.yaml /mnt/tests/opa/keycloak-user_test.rego.tpl
+	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_test.rego.tpl
+	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test -x /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_test.rego.tpl
+	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test -x /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_xname_test.rego.tpl

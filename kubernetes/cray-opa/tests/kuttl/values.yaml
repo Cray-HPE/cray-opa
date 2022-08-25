@@ -33,3 +33,23 @@ opa:
     limits:
       memory: "128Mi"
       cpu: "100m"
+
+ingresses:
+  custom:
+    policies:
+      custom:
+        - custom-keycloak
+      hmn: false
+      keycloak:
+        admin: false
+        user: true
+      spire: false
+    # namespace of the ingress containers
+    # this will likely be different than the OPA namespace
+    namespace: istio-system
+    labelSelector:
+      istio: ingressgateway-custom
+    issuers:
+      internal_http: "http://keycloak:8080/keycloak/realms/shasta"
+      gw_http: "http://api-gw-service-nmn.local/keycloak/realms/shasta"
+      gw_https: "https://api-gw-service-nmn.local/keycloak/realms/shasta"

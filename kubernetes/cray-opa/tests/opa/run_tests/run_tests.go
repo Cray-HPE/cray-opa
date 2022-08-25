@@ -1,26 +1,24 @@
+// MIT License
 //
-//  MIT License
+// (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
 //
-//  (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a
-//  copy of this software and associated documentation files (the "Software"),
-//  to deal in the Software without restriction, including without limitation
-//  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//  and/or sell copies of the Software, and to permit persons to whom the
-//  Software is furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
 //
-//  The above copyright notice and this permission notice shall be included
-//  in all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-//  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-//  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-//  OTHER DEALINGS IN THE SOFTWARE.
-//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+// OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
 package main
 
 import (
@@ -36,6 +34,8 @@ import (
 	"net/http/httptest"
 	"os"
 	"os/exec"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/Masterminds/sprig"
@@ -82,11 +82,12 @@ func (t tokenCreator) create(args createTokenArgs) (string, error) {
 }
 
 func main() {
+	var xnameEnablement bool
+	flag.BoolVar(&xnameEnablement, "x", false, "Enable xname validation")
 	flag.Parse()
 
 	policyTemplateFilename := flag.Arg(0)
 	testTemplateFilename := flag.Arg(1)
-	policyTemplateName := flag.Arg(2)
 
 	randomKey := make([]byte, 32)
 	rand.Read(randomKey)
@@ -121,6 +122,16 @@ func main() {
 	spireIssuer := "http://spire.local/shasta/vshastaio"
 	shastaAud := "shasta"
 	systemComputeAud := "system-compute"
+
+	var spireSubNCNPrefix string
+	var spireSubComputePrefix string
+	if xnameEnablement {
+		spireSubNCNPrefix = "spiffe://shasta/ncn/ncnw001/workload/"
+		spireSubComputePrefix = "spiffe://shasta/compute/x1/workload/"
+	} else {
+		spireSubNCNPrefix = "spiffe://shasta/ncn/workload/"
+		spireSubComputePrefix = "spiffe://shasta/compute/workload/"
+	}
 	var spireSub string
 
 	args := createTokenArgs{
@@ -183,7 +194,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireInvalidSub)
 
-	spireSub = "spiffe://shasta/ncn/workload/cfs-state-reporter"
+	spireSub = spireSubNCNPrefix + "cfs-state-reporter"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -193,7 +204,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnCfsStateReporter)
 
-	spireSub = "spiffe://shasta/ncn/workload/ckdump"
+	spireSub = spireSubNCNPrefix + "ckdump"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -203,7 +214,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnCkdump)
 
-	spireSub = "spiffe://shasta/ncn/workload/ckdump_helper"
+	spireSub = spireSubNCNPrefix + "ckdump_helper"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -213,7 +224,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnCkdumpHelper)
 
-	spireSub = "spiffe://shasta/ncn/workload/cpsmount"
+	spireSub = spireSubNCNPrefix + "cpsmount"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -223,7 +234,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnCpsmount)
 
-	spireSub = "spiffe://shasta/ncn/workload/cpsmount_helper"
+	spireSub = spireSubNCNPrefix + "cpsmount_helper"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -233,7 +244,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnCpsmountHelper)
 
-	spireSub = "spiffe://shasta/ncn/workload/dvs-hmi"
+	spireSub = spireSubNCNPrefix + "dvs-hmi"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -243,7 +254,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnDvsHmi)
 
-	spireSub = "spiffe://shasta/ncn/workload/dvs-map"
+	spireSub = spireSubNCNPrefix + "dvs-map"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -253,7 +264,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnDvsMap)
 
-	spireSub = "spiffe://shasta/ncn/workload/heartbeat"
+	spireSub = spireSubNCNPrefix + "heartbeat"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -263,7 +274,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnHeartbeat)
 
-	spireSub = "spiffe://shasta/ncn/workload/orca"
+	spireSub = spireSubNCNPrefix + "orca"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -273,7 +284,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnOrca)
 
-	spireSub = "spiffe://shasta/compute/workload/cfs-state-reporter"
+	spireSub = spireSubComputePrefix + "cfs-state-reporter"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -283,7 +294,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeCfsStateReporter)
 
-	spireSub = "spiffe://shasta/compute/workload/ckdump"
+	spireSub = spireSubComputePrefix + "ckdump"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -293,7 +304,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeCkdump)
 
-	spireSub = "spiffe://shasta/compute/workload/ckdump_helper"
+	spireSub = spireSubComputePrefix + "ckdump_helper"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -303,7 +314,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeCkdumpHelper)
 
-	spireSub = "spiffe://shasta/compute/workload/cpsmount"
+	spireSub = spireSubComputePrefix + "cpsmount"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -313,7 +324,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeCpsmount)
 
-	spireSub = "spiffe://shasta/compute/workload/cpsmount_helper"
+	spireSub = spireSubComputePrefix + "cpsmount_helper"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -323,7 +334,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeCpsmountHelper)
 
-	spireSub = "spiffe://shasta/compute/workload/dvs-hmi"
+	spireSub = spireSubComputePrefix + "dvs-hmi"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -333,7 +344,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeDvsHmi)
 
-	spireSub = "spiffe://shasta/compute/workload/dvs-map"
+	spireSub = spireSubComputePrefix + "dvs-map"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -343,7 +354,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeDvsMap)
 
-	spireSub = "spiffe://shasta/compute/workload/heartbeat"
+	spireSub = spireSubComputePrefix + "heartbeat"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -353,7 +364,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeHeartbeat)
 
-	spireSub = "spiffe://shasta/compute/workload/orca"
+	spireSub = spireSubComputePrefix + "orca"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -363,7 +374,7 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeOrca)
 
-	spireSub = "spiffe://shasta/compute/workload/wlm"
+	spireSub = spireSubComputePrefix + "wlm"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
 	}
@@ -375,43 +386,89 @@ func main() {
 
 	// Reading in the policy template file and generating policy file.
 
-	dat, err := ioutil.ReadFile(policyTemplateFilename)
+	yf, err := ioutil.ReadFile(policyTemplateFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// fmt.Println("Read the template file %v", string(dat))
+
+	// Isolate policy from yaml
+	tSplit := strings.Split(string(yf), "\n")
+	var l int
+	for i, v := range tSplit {
+		if v == "  policy.rego: |-" {
+			l = i + 1
+			break
+		}
+	}
+	tSplit = tSplit[l : len(tSplit)-2]
+	tSplit = append([]string{"{{ define \"test.policy\" }}"}, tSplit...)
+
+	// Add missing default deny from base policy
+	for i, v := range tSplit {
+		if v == "" {
+			l = i
+			break
+		}
+	}
+
+	tSplit = append(tSplit[:l+1], tSplit[l:]...)
+	tSplit[l] = "    default allow = { \"allowed\": false, \"headers\": {\"x-ext-auth-allow\": \"no\"}, \"body\": \"Unauthorized Request\", \"http_status\": 403 }"
+
+	// Fix variables
+	dat := []byte(strings.Join(tSplit, "\n"))
+	changeOptions := regexp.MustCompile(".options.issuers")
+	dat = changeOptions.ReplaceAll(dat, []byte(".Values.issuers"))
 
 	tpl := template.Must(
 		template.New("base").Funcs(sprig.FuncMap()).Parse(string(dat)))
 
-	values := map[string]interface{}{
-		"Values": map[string]interface{}{
-			"ingresses": map[string]interface{}{
-				"ingressgateway": map[string]interface{}{
-					"issuers": []string{keycloakIssuer},
+	var values map[string]interface{}
+
+	if xnameEnablement {
+		values = map[string]interface{}{
+			"Values": map[string]interface{}{
+				"opa": map[string]interface{}{
+					"xnamePolicy": map[string]interface{}{
+						"enabled":   true,
+						"bos":       true,
+						"cfs":       true,
+						"dvs":       true,
+						"heartbeat": true,
+					},
 				},
-				"ingressgateway-customer-admin": map[string]interface{}{
-					"issuers": []string{keycloakIssuer},
-				},
-				"ingressgateway-customer-user": map[string]interface{}{
-					"issuers": []string{keycloakIssuer},
-				},
-				"ingressgateway-hmn": map[string]interface{}{
-					"issuers": []string{keycloakIssuer},
+				"requireHeartbeatToken": true,
+				"issuers":               []string{keycloakIssuer},
+				"jwtValidation": map[string]interface{}{
+					"keycloak": map[string]interface{}{
+						"jwksUri": ts.URL,
+					},
+					"spire": map[string]interface{}{
+						"jwksUri":     ts.URL,
+						"issuers":     []string{spireIssuer},
+						"trustDomain": "shasta",
+					},
 				},
 			},
-			"jwtValidation": map[string]interface{}{
-				"keycloak": map[string]interface{}{
-					"jwksUri": ts.URL,
-				},
-				"spire": map[string]interface{}{
-					"jwksUri":     ts.URL,
-					"issuers":     []string{spireIssuer},
-					"trustDomain": "shasta",
+		}
+	} else {
+		values = map[string]interface{}{
+			"Values": map[string]interface{}{
+				"issuers": []string{keycloakIssuer},
+				"jwtValidation": map[string]interface{}{
+					"keycloak": map[string]interface{}{
+						"jwksUri": ts.URL,
+					},
+					"spire": map[string]interface{}{
+						"jwksUri":     ts.URL,
+						"issuers":     []string{spireIssuer},
+						"trustDomain": "shasta",
+					},
 				},
 			},
-		},
+		}
 	}
+
+	log.Printf("Values: %v\n", values)
 
 	f, err := os.Create("policy.rego")
 	if err != nil {
@@ -421,7 +478,7 @@ func main() {
 	defer f.Close()
 
 	fmt.Println("Rendering policy template to 'policy.rego'")
-	err = tpl.ExecuteTemplate(f, policyTemplateName, values)
+	err = tpl.ExecuteTemplate(f, "test.policy", values)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -525,7 +582,6 @@ func main() {
 	fmt.Println("*****")
 	fmt.Printf("Policy File: %s\n", policyTemplateFilename)
 	fmt.Printf("Test File: %s\n", testTemplateFilename)
-	fmt.Printf("Template: %s\n", policyTemplateName)
 
 	fmt.Println("Executing ./opa_envoy_linux_amd64 check -S ./policy.rego ./test.rego")
 

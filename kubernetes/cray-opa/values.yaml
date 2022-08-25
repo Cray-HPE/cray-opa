@@ -31,6 +31,13 @@ priorityClassName: csm-high-priority-service
 
 ingresses:
   ingressgateway:
+    policies:
+      custom: {}
+      hmn: false
+      keycloak:
+        admin: true
+        user: true
+      spire: true
     # namespace of the ingress containers
     # this will likely be different than the OPA namespace
     namespace: istio-system
@@ -41,16 +48,37 @@ ingresses:
       gw_http: "http://api-gw-service-nmn.local/keycloak/realms/shasta"
       gw_https: "https://api-gw-service-nmn.local/keycloak/realms/shasta"
   ingressgateway-customer-admin:
+    policies:
+      custom: {}
+      hmn: false
+      keycloak:
+        admin: true
+        user: true
+      spire: false
     namespace: istio-system
     labelSelector:
       istio: ingressgateway-customer-admin
     issuers: []
   ingressgateway-customer-user:
+    policies:
+      custom: {}
+      hmn: false
+      keycloak:
+        admin: false
+        user: true
+      spire: false
     namespace: istio-system
     labelSelector:
       istio: ingressgateway-customer-user
     issuers: []
   ingressgateway-hmn:
+    policies:
+      custom: {}
+      hmn: true
+      keycloak:
+        admin: false
+        user: false
+      spire: false
     namespace: istio-system
     labelSelector:
       istio: istio-ingressgateway-hmn
@@ -94,17 +122,6 @@ opa:
     dvs: false
     heartbeat: false
 
-# To override the default policy in files/policy.rego follow the example below
-# NOTE: If the policy changes or is overridden, you MUST do a rolling restart of the
-# OPA pods to pick them up until we stop mounting as a configmap.
-
-# policy: |
-#   # Istio Ingress Gateway OPA Policy
-#   package istio.authz
-
-#   default allow = true
-
-# Run each opa pod on a separate worker when possible
 affinity:
   # set default to 'preferred' for default preferred anti affinity rule
   # set default to 'required' for default required anti affinity rule

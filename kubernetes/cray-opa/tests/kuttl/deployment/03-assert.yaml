@@ -21,14 +21,10 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    meta.helm.sh/release-name: cray-opa
-    meta.helm.sh/release-namespace: opa
-  name: cray-opa-ingressgateway-hmn
+  name: cray-opa-ingressgateway-customer-admin
   namespace: opa
 spec:
   progressDeadlineSeconds: 600
@@ -40,73 +36,49 @@ spec:
       maxUnavailable: 25%
     type: RollingUpdate
   template:
-    metadata:
-      labels:
-        app.kubernetes.io/instance: cray-opa
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: cray-opa-ingressgateway-hmn
     spec:
       affinity:
         podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app.kubernetes.io/name
-                      operator: In
-                      values:
-                        - ingressgateway-hmn
-                topologyKey: kubernetes.io/hostname
-              weight: 1
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: deployment/uuid
+                    operator: In
+              topologyKey: kubernetes.io/hostname
       containers:
-        - args:
-            - run
-            - --server
-            - --log-level=info
-            - --config-file=/config/config.yaml
-            - /policy/policy.rego
-          env:
-            - name: POLICY_CONFIGMAP_VERSION
-              value: "8"
-            - name: HTTP_SEND_TIMEOUT
-              value: 10s
-          image: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa:0.26.0-envoy-6
-          imagePullPolicy: IfNotPresent
-          name: opa-istio
+        - name: opa-istio
           ports:
             - containerPort: 9191
               name: http
               protocol: TCP
-          resources:
-            limits:
-              cpu: 100m
-              memory: 128Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-            - mountPath: /config
-              name: opa-istio-config
-            - mountPath: /policy
-              name: opa-policy
-            - mountPath: /jwtValidationFetchTls
-              name: fetch-jwt-certs-ca-vol
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
+          securityContext:
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
       volumes:
         - configMap:
             defaultMode: 420
-            name: istio-config-ingressgateway-hmn
+            name: istio-config-ingressgateway-customer-admin
           name: opa-istio-config
-        - configMap:
+        - name: opa-policies
+          projected:
             defaultMode: 420
-            name: opa-policy-ingressgateway-hmn
-          name: opa-policy
+            sources:
+              - configMap:
+                  items:
+                    - key: policy.rego
+                      path: base.rego
+                  name: opa-policy-ingressgateway-customer-admin-base
+              - configMap:
+                  items:
+                    - key: policy.rego
+                      path: keycloakadmin.rego
+                  name: opa-policy-ingressgateway-customer-admin-keycloak-admin
+              - configMap:
+                  items:
+                    - key: policy.rego
+                      path: keycloakuser.rego
+                  name: opa-policy-ingressgateway-customer-admin-keycloak-user
         - configMap:
             defaultMode: 420
             name: cray-configmap-ca-public-key
