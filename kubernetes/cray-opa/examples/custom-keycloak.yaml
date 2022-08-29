@@ -23,7 +23,7 @@ data:
 
     allow {
         roles_for_user[r]
-        required_roles[r]
+        required_custom_roles[r]
     }
 
     # Check if there is an authorization header and split the type from token
@@ -51,18 +51,18 @@ data:
     }
 
     # Determine if the path/verb requests is authorized based on the JWT roles
-    required_roles[r] {
-        perm := role_perms[r][_]
+    required_custom_roles[r] {
+        perm := custom_role_perms[r][_]
         perm.method = http_request.method
         re_match(perm.path, original_path)
     }
 
     # Our list of endpoints we accept based on roles.
-    role_perms = {
-        "custom": allowed_methods["custom"],
+    custom_role_perms = {
+        "custom": allowed_custom_methods["custom"],
     }
 
-    allowed_methods := {
+    allowed_custom_methods := {
       "custom": [
           # Custom API Access
           {"method": "DELETE", "path": `^/custom/api.*$`},
