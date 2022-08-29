@@ -76,7 +76,7 @@ data:
     # has access to the endpoint requested
     allow {
         roles_for_user[r]
-        required_roles[r]
+        required_admin_roles[r]
     }
 
     # Check if there is an authorization header and split the type from token
@@ -112,14 +112,14 @@ data:
     }
 
     # Determine if the path/verb requests is authorized based on the JWT roles
-    required_roles[r] {
-        perm := role_perms[r][_]
+    required_admin_roles[r] {
+        perm := admin_role_perms[r][_]
         perm.method = http_request.method
         re_match(perm.path, original_path)
     }
 
 
-    allowed_methods := {
+    allowed_admin_methods := {
       "admin": [
           {"method": "GET",  "path": `.*`},
           {"method": "PUT",  "path": `.*`},
@@ -132,8 +132,8 @@ data:
 
     # Our list of endpoints we accept based on roles.
     # The admin roll can make any call.
-    role_perms = {
-        "admin": allowed_methods["admin"],
+    admin_role_perms = {
+        "admin": allowed_admin_methods["admin"],
     }
 
 {{- end }}

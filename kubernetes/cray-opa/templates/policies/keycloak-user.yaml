@@ -77,7 +77,7 @@ data:
     # has access to the endpoint requested
     allow {
         roles_for_user[r]
-        required_roles[r]
+        required_user_roles[r]
     }
 
     # Check if there is an authorization header and split the type from token
@@ -114,14 +114,14 @@ data:
     }
 
     # Determine if the path/verb requests is authorized based on the JWT roles
-    required_roles[r] {
-        perm := role_perms[r][_]
+    required_user_roles[r] {
+        perm := user_role_perms[r][_]
         perm.method = http_request.method
         re_match(perm.path, original_path)
     }
 
 
-    allowed_methods := {
+    allowed_user_methods := {
       "user": [
           # UAS
           {"method": "GET", "path": `^/apis/uas-mgr/v1/$`}, # Get UAS API Version
@@ -191,11 +191,11 @@ data:
     }
 
     # Our list of endpoints we accept based on roles.
-    role_perms = {
-        "user": allowed_methods["user"],
-        "wlm": allowed_methods["wlm"],
-        "ckdump": allowed_methods["ckdump"],
-        "monitor-ro": allowed_methods["monitor-ro"],
+    user_role_perms = {
+        "user": allowed_user_methods["user"],
+        "wlm": allowed_user_methods["wlm"],
+        "ckdump": allowed_user_methods["ckdump"],
+        "monitor-ro": allowed_user_methods["monitor-ro"],
     }
 {{- end }}
 {{- end }}
