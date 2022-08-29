@@ -23,7 +23,7 @@ data:
         [a_type, a_token] := split(http_request.headers.authorization, " ")
     }
 
-    spire_methods := {
+    custom_spire_methods := {
       "custom": [
         {"method": "DELETE", "path": `^/custom/api.*$`},
         {"method": "GET", "path": `^/custom/api.*$`},
@@ -54,11 +54,11 @@ data:
         s :=  replace(parsed_spire_token.payload.sub, parsed_spire_token.xname, "XNAME")
 
         # Test subject matches destination
-        perm := sub_match[s][_]
+        perm := custom_sub_match[s][_]
         perm.method = http_request.method
         re_match(perm.path, original_path)
     }
 
-    sub_match = {
-        "spiffe://shasta/compute/XNAME/workload/custom-spire-agent": spire_methods["custom"],
+    custom_sub_match = {
+        "spiffe://shasta/compute/XNAME/workload/custom-spire-agent": custom_spire_methods["custom"],
     }
