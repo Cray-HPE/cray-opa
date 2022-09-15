@@ -121,6 +121,7 @@ opa:
     ckdump: false
     dvs: false
     heartbeat: false
+    tpmProvisioner: false
 
 affinity:
   # set default to 'preferred' for default preferred anti affinity rule
