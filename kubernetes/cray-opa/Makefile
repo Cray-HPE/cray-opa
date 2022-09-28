@@ -42,5 +42,6 @@ rego_test:
 	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/keycloak-admin.yaml /mnt/tests/opa/keycloak-admin_test.rego.tpl
 	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/keycloak-user.yaml /mnt/tests/opa/keycloak-user_test.rego.tpl
 	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_test.rego.tpl
+	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test -x /mnt/templates/policies/keycloak-system.yaml /mnt/tests/opa/keycloak-system_test.rego.tpl
 	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test -x /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_test.rego.tpl
 	docker run --rm -v $(current_dir)/:/mnt --entrypoint "/app/run_tests" cray-opa-test -x /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_xname_test.rego.tpl

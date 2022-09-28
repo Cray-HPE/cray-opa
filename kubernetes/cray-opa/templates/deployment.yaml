@@ -129,6 +129,13 @@ spec:
                 - key: policy.rego
                   path: keycloakuser.rego
           {{- end}}
+          {{- if $options.policies.keycloak.system }}
+          - configMap:
+              name: opa-policy-{{ $name }}-keycloak-system
+              items:
+                - key: policy.rego
+                  path: keycloaksystem.rego
+          {{- end}}
           {{- range $customConfigMap := $options.policies.custom }}
           - configMap:
               name: {{ $customConfigMap }}

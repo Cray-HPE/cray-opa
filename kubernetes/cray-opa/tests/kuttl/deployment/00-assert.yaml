@@ -84,6 +84,11 @@ spec:
                     - key: policy.rego
                       path: keycloakuser.rego
                   name: opa-policy-ingressgateway-keycloak-user
+              - configMap:
+                  items:
+                    - key: policy.rego
+                      path: keycloaksystem.rego
+                  name: opa-policy-ingressgateway-keycloak-system
         - configMap:
             defaultMode: 420
             name: cray-configmap-ca-public-key
