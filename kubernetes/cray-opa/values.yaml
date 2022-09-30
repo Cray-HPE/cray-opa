@@ -37,6 +37,7 @@ ingresses:
       keycloak:
         admin: true
         user: true
+        system: true
       spire: true
     # namespace of the ingress containers
     # this will likely be different than the OPA namespace
@@ -54,6 +55,7 @@ ingresses:
       keycloak:
         admin: true
         user: true
+        system: false
       spire: false
     namespace: istio-system
     labelSelector:
@@ -66,6 +68,7 @@ ingresses:
       keycloak:
         admin: false
         user: true
+        system: false
       spire: false
     namespace: istio-system
     labelSelector:
@@ -78,6 +81,7 @@ ingresses:
       keycloak:
         admin: false
         user: false
+        system: false
       spire: false
     namespace: istio-system
     labelSelector:
