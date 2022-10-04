@@ -171,7 +171,7 @@ data:
       }
 
       sub_match = {
-          "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/bos-state-reporter": spire_methods["bos"],
+          "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/bos-reporter": spire_methods["bos"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/ckdump": spire_methods["ckdump"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
@@ -183,7 +183,7 @@ data:
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/orca": spire_methods["dvs"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/tpm-provisioner": spire_methods["tpm-provisioner"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/wlm": spire_methods["wlm"],
-          "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/bos-state-reporter": spire_methods["bos"],
+          "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/bos-reporter": spire_methods["bos"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount": spire_methods["cps"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount_helper": spire_methods["cps"],
@@ -195,7 +195,7 @@ data:
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/heartbeat": spire_methods["heartbeat"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/tpm-provisioner": spire_methods["tpm-provisioner"],
-          "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/bos-state-reporter": spire_methods["bos"],
+          "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/bos-reporter": spire_methods["bos"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/ckdump": spire_methods["ckdump"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
@@ -237,7 +237,7 @@ data:
     }
 
     sub_match = {
-        "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/workload/bos-state-reporter": spire_methods["bos"],
+        "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/workload/bos-reporter": spire_methods["bos"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/workload/cfs-state-reporter": spire_methods["cfs"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump": spire_methods["ckdump"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/workload/ckdump_helper": spire_methods["ckdump"],
@@ -249,7 +249,7 @@ data:
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/workload/orca": spire_methods["dvs"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/workload/tpm-provisioner": spire_methods["tpm-provisioner"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/compute/workload/wlm": spire_methods["wlm"],
-        "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/bos-state-reporter": spire_methods["bos"],
+        "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/bos-reporter": spire_methods["bos"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/cfs-state-reporter": spire_methods["cfs"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount": spire_methods["cps"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/cpsmount_helper": spire_methods["cps"],
@@ -261,7 +261,7 @@ data:
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/workload/cfs-state-reporter": spire_methods["cfs"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/workload/heartbeat": spire_methods["heartbeat"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/workload/tpm-provisioner": spire_methods["tpm-provisioner"],
-        "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/uan/workload/bos-state-reporter": spire_methods["bos"],
+        "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/uan/workload/bos-reporter": spire_methods["bos"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/uan/workload/cfs-state-reporter": spire_methods["cfs"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/uan/workload/ckdump": spire_methods["ckdump"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/uan/workload/ckdump_helper": spire_methods["ckdump"],
