@@ -18,7 +18,7 @@ default allow = {
 
 # Whitelist traffic to HMS hmcollector
 allow {
-    http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
+    http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector-ingress.services.svc.cluster.local:80/*"
 }
 
 # The path being requested from the user. When the envoy filter is configured for
