@@ -428,7 +428,7 @@ spire_methods := {
   ]
 }
 sub_match = {
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/bos-state-reporter": spire_methods["bos"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/bos-reporter": spire_methods["bos"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/ckdump": spire_methods["ckdump"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
@@ -439,7 +439,7 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/heartbeat": spire_methods["heartbeat"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/orca": spire_methods["dvs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/XNAME/workload/wlm": spire_methods["wlm"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/bos-state-reporter": spire_methods["bos"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/bos-reporter": spire_methods["bos"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount": spire_methods["cps"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/cpsmount_helper": spire_methods["cps"],
@@ -449,7 +449,7 @@ sub_match = {
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/orca": spire_methods["dvs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/heartbeat": spire_methods["heartbeat"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/bos-state-reporter": spire_methods["bos"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/bos-reporter": spire_methods["bos"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/ckdump": spire_methods["ckdump"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/XNAME/workload/ckdump_helper": spire_methods["ckdump"],
@@ -466,9 +466,9 @@ sub_match = {
 # From https://connect.us.cray.com/confluence/display/SKERN/Shasta+Compute+SPIRE+Security
 # This is an initial set, not yet expected to be complete.
 sub_match = {
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/bos-state-reporter": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/workload/bos-state-reporter": allowed_methods["system-compute"],
-    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/bos-state-reporter": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/bos-reporter": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/uan/workload/bos-reporter": allowed_methods["system-compute"],
+    "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/bos-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/compute/workload/cfs-state-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/storage/workload/cfs-state-reporter": allowed_methods["system-compute"],
     "spiffe://{{ .Values.jwtValidation.spire.trustDomain }}/ncn/workload/cfs-state-reporter": allowed_methods["system-compute"],
