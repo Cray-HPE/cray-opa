@@ -17,7 +17,7 @@ data:
 
     # Whitelist traffic to HMS hmcollector
     allow {
-        http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector.services.svc.cluster.local:80/*"
+        http_request.headers["x-envoy-decorator-operation"] = "cray-hms-hmcollector-ingress.services.svc.cluster.local:80/*"
     }
 
     # Whitelist Keycloak, since it allows users to login and obtain JWTs.
