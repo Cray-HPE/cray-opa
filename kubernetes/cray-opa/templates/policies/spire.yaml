@@ -92,9 +92,9 @@ data:
         ],
         "tpm-provisioner": [
         {{- if and (eq $.Values.opa.xnamePolicy.tpmProvisioner true) (eq $.Values.opa.xnamePolicy.enabled true) }}
-            {"method": "GET", "path": sprintf("^/apis/tpm-provisioner/challenge/authorize?xname=%v&type=[A-Za-z0-9]*$", [parsed_spire_token.xname])},
+            {"method": "GET", "path": sprintf("^/apis/tpm-provisioner/authorize?xname=%v&type=[A-Za-z0-9]*$", [parsed_spire_token.xname])},
         {{- else}}
-            {"method": "GET", "path": `^/apis/tpm-provisioner/challenge/authorize.*$`},
+            {"method": "GET", "path": `^/apis/tpm-provisioner/authorize.*$`},
         {{- end}}
             {"method": "POST", "path": `^/apis/tpm-provisioner/challenge/request$`},
             {"method": "POST", "path": `^/apis/tpm-provisioner/challenge/submit$`},
