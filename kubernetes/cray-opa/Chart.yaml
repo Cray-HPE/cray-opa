@@ -23,7 +23,7 @@
 #
 apiVersion: v2
 name: cray-opa
-version: 1.25.3
+version: 1.25.4
 description: Cray Open Policy Agent
 keywords:
   - opa
