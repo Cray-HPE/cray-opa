@@ -56,7 +56,6 @@ allow {
 
 allow {
     any([
-        #startswith(original_path, "/keycloak"),
         startswith(original_path, "/vcs"),
     ])
 }
