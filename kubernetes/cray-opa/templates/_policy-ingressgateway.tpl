@@ -55,8 +55,13 @@ original_body = o_path {
 #     * VCS/Gitea
 #
 allow {
+    startswith(original_path, "/keycloak")
+    not re_match(`^/keycloak/realms/[a-zA-Z0-9]+/protocol/openid-connect/.*request_uri=.*$`, original_path)
+}
+
+allow {
     any([
-        startswith(original_path, "/keycloak"),
+        #startswith(original_path, "/keycloak"),
         startswith(original_path, "/vcs"),
         startswith(original_path, "/spire-jwks-"),
     ])
