@@ -9,6 +9,7 @@ test_allow_bypassed_urls_with_no_auth_header {
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/keycloak"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/vcs"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/repository"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/spire-jwks-vshastaio/keys"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/v2"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/service/rest"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/capsules/"}}}}
@@ -60,9 +61,8 @@ test_pxe {
 compute_auth = "Bearer {{ .computeToken }}"
 
 cfs_mock_path = "/apis/cfs/components/mock"
-cps_mock_path = "/apis/v2/cps/mock"
 hbtb_heartbeat_path = "/apis/hbtd/hmi/v1/heartbeat"
-nmd_mock_path = "/apis/v2/nmd/mock"
+nmd_mock_path = "/apis/v2/nmd/status/mock"
 smd_statecomponents_path = "/apis/smd/hsm/v2/State/Components"
 hmnfd_subscribe_path = "/apis/hmnfd/hmi/v1/subscribe"
 hmnfd_subscriptions_path = "/apis/hmnfd/hmi/v1/subscriptions"
@@ -84,11 +84,9 @@ test_compute {
 
   # CPS - Allowed
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": compute_auth}}}}}
-
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/cps/transports/test", "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/transports", "headers": {"authorization": compute_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/contents", "headers": {"authorization": compute_auth}}}}}
 
   # NMD - Allowed
 
@@ -191,13 +189,10 @@ spire_correct_sub(sub) {
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/cps/transports/test", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/transports", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/contents", "headers": {"authorization": sub}}}}}
 
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
@@ -240,9 +235,12 @@ spire_ckdump(spire_sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/cps/transports/test", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/transports", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/contents", "headers": {"authorization": spire_sub}}}}}
+
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/contents", "headers": {"authorization": spire_sub}}}}}
 }
 
 test_spire_ckdump {
@@ -263,9 +261,9 @@ test_spire_invalid_sub {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_mock_path, "headers": {"authorization": spire_sub}}}}}
 
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/cps/transports/test", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/transports", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/contents", "headers": {"authorization": spire_sub}}}}}
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}
