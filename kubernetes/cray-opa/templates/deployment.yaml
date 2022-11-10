@@ -51,7 +51,7 @@ spec:
         env:
           - name: POLICY_CONFIGMAP_VERSION
             # Change to force opa pods to restart and re-read ConfigMap.
-            value: "8"
+            value: "9"
           {{- if $.Values.opa.httpTimeout }}
           - name: HTTP_SEND_TIMEOUT
             value: {{ $.Values.opa.httpTimeout | quote }}
