@@ -53,7 +53,10 @@ original_body = o_path {
 #
 #     * VCS/Gitea
 #
-allow { startswith(original_path, "/keycloak") }
+allow {
+    startswith(original_path, "/keycloak")
+    not re_match(`^/keycloak/realms/[a-zA-Z0-9]+/protocol/openid-connect/.*request_uri=.*$`, original_path)
+}
 allow { startswith(original_path, "/vcs") }
 allow { startswith(original_path, "/spire-jwks-") }
 # Allow cloud-init endpoints, as we do validation based on incoming IP.
