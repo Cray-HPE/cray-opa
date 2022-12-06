@@ -48,17 +48,43 @@ original_body = o_path {
     o_path := http_request.body
 }
 
-# Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. Spire endpoints and vcs are also enabled here. Legacy services to be
-# migrated or removed:
-#
-#     * VCS/Gitea
-#
-allow {
+# Allow broad access to CMN LB for keycloak (CMN and NMN share Istio + OPA ingress stack in CSM 1.2.x), restrict to specific
+# endpoints otherwise
+
+allow
+{
     startswith(original_path, "/keycloak")
+    startswith(http_request.host, "auth.cmn.")
+}
+
+allow
+{
+    startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/auth")
+    # Mitigate CVE-2020-10770
     not re_match(`^/keycloak/realms/[a-zA-Z0-9]+/protocol/openid-connect/.*request_uri=.*$`, original_path)
 }
 
+allow
+{
+    any([
+        startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/token"),
+        startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/userinfo"),
+        startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/logout"),
+        startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/certs"),
+        startswith(original_path, "/keycloak/realms/shasta/.well-known/openid-configuration")
+    ])   
+}
+
+allow
+{
+    startswith(original_path, "/keycloak/resources")
+    any([
+        http_request.method == "GET",
+        http_request.method == "HEAD"
+    ])
+}
+
+# Allow all access to Gitea, Spire JWKS
 allow {
     any([
         startswith(original_path, "/vcs"),

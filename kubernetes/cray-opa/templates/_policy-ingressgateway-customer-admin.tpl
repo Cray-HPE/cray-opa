@@ -44,16 +44,17 @@ original_path = o_path {
     o_path := http_request.path
 }
 
-# Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. vcs is also enabled here. Legacy services to be migrated or removed:
-#
-#     * VCS/Gitea
-#
+# Allow all access to Gitea/VCS
 allow {
-    any([
-        startswith(original_path, "/keycloak"),
-        startswith(original_path, "/vcs"),
-    ])
+    startswith(original_path, "/vcs")
+}
+
+# Allow all access to Keycloak, also apply mitigations
+allow
+{
+    startswith(original_path, "/keycloak")
+    # Mitigate CVE-2020-10770
+    not re_match(`^/keycloak/realms/[a-zA-Z0-9]+/protocol/openid-connect/.*request_uri=.*$`, original_path)
 }
 
 # Allow cloud-init endpoints, as we do validation based on incoming IP.
