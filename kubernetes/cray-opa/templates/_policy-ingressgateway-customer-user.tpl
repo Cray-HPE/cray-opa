@@ -44,20 +44,37 @@ original_path = o_path {
     o_path := http_request.path
 }
 
-# Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. vcs are also enabled here. Legacy services to be migrated or removed:
-#
-#     * VCS/Gitea
-#
-allow {
-    startswith(original_path, "/keycloak")
+# Allow limited paths for Keycloak
+allow
+{
+    startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/auth")
+    # Mitigate CVE-2020-10770
     not re_match(`^/keycloak/realms/[a-zA-Z0-9]+/protocol/openid-connect/.*request_uri=.*$`, original_path)
 }
 
-allow {
+allow
+{
     any([
-        startswith(original_path, "/vcs"),
+        startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/token"),
+        startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/userinfo"),
+        startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/logout"),
+        startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/certs"),
+        startswith(original_path, "/keycloak/realms/shasta/.well-known/openid-configuration")
+    ])   
+}
+
+allow
+{
+    startswith(original_path, "/keycloak/resources")
+    any([
+        http_request.method == "GET",
+        http_request.method == "HEAD"
     ])
+}
+
+# Allow all access to Gitea
+{
+    startswith(original_path, "/vcs")
 }
 
 # Allow cloud-init endpoints, as we do validation based on incoming IP.

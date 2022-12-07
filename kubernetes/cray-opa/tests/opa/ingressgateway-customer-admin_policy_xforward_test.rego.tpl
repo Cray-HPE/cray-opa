@@ -32,6 +32,11 @@ test_user {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/uas-mgr/v1/", "headers": {"x-forwarded-access-token": "{{ .userToken }}"}}}}}
 }
 
+# Mitigate CVE-2020-10770
+test_keycloak_cve_2020_10770 {
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/keycloak/realms/shasta/protocol/openid-connect/auth?scope=openid&response_type=code&redirect_uri=valid&state=cfx&nonce=cfx&client_id=security-admin-console&request_uri=http://hook.url'"}}}}
+}
+
 test_admin {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/api1", "headers": {"x-forwarded-access-token": "{{ .adminToken }}"}}}}}
 }
