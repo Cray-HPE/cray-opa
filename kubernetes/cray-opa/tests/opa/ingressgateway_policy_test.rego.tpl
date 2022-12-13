@@ -5,7 +5,7 @@ package istio.authz
 # allow.http_status is 403 when the request is rejected due to the default allow.
 # allow.http_status is not present the request is successful because the result is true.
 
-# For keycloak. Limit broad /keycloak access to requests using the CMN LB
+# Limit broad /keycloak access to requests using the CMN LB
 test_allow_bypassed_urls_with_no_auth_header {
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/keycloak", "host": "auth.cmn.acme.com"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/keycloak", "host": "auth.nmnlb.acme.com"}}}}
