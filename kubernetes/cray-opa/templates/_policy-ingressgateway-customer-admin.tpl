@@ -5,7 +5,7 @@ Copyright 2021-2022 Hewlett Packard Enterprise Development LP
 
 # Istio Ingress Customer Admin Gateway OPA Policy
 package istio.authz
-
+import future.keywords.in
 import input.attributes.request.http as http_request
 
 # Default return a 403 unless any of the allows are true
@@ -43,12 +43,15 @@ original_path = o_path {
     o_path := http_request.path
 }
 
-# Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. vcs is also enabled here. Legacy services to be migrated or removed:
-#
-#     * VCS/Gitea
-#
-allow { startswith(original_path, "/keycloak") }
+# Allow all access to Keycloak, also apply mitigations
+allow
+{
+    startswith(original_path, "/keycloak")
+    # Mitigate CVE-2020-10770
+    not re_match(`^/keycloak/realms/[a-zA-Z0-9]+/protocol/openid-connect/.*request_uri=.*$`, original_path)
+}
+
+# Allow all access to Gitea/VCS
 allow { startswith(original_path, "/vcs") }
 
 # Allow cloud-init endpoints, as we do validation based on incoming IP.
