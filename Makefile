@@ -34,7 +34,7 @@ chart: chart_setup chart_package
 # grep command equals 0, patterns found, fail make
 # grep command != 0, patterns not found, succeed make
 check_policy_whitespace:
-		@echo 'Testing Policy for Whitespace'; sh -c "grep -ne '[\t ] $$' kubernetes/cray-opa/templates/_policy*.tpl && exit 1; exit 0"; exit $$?
+		@echo 'Testing Policy for Whitespace'; sh -c "grep -ne '[[:space:]]$$' kubernetes/cray-opa/templates/_policy*.tpl && exit 1; exit 0"; exit $$?
 
 chart_setup:
 		mkdir -p ${CHART_PATH}/.packaged
