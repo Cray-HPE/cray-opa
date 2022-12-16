@@ -27,9 +27,12 @@ CHART_VERSION ?= local
 
 HELM_UNITTEST_IMAGE ?= quintush/helm-unittest:3.3.0-0.2.5
 
-all : test chart
+all : check_policy_whitespace test chart
 test: chart_test rego_test
 chart: chart_setup chart_package
+
+check_policy_whitespace:
+		@echo 'Testing Policy for Whitespace'; sh -c "grep -ne '[[:space:]]$$' kubernetes/cray-opa/templates/_policy*.tpl && exit 1; exit 0"; exit $$?
 
 chart_setup:
 		mkdir -p ${CHART_PATH}/.packaged
