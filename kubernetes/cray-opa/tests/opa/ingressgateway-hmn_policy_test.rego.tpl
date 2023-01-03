@@ -5,8 +5,16 @@ package istio.authz
 # allow.http_status is 403 when the request is rejected due to the default allow.
 # allow.http_status is not present the request is successful because the result is true.
 
+# Limit broad access to keycloak. 
 test_allow_bypassed_urls_with_no_auth_header {
-  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/keycloak"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/keycloak/realms/shasta/protocol/openid-connect/auth"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/keycloak/realms/shasta/protocol/openid-connect/logout"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/keycloak/realms/shasta/protocol/openid-connect/token"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/keycloak/realms/shasta/protocol/openid-connect/userinfo"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/keycloak/realms/shasta/protocol/openid-connect/certs"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/keycloak/realms/shasta/.well-known/openid-configuration"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/keycloak/resources/foo"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/keycloak/resources/foo"}}}}
 }
 
 test_deny_bypassed_urls_with_no_auth_header {
@@ -16,6 +24,11 @@ test_deny_bypassed_urls_with_no_auth_header {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/service/rest"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/capsules/"}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/apis/gozerd/"}}}}
+}
+
+# Mitigate CVE-2020-10770
+test_keycloak_cve_2020_10770 {
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"path": "/keycloak/realms/shasta/protocol/openid-connect/auth?scope=openid&response_type=code&redirect_uri=valid&state=cfx&nonce=cfx&client_id=security-admin-console&request_uri=http://hook.url'"}}}}
 }
 
 test_deny_tokens_api {

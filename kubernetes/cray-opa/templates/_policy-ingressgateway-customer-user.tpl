@@ -5,7 +5,7 @@ Copyright 2021-2022 Hewlett Packard Enterprise Development LP
 
 # Istio Ingress Customer User Gateway OPA Policy
 package istio.authz
-
+import future.keywords.in
 import input.attributes.request.http as http_request
 
 # Default return a 403 unless any of the allows are true
@@ -43,15 +43,33 @@ original_path = o_path {
     o_path := http_request.path
 }
 
-# Whitelist Keycloak, since those services enable users to login and obtain
-# JWTs. vcs are also enabled here. Legacy services to be migrated or removed:
-#
-#     * VCS/Gitea
-#
-allow {
-    startswith(original_path, "/keycloak")
+# Allow limited paths for Keycloak
+allow
+{
+    startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/auth")
+    # Mitigate CVE-2020-10770
     not re_match(`^/keycloak/realms/[a-zA-Z0-9]+/protocol/openid-connect/.*request_uri=.*$`, original_path)
 }
+
+keycloak_oidc_paths := {
+  "/keycloak/realms/shasta/protocol/openid-connect/token",
+  "/keycloak/realms/shasta/protocol/openid-connect/userinfo",
+  "/keycloak/realms/shasta/protocol/openid-connect/logout",
+  "/keycloak/realms/shasta/protocol/openid-connect/certs",
+  "/keycloak/realms/shasta/.well-known/openid-configuration"
+}
+
+allow {
+  some x in keycloak_oidc_paths
+  startswith(original_path, x)
+}
+
+allow {
+  startswith(original_path, "/keycloak/resources")
+  http_request.method in {"GET", "HEAD"}
+}
+
+# Allow all access to Gitea
 allow { startswith(original_path, "/vcs") }
 
 # Allow cloud-init endpoints, as we do validation based on incoming IP.

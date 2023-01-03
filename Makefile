@@ -27,9 +27,12 @@ CHART_VERSION ?= local
 
 HELM_UNITTEST_IMAGE ?= quintush/helm-unittest:3.3.0-0.2.5
 
-all : test chart
+all : check_policy_whitespace test chart
 test: chart_test rego_test
 chart: chart_setup chart_package
+
+check_policy_whitespace:
+		@echo 'Testing Policy for Whitespace'; sh -c "grep -ne '[[:space:]]$$' kubernetes/cray-opa/templates/_policy*.tpl && exit 1; exit 0"; exit $$?
 
 chart_setup:
 		mkdir -p ${CHART_PATH}/.packaged
@@ -51,6 +54,7 @@ rego_test:
 	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test-xname-disabled /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.xname_workloads.rego.tpl ingressgateway.policy
 	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-admin.tpl /mnt/tests/opa/ingressgateway-customer-admin_policy_test.rego.tpl ingressgateway-customer-admin.policy
 	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-user.tpl /mnt/tests/opa/ingressgateway-customer-user_policy_test.rego.tpl ingressgateway-customer-user.policy
+	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_test.rego.tpl ingressgateway.policy
 	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway.tpl /mnt/tests/opa/ingressgateway_policy_xforward_test.rego.tpl ingressgateway.policy
 	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-admin.tpl /mnt/tests/opa/ingressgateway-customer-admin_policy_xforward_test.rego.tpl ingressgateway-customer-admin.policy
 	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/_policy-ingressgateway-customer-user.tpl /mnt/tests/opa/ingressgateway-customer-user_policy_xforward_test.rego.tpl ingressgateway-customer-user.policy
