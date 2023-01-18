@@ -59,8 +59,9 @@ data:
     http_request.method in {"GET", "HEAD"}
     }
 
-    # Allow all access to Gitea
+    # Allow all access to Gitea, Spire JWKS
     allow { startswith(original_path, "/vcs") }
+    allow { startswith(original_path, "/spire-jwks-") }
 
     # Allow cloud-init endpoints, as we do validation based on incoming IP.
     # In the future, these requests will come in via the TOR switches and ideally
