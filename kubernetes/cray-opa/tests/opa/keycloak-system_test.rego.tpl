@@ -21,7 +21,6 @@ test_allow_bypassed_urls_with_no_auth_header {
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/spire-jwks-vshastaio/keys"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/v2"}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/service/rest"}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"path": "/service/rest"}}}}
 }
 
 test_user_when_admin_required {
