@@ -45,7 +45,7 @@ data:
         o_path := http_request.path
     }
 
-    # Allow broad access to CMN LB for keycloak (CMN and NMN share Istio + OPA ingress stack in CSM 1.3.x), restrict to specific
+    # Allow broad access to CMN LB for keycloak (CMN and NMN share Istio + OPA ingress stack in CSM 1.4.x), restrict to specific
     # endpoints otherwise
 
     allow
