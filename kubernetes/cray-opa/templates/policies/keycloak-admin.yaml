@@ -14,6 +14,7 @@ data:
   policy.rego: |-
     # Keycloak Admin OPA Policy
     package istio.authz
+    import future.keywords.in
     import input.attributes.request.http as http_request
 
 
@@ -44,12 +45,41 @@ data:
         o_path := http_request.path
     }
 
-    # Whitelist Keycloak, since those services enable users to login and obtain
-    # JWTs. vcs is also enabled here. Legacy services to be migrated or removed:
-    #
-    #     * VCS/Gitea
-    #
-    allow { startswith(original_path, "/keycloak") }
+    # Allow broad access to CMN LB for keycloak (CMN and NMN share Istio + OPA ingress stack in CSM 1.4.x), restrict to specific
+    # endpoints otherwise
+
+    allow
+    {
+        startswith(original_path, "/keycloak")
+        startswith(http_request.host, "auth.cmn.")
+    }
+
+    allow
+    {
+        startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/auth")
+        # Mitigate CVE-2020-10770
+        not re_match(`^/keycloak/realms/[a-zA-Z0-9]+/protocol/openid-connect/.*request_uri=.*$`, original_path)
+    }
+
+    keycloak_oidc_paths := {
+    "/keycloak/realms/shasta/protocol/openid-connect/token",
+    "/keycloak/realms/shasta/protocol/openid-connect/userinfo",
+    "/keycloak/realms/shasta/protocol/openid-connect/logout",
+    "/keycloak/realms/shasta/protocol/openid-connect/certs",
+    "/keycloak/realms/shasta/.well-known/openid-configuration"
+    }
+
+    allow {
+    some x in keycloak_oidc_paths
+    startswith(original_path, x)
+    }
+
+    allow {
+    startswith(original_path, "/keycloak/resources")
+    http_request.method in {"GET", "HEAD"}
+    }
+
+    # Allow all access to Gitea
     allow { startswith(original_path, "/vcs") }
 
     # Allow cloud-init endpoints, as we do validation based on incoming IP.
