@@ -1,5 +1,5 @@
 {{- /*
-Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 */ -}}
 {{- range $name, $options := .Values.ingresses }}
 {{- if $options.policies.keycloak.system }}
@@ -147,6 +147,8 @@ data:
         {"method": "GET",  "path": `^/apis/smd/hsm/v./.*$`},
         {"method": "HEAD",  "path": `^/apis/smd/hsm/v./.*$`},
         {"method": "PATCH",  "path": `^/apis/smd/hsm/v./State/Components/BulkSoftwareStatus$`},
+        #PCS -> Get power status if prefered over SMD
+        {"method": "GET",  "path": `^/apis/power-control/v1/power-status.*$`},
         #HMNFD -> subscribe only, cannot create state change notifications
         {"method": "GET",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
         {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},

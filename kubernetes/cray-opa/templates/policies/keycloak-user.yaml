@@ -1,5 +1,5 @@
 {{- /*
-Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 */ -}}
 {{- range $name, $options := .Values.ingresses }}
 {{- if $options.policies.keycloak.user }}
@@ -178,6 +178,11 @@ data:
           {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap$`},
           {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap_capabilities$`},
           {"method": "POST", "path": `^/apis/capmc/capmc/v1/set_power_cap$`},
+          # PCS - Power control - component power transitioning, power status, and power capping.
+          {"method": "GET", "path": `^/apis/power-control/.*$`},
+          {"method": "POST", "path": `^/apis/power-control/.*$`},
+          {"method": "PATCH", "path": `^/apis/power-control/.*$`},
+          {"method": "DELETE", "path": `^/apis/power-control/.*$`},
           # BOS - node boot
           {"method": "GET", "path": `^/apis/bos/.*$`},
           {"method": "HEAD", "path": `^/apis/bos/.*$`},

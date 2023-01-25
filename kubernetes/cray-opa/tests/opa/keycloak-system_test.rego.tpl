@@ -1,4 +1,4 @@
-# Copyright 2021,2022 Hewlett Packard Enterprise Development LP
+# Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 
 package istio.authz
 ## HOW TO DO UNIT TESTING
@@ -108,6 +108,13 @@ test_compute {
   # SMD - not allowed
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": smd_statecomponents_path, "headers": {"authorization": compute_auth}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": smd_statecomponents_path, "headers": {"authorization": compute_auth}}}}}
+
+  # PCS - allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/power-control/v1/power-status?xname=TEST", "headers": {"authorization": compute_auth}}}}}
+
+  # PCS - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/power-control/v1/transitions", "headers": {"authorization": compute_auth}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/power-control/v1/transitions", "headers": {"authorization": compute_auth}}}}}
 
   # HMNFD - Allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": compute_auth}}}}}
