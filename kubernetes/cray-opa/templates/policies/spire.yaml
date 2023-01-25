@@ -77,6 +77,9 @@ data:
           {"method": "GET",   "path": `^/apis/smd/hsm/v2/.*$`},
           {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},
 
+          #PCS -> Get power status. If desired over SMD power status
+          {"method": "GET", "path": `^/apis/power-control/v1/power-status.*$`},
+
           #HMNFD -> subscribe only, cannot create state change notifications
           {"method": "GET",   "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
           {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
@@ -110,6 +113,11 @@ data:
             {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap$`},
             {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap_capabilities$`},
             {"method": "POST", "path": `^/apis/capmc/capmc/v1/set_power_cap$`},
+            # PCS - Power control - component power transitioning, power status, and power capping.
+            {"method": "GET", "path": `^/apis/power-control/.*$`},
+            {"method": "POST", "path": `^/apis/power-control/.*$`},
+            {"method": "PATCH", "path": `^/apis/power-control/.*$`},
+            {"method": "DELETE", "path": `^/apis/power-control/.*$`},
             # BOS - node boot
             {"method": "GET", "path": `^/apis/bos/.*$`},
             {"method": "HEAD", "path": `^/apis/bos/.*$`},
