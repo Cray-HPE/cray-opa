@@ -1,4 +1,4 @@
-# Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 
 package istio.authz
 ## HOW TO DO UNIT TESTING
@@ -158,6 +158,11 @@ test_wlm {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"authorization": wlm_auth}}}}}
   # CAPMC - not allowed
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"authorization": wlm_auth}}}}}
+  # PCS - allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/power-control/v1/power-status?xname=test", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/power-control/v1/transitions", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/power-control/v1/power-cap", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/power-control/v1/transitions/test", "headers": {"authorization": wlm_auth}}}}}
   # BOS - allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v1/session", "headers": {"authorization": wlm_auth}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/bos/v1/session", "headers": {"authorization": wlm_auth}}}}}
@@ -197,6 +202,11 @@ test_wlm_xforwarded {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
   # CAPMC - not allowed
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  # PCS - allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/power-control/v1/power-status?xname=test", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/power-control/v1/transitions", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/power-control/v1/power-cap", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/power-control/v1/transitions/test", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
   # BOS - allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
