@@ -44,7 +44,7 @@ data:
     # If the auth type is bearer, decode the JWT
     parsed_kc_token = {"payload": payload} {
         found_auth.type == "Bearer"
-        response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.keycloak.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
+        response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.keycloak.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt", "raise_error": false})
         [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "shasta"})
 
         # Verify that the issuer is as expected.
