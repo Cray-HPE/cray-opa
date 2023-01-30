@@ -136,7 +136,9 @@ jwtValidation:
   keycloak:
     jwksUri: "https://istio-ingressgateway.istio-system.svc.cluster.local./keycloak/realms/shasta/protocol/openid-connect/certs"
   spire:
-    jwksUri: "http://spire-jwks.spire.svc.cluster.local/keys"
+    jwksUris:
+      - "http://spire-jwks.spire.svc.cluster.local/keys"
+      - "http://cray-spire-jwks.spire.svc.cluster.local/keys"
     issuers:
       vshasta.io: "http://spire.local/shasta/vshastaio"
     trustDomain: shasta

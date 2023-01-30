@@ -146,13 +146,18 @@ data:
         ]
       }
 
+       verify_payload := payload {
+                response := [{{- range $.Values.jwtValidation.spire.jwksUris }}http.send({"method": "get", "url": "{{.}}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt", "raise_error": false}),{{- end }}]
+                [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response[_].raw_body, "aud": "system-compute"})
+      }
+
     {{- if $.Values.opa.xnamePolicy.enabled }}
     # Spire With XNAME Validation
     # If the auth type is bearer, decode the JWT
       parsed_spire_token = {"payload": payload, "xname": xname} {
           found_auth.type == "Bearer"
-          response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.spire.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
-          [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "system-compute"})
+
+          payload = verify_payload
 
           # Verify that the issuer is as expected.
           allowed_issuers := [
@@ -218,8 +223,8 @@ data:
     # If the auth type is bearer, decode the JWT
     parsed_spire_token = {"payload": payload} {
         found_auth.type == "Bearer"
-        response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.spire.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
-        [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "system-compute"})
+
+        payload := verify_payload
 
         # Verify that the issuer is as expected.
         allowed_issuers := [

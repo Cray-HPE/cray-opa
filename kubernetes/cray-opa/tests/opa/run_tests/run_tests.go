@@ -463,7 +463,7 @@ func main() {
 						"jwksUri": ts.URL,
 					},
 					"spire": map[string]interface{}{
-						"jwksUri":     ts.URL,
+						"jwksUris":    []string{ts.URL},
 						"issuers":     []string{spireIssuer},
 						"trustDomain": "shasta",
 					},
@@ -479,7 +479,7 @@ func main() {
 						"jwksUri": ts.URL,
 					},
 					"spire": map[string]interface{}{
-						"jwksUri":     ts.URL,
+						"jwksUris":    []string{ts.URL},
 						"issuers":     []string{spireIssuer},
 						"trustDomain": "shasta",
 					},
