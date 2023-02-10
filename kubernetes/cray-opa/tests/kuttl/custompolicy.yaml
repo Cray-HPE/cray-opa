@@ -56,7 +56,7 @@ data:
     required_custom_roles[r] {
         perm := custom_role_perms[r][_]
         perm.method = http_request.method
-        re_match(perm.path, original_path)
+        perm.path = original_path
     }
 
     # Our list of endpoints we accept based on roles.

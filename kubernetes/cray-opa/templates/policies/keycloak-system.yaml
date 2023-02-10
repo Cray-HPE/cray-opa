@@ -91,7 +91,7 @@ data:
     required_system_roles[r] {
         perm := system_role_perms[r][_]
         perm.method = http_request.method
-        re_match(perm.path, original_path)
+        regex.match(perm.path, original_path)
     }
 
 

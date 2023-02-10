@@ -24,7 +24,7 @@
 ---
 image:
   repository: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa
-  tag: 0.42.1-envoy  # When changing this, also update tests/opa//Dockerfile.
+  tag: 0.48.0-envoy  # When changing this, also update tests/opa//Dockerfile.
   pullPolicy: IfNotPresent
 
 priorityClassName: csm-high-priority-service
@@ -141,4 +141,5 @@ jwtValidation:
       - "http://cray-spire-jwks.spire.svc.cluster.local/keys"
     issuers:
       vshasta.io: "http://spire.local/shasta/vshastaio"
+      crayspire.local: "http://crayspire.local/shasta"
     trustDomain: shasta

@@ -20,7 +20,11 @@ data:
   {{- end}}
       package istio.authz
       import input.attributes.request.http as http_request
+      import future.keywords.in
 
+
+    # Allow access to the spire jwks key data.
+      allow { startswith(original_path, "/spire-jwks") }
 
     # The path being requested from the user. When the envoy filter is configured for
     # SIDECAR_INBOUND this is: http_request.headers["x-envoy-original-path"].
@@ -146,9 +150,16 @@ data:
         ]
       }
 
+      isValid(resp) := p {
+        [v, _, p] := io.jwt.decode_verify(found_auth.token, {"cert": resp.raw_body, "aud": "system-compute"})
+        v == true
+      }
+
        verify_payload := payload {
-                response := [{{- range $.Values.jwtValidation.spire.jwksUris }}http.send({"method": "get", "url": "{{.}}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt", "raise_error": false}),{{- end }}]
-                [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response[_].raw_body, "aud": "system-compute"})
+                responses := [{{- range $.Values.jwtValidation.spire.jwksUris }}http.send({"method": "get", "url": "{{.}}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt", "raise_error": false}),{{- end }}]
+
+                some response in responses
+                  payload := isValid(response)
       }
 
     {{- if $.Values.opa.xnamePolicy.enabled }}
@@ -177,7 +188,7 @@ data:
           # Test subject matches destination
           perm := sub_match[s][_]
           perm.method = http_request.method
-          re_match(perm.path, original_path)
+          regex.match(perm.path, original_path)
       }
 
       sub_match = {
@@ -243,7 +254,7 @@ data:
         # Test subject matches destination
         perm := sub_match[s][_]
         perm.method = http_request.method
-        re_match(perm.path, original_path)
+        regex.match(perm.path, original_path)
     }
 
     sub_match = {

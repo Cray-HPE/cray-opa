@@ -115,7 +115,7 @@ data:
     required_admin_roles[r] {
         perm := admin_role_perms[r][_]
         perm.method = http_request.method
-        re_match(perm.path, original_path)
+        regex.match(perm.path, original_path)
     }
 
 

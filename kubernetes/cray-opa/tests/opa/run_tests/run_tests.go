@@ -118,8 +118,38 @@ func main() {
 	}))
 	defer ts.Close()
 
+	cRandomKey := make([]byte, 32)
+	rand.Read(cRandomKey)
+
+	ctc := tokenCreator{key: cRandomKey}
+
+	cRandomKeyB64 := base64.RawURLEncoding.EncodeToString(cRandomKey)
+
+	crayJwksResponseData := map[string]interface{}{
+		"keys": []interface{}{
+			map[string]interface{}{
+				"kid": "MoeoCPOcAKjkbMy7k-IhGMtjvqehZqRTqevioCtoaNM",
+				"kty": "oct",
+				"k":   cRandomKeyB64,
+				"alg": "HS256",
+			},
+		},
+	}
+
+	crayJwksResponse, err := json.Marshal(crayJwksResponseData)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("JWKS FETCHED!")
+		fmt.Fprintln(w, string(crayJwksResponse))
+	}))
+	defer ts.Close()
+
 	keycloakIssuer := "http://keycloak1"
 	spireIssuer := "http://spire.local/shasta/vshastaio"
+	craySpireIssuer := "http://crayspire.local/shasta"
 	shastaAud := "shasta"
 	systemComputeAud := "system-compute"
 
@@ -404,6 +434,16 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireComputeTPMProvisioner)
 
+	spireSub = spireSubComputePrefix + "tpm-provisioner"
+	args = createTokenArgs{
+		issuer: craySpireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
+	craySpireComputeTPMProvisioner, err := ctc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeTPMProvisioner)
+
 	// Reading in the policy template file and generating policy file.
 
 	yf, err := ioutil.ReadFile(policyTemplateFilename)
@@ -463,8 +503,8 @@ func main() {
 						"jwksUri": ts.URL,
 					},
 					"spire": map[string]interface{}{
-						"jwksUris":    []string{ts.URL},
-						"issuers":     []string{spireIssuer},
+						"jwksUris":    []string{ts.URL, cts.URL},
+						"issuers":     []string{spireIssuer, craySpireIssuer},
 						"trustDomain": "shasta",
 					},
 				},
@@ -479,8 +519,8 @@ func main() {
 						"jwksUri": ts.URL,
 					},
 					"spire": map[string]interface{}{
-						"jwksUris":    []string{ts.URL},
-						"issuers":     []string{spireIssuer},
+						"jwksUris":    []string{ts.URL, cts.URL},
+						"issuers":     []string{spireIssuer, craySpireIssuer},
 						"trustDomain": "shasta",
 					},
 				},
@@ -548,17 +588,18 @@ func main() {
 				"tpm_provisioner":    spireNcnTPMProvisioner,
 			},
 			"compute": map[string]interface{}{
-				"cfs_state_reporter": spireComputeCfsStateReporter,
-				"ckdump":             spireComputeCkdump,
-				"ckdump_helper":      spireComputeCkdumpHelper,
-				"cpsmount":           spireComputeCpsmount,
-				"cpsmount_helper":    spireComputeCpsmountHelper,
-				"dvs_hmi":            spireComputeDvsHmi,
-				"dvs_map":            spireComputeDvsMap,
-				"heartbeat":          spireComputeHeartbeat,
-				"orca":               spireComputeOrca,
-				"tpm_provisioner":    spireComputeTPMProvisioner,
-				"wlm":                spireComputeWlm,
+				"cfs_state_reporter":   spireComputeCfsStateReporter,
+				"ckdump":               spireComputeCkdump,
+				"ckdump_helper":        spireComputeCkdumpHelper,
+				"cpsmount":             spireComputeCpsmount,
+				"cpsmount_helper":      spireComputeCpsmountHelper,
+				"dvs_hmi":              spireComputeDvsHmi,
+				"dvs_map":              spireComputeDvsMap,
+				"heartbeat":            spireComputeHeartbeat,
+				"orca":                 spireComputeOrca,
+				"tpm_provisioner":      spireComputeTPMProvisioner,
+				"cray_tpm_provisioner": craySpireComputeTPMProvisioner,
+				"wlm":                  spireComputeWlm,
 			},
 		},
 	}
