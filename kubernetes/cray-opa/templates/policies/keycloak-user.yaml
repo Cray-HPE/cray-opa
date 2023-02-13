@@ -148,27 +148,8 @@ data:
           {"method": "GET", "path": `^/apis/sma-telemetry-api/.*$`}, # All SMA telemetry API Calls - GET
       ],
       "wlm": [
-          # CAPMC - power capping and power control; eventually this will need to add PCS
-            ## CAPMC -> Xnames
-          {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_xname_status$`},
-          {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_reinit$`},
-          {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_on$`},
-          {"method": "POST", "path": `^/apis/capmc/capmc/v1/xname_off$`},
-            ## CAPMC -> Power Capping
-          {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap$`},
-          {"method": "POST", "path": `^/apis/capmc/capmc/v1/get_power_cap_capabilities$`},
-          {"method": "POST", "path": `^/apis/capmc/capmc/v1/set_power_cap$`},
-          # PCS - Power control - component power transitioning, power status, and power capping.
-          {"method": "GET", "path": `^/apis/power-control/.*$`},
-          {"method": "POST", "path": `^/apis/power-control/.*$`},
-          {"method": "PATCH", "path": `^/apis/power-control/.*$`},
-          {"method": "DELETE", "path": `^/apis/power-control/.*$`},
           # BOS - node boot
-          {"method": "GET", "path": `^/apis/bos/.*$`},
-          {"method": "HEAD", "path": `^/apis/bos/.*$`},
-          {"method": "POST", "path": `^/apis/bos/.*$`},
-          {"method": "PATCH", "path": `^/apis/bos/.*$`},
-          {"method": "DELETE", "path": `^/apis/bos/.*$`},
+          {"method": "POST", "path": `^/apis/bos/v2/applystaged$`},
           # SMD - hardware state query
           {"method": "GET",  "path": `^/apis/smd/hsm/v2/.*$`},
           {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},
