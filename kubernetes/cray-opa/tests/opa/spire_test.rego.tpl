@@ -257,6 +257,51 @@ test_tpm_provisioner {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/tpm-provisioner/whitelist/remove", "headers": {"authorization": "Bearer {{ .spire.compute.tpm_provisioner }}" }}}}}
 }
 
+test_wlm {
+  spire_sub = "Bearer {{ .spire.compute.wlm }}"
+
+  # CAPMC - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_xname_status", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_reinit", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_on", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_off", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_power_cap", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_power_cap_capabilities", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"authorization": spire_sub}}}}}
+  # PCS - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/power-control/v1/power-status?xname=test", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/power-control/v1/transitions", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/power-control/v1/power-cap", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/power-control/v1/transitions/test", "headers": {"authorization": spire_sub}}}}}
+  # BOS - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v2/applystaged", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v1/session", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/bos/v1/session", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v1/session", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/bos/v1/session", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/bos/v1/session", "headers": {"authorization": spire_sub}}}}}
+  # SMD - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}
+  # VNID - allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/vnid/fabric/vnis", "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/vnid/fabric/vnis", "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/vnid/fabric/vnis", "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/vnid/fabric/vnis", "headers": {"authorization": spire_sub}}}}}
+  # VNID - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/vnid/fabric/vnis", "headers": {"authorization": spire_sub}}}}}
+  # jackaloped - allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/jackaloped/fabric/nics", "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/jackaloped/fabric/nics", "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/jackaloped/fabric/nics", "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/jackaloped/fabric/nics", "headers": {"authorization": spire_sub}}}}}
+  # jackaloped - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/jackaloped/fabric/nics", "headers": {"authorization": spire_sub}}}}}
+}
+
 test_tpm_provisioner_cray_spire {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm-provisioner/challenge/authorize?xname=x1&type=compute", "headers": {"authorization": "Bearer {{ .spire.compute.cray_tpm_provisioner }}" }}}}}
 

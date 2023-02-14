@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- Reduce scope of WLM roles
 
 ## [1.3.0]
 ### Changed
