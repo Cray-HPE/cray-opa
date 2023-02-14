@@ -193,27 +193,28 @@ test_wlm {
 }
 
 test_wlm_xforwarded {
-  # CAPMC - allowed
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_xname_status", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_reinit", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_on", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_off", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_power_cap", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_power_cap_capabilities", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
   # CAPMC - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_xname_status", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_reinit", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_on", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/xname_off", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_power_cap", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/get_power_cap_capabilities", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/capmc/capmc/v1/set_power_cap", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  # PCS - allowed
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/power-control/v1/power-status?xname=test", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/power-control/v1/transitions", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/power-control/v1/power-cap", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/power-control/v1/transitions/test", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  # PCS - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/power-control/v1/power-status?xname=test", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/power-control/v1/transitions", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/power-control/v1/power-cap", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/power-control/v1/transitions/test", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
   # BOS - allowed
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v2/applystaged", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  # BOS - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
   # SMD - allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
