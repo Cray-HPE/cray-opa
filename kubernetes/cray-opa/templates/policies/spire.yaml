@@ -20,7 +20,11 @@ data:
   {{- end}}
       package istio.authz
       import input.attributes.request.http as http_request
+      import future.keywords.in
 
+
+    # Allow access to the spire jwks key data.
+      allow { startswith(original_path, "/spire-jwks") }
 
     # The path being requested from the user. When the envoy filter is configured for
     # SIDECAR_INBOUND this is: http_request.headers["x-envoy-original-path"].
@@ -146,13 +150,25 @@ data:
         ]
       }
 
+      isValid(resp) := p {
+        [v, _, p] := io.jwt.decode_verify(found_auth.token, {"cert": resp.raw_body, "aud": "system-compute"})
+        v == true
+      }
+
+       verify_payload := payload {
+                responses := [{{- range $.Values.jwtValidation.spire.jwksUris }}http.send({"method": "get", "url": "{{.}}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt", "raise_error": false}),{{- end }}]
+
+                some response in responses
+                  payload := isValid(response)
+      }
+
     {{- if $.Values.opa.xnamePolicy.enabled }}
     # Spire With XNAME Validation
     # If the auth type is bearer, decode the JWT
       parsed_spire_token = {"payload": payload, "xname": xname} {
           found_auth.type == "Bearer"
-          response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.spire.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
-          [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "system-compute"})
+
+          payload = verify_payload
 
           # Verify that the issuer is as expected.
           allowed_issuers := [
@@ -172,7 +188,7 @@ data:
           # Test subject matches destination
           perm := sub_match[s][_]
           perm.method = http_request.method
-          re_match(perm.path, original_path)
+          regex.match(perm.path, original_path)
       }
 
       sub_match = {
@@ -218,8 +234,8 @@ data:
     # If the auth type is bearer, decode the JWT
     parsed_spire_token = {"payload": payload} {
         found_auth.type == "Bearer"
-        response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.spire.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt"})
-        [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "system-compute"})
+
+        payload := verify_payload
 
         # Verify that the issuer is as expected.
         allowed_issuers := [
@@ -238,7 +254,7 @@ data:
         # Test subject matches destination
         perm := sub_match[s][_]
         perm.method = http_request.method
-        re_match(perm.path, original_path)
+        regex.match(perm.path, original_path)
     }
 
     sub_match = {
