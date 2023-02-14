@@ -56,7 +56,7 @@ data:
         # Test subject matches destination
         perm := custom_sub_match[s][_]
         perm.method = http_request.method
-        re_match(perm.path, original_path)
+        regex.match(perm.path, original_path)
     }
 
     custom_sub_match = {
