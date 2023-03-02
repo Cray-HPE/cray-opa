@@ -163,13 +163,23 @@ data:
         {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat$`},
         {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
         {"method": "GET", "path": `^/apis/hbtd/hmi/v1/params$`},
-      ]
+      ],
+      "system-nexus": [
+        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/clients/.*$`},
+        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/clients$`},
+        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/users/.*$`},
+        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/users$`},
+        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/roles/.*$`},
+        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/roles$`},
+        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/groups$`},
+      ],
     }
 
     # Our list of endpoints we accept based on roles.
     system_role_perms = {
       "system-pxe": allowed_system_methods["system-pxe"],
       "system-compute": allowed_system_methods["system-compute"],
+      "system-nexus": allowed_system_methods["system-nexus"],
     }
 {{- end }}
 {{- end }}
