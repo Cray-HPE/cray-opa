@@ -166,12 +166,12 @@ data:
       ],
       "system-nexus": [
         {"method": "GET", "path": `^/keycloak/admin/realms/shasta/clients/.*$`},
-        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/clients$`},
+        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/clients.*$`},
         {"method": "GET", "path": `^/keycloak/admin/realms/shasta/users/.*$`},
-        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/users$`},
+        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/users.*$`},
         {"method": "GET", "path": `^/keycloak/admin/realms/shasta/roles/.*$`},
-        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/roles$`},
-        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/groups$`},
+        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/roles.*$`},
+        {"method": "GET", "path": `^/keycloak/admin/realms/shasta/groups.*$`},
       ],
     }
 
