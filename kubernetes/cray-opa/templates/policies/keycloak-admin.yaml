@@ -128,12 +128,24 @@ data:
           {"method": "PATCH",  "path": `.*`},
           {"method": "HEAD",  "path": `.*`},
       ],
+      "tenant-admin": [
+          # BOS
+          {"method": "POST", "path": `^/apis/bos/v2/applystaged$`}, # POST allows tenants to continue booting specific components already staged
+          {"method": "GET",  "path": `^/apis/bos/v2/components$`}, # GET allows a listing of all active components states
+          {"method": "GET",  "path": `^/apis/bos/v2/components/.*$`}, # GET information on an individual component
+          {"method": "POST", "path": `^/apis/bos/v2/sessions$`}, # POST Creates a new BOSv2 Session
+          {"method": "GET",  "path": `^/apis/bos/v2/sessions/.*$`}, # GET allows monitoring status of individual sessions
+          {"method": "GET",  "path": `^/apis/bos/v2/sessions/.*?/status$`}, # Obtain more detailed status information for an individual session
+          {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates$`}, # GET BOSv2 SessionTemplates (list all)
+          {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates/.*?$`}, # GET BOSv2 SessionTemplates (obtain details about a specific session template)
+      ]
     }
 
     # Our list of endpoints we accept based on roles.
     # The admin roll can make any call.
     admin_role_perms = {
         "admin": allowed_admin_methods["admin"],
+        "tenant-admin": allowed_admin_methods["tenant-admin"],
     }
 
 {{- end }}
