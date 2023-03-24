@@ -9,6 +9,7 @@ cfs_mock_path = "/apis/cfs/components/mock"
 cfs_ncn_mock_path = "/apis/cfs/components/ncnw001"
 cfs_compute_mock_path = "/apis/cfs/components/x1"
 cps_mock_path = "/apis/v2/cps/mock"
+cos_config_mock_path = "/apis/v2/cos/mock"
 hbtb_heartbeat_path = "/apis/hbtd/hmi/v1/heartbeat"
 nmd_mock_path = "/apis/v2/nmd/status"
 smd_statecomponents_path = "/apis/smd/hsm/v2/State/Components"
@@ -140,6 +141,9 @@ spire_cps(spire_sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/cps/deployment", "headers": {"authorization": spire_sub}}}}}
 
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/cos/configs", "headers": {"authorization": spire_sub}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cos_config_mock_path, "headers": {"authorization": spire_sub}}}}}
+
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": spire_sub}}}}}
@@ -153,7 +157,7 @@ spire_cps(spire_sub) {
 test_spire_cps {
   spire_cps("Bearer {{ .spire.compute.cpsmount }}")
   spire_cps("Bearer {{ .spire.compute.cpsmount_helper }}")
-  spire_cps("Bearer {{ .spire.ncn.cpsmount_helper }}")
+  spire_cps("Bearer {{ .spire.ncn.cpsmount }}")
   spire_cps("Bearer {{ .spire.ncn.cpsmount_helper }}")
 }
 
@@ -177,6 +181,8 @@ spire_ckdump_compute(sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cos_config_mock_path, "headers": {"authorization": sub}}}}}
 }
 
 
@@ -200,6 +206,8 @@ spire_ckdump_ncn(sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cos_config_mock_path, "headers": {"authorization": sub}}}}}
 }
 
 test_spire_ckdump_compute {
@@ -226,6 +234,8 @@ test_spire_invalid_sub {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cos_config_mock_path, "headers": {"authorization": spire_sub}}}}}
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}

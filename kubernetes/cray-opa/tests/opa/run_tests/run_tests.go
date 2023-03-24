@@ -274,6 +274,16 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnCpsmountHelper)
 
+	spireSub = spireSubNCNPrefix + "cos_config_helper"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
+	spireNcnCosConfigHelper, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireNcnCosConfigHelper)
+
 	spireSub = spireSubNCNPrefix + "dvs-hmi"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
@@ -373,6 +383,16 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(spireSub, ":", spireComputeCpsmountHelper)
+
+	spireSub = spireSubComputePrefix + "cos_config_helper"
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
+	spireComputeCosConfigHelper, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireComputeCosConfigHelper)
 
 	spireSub = spireSubComputePrefix + "dvs-hmi"
 	args = createTokenArgs{
@@ -581,6 +601,7 @@ func main() {
 				"ckdump_helper":      spireNcnCkdumpHelper,
 				"cpsmount":           spireNcnCpsmount,
 				"cpsmount_helper":    spireNcnCpsmountHelper,
+				"cos_config_helper":   spireNcnCosConfigHelper,
 				"dvs_hmi":            spireNcnDvsHmi,
 				"dvs_map":            spireNcnDvsMap,
 				"heartbeat":          spireNcnHeartbeat,
@@ -593,6 +614,7 @@ func main() {
 				"ckdump_helper":        spireComputeCkdumpHelper,
 				"cpsmount":             spireComputeCpsmount,
 				"cpsmount_helper":      spireComputeCpsmountHelper,
+				"cos_config_helper":    spireComputeCosConfigHelper,
 				"dvs_hmi":              spireComputeDvsHmi,
 				"dvs_map":              spireComputeDvsMap,
 				"heartbeat":            spireComputeHeartbeat,
