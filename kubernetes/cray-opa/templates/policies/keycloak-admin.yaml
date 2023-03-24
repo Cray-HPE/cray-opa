@@ -130,14 +130,17 @@ data:
       ],
       "tenant-admin": [
           # BOS
+          {"method": "GET",  "path": `^/apis/bos/v2$`}, # Allow access to version linkage
           {"method": "POST", "path": `^/apis/bos/v2/applystaged$`}, # POST allows tenants to continue booting specific components already staged
           {"method": "GET",  "path": `^/apis/bos/v2/components$`}, # GET allows a listing of all active components states
           {"method": "GET",  "path": `^/apis/bos/v2/components/.*$`}, # GET information on an individual component
+          {"method": "GET",  "path": `^/apis/bos/v2/healthz$`}, # Allow tenant admins to know the overall health of the deployment
           {"method": "POST", "path": `^/apis/bos/v2/sessions$`}, # POST Creates a new BOSv2 Session
           {"method": "GET",  "path": `^/apis/bos/v2/sessions/.*$`}, # GET allows monitoring status of individual sessions
           {"method": "GET",  "path": `^/apis/bos/v2/sessions/.*?/status$`}, # Obtain more detailed status information for an individual session
           {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates$`}, # GET BOSv2 SessionTemplates (list all)
           {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates/.*?$`}, # GET BOSv2 SessionTemplates (obtain details about a specific session template)
+          {"method": "GET",  "path": `^/apis/bos/v2/version$`} # GETs allow views on specific BOS version information
       ]
     }
 
