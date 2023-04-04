@@ -72,6 +72,9 @@ test_compute {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/v2/cps/contents", "headers": {"authorization": compute_auth}}}}}
 
   # NMD - Allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/v2/cos/configs", "headers": {"authorization": compute_auth}}}}}
+
+  # NMD - Allowed
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/v2/nmd/status/x1", "headers": {"authorization": compute_auth}}}}}
 
