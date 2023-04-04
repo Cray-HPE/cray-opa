@@ -112,6 +112,8 @@ data:
         {"method": "POST",  "path": `^/apis/v2/cps/contents$`},
         {"method": "POST",  "path": `^/apis/v2/cps/transports$`},
 
+        {"method": "GET",  "path": `^/apis/v2/cos/configs$`},
+
         {"method": "PUT",  "path": `^/apis/v2/nmd/status/.*$`},
 
         #SMD -> GET everything, DVS currently needs to update BulkSoftwareStatus

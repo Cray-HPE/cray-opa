@@ -1,4 +1,4 @@
-# Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 
 package istio.authz
 ## HOW TO DO UNIT TESTING
@@ -58,6 +58,7 @@ compute_auth = "Bearer {{ .computeToken }}"
 
 cfs_mock_path = "/apis/components/cfs/mock"
 cps_mock_path = "/apis/v2/cps/mock"
+cos_config_mock_path = "/apis/v2/cos/mock"
 hbtb_heartbeat_path = "/apis/hbtd/hmi/v1/heartbeat"
 nmd_mock_path = "/apis/v2/nmd/mock"
 smd_statecomponents_path = "/apis/smd/hsm/v2/State/Components"
@@ -73,6 +74,8 @@ spire_correct_sub(sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cos_config_mock_path, "headers": {"authorization": sub}}}}}
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
@@ -100,12 +103,14 @@ test_deny_spire_subs {
   spire_correct_sub("Bearer {{ .spire.ncn.cfs_state_reporter }}")
   spire_correct_sub("Bearer {{ .spire.ncn.cpsmount }}")
   spire_correct_sub("Bearer {{ .spire.ncn.cpsmount_helper }}")
+  spire_correct_sub("Bearer {{ .spire.ncn.cos_config_helper}}")
   spire_correct_sub("Bearer {{ .spire.ncn.dvs_hmi }}")
   spire_correct_sub("Bearer {{ .spire.ncn.dvs_map }}")
   spire_correct_sub("Bearer {{ .spire.ncn.orca }}")
   spire_correct_sub("Bearer {{ .spire.compute.cfs_state_reporter }}")
   spire_correct_sub("Bearer {{ .spire.compute.cpsmount }}")
   spire_correct_sub("Bearer {{ .spire.compute.cpsmount_helper }}")
+  spire_correct_sub("Bearer {{ .spire.compute.cos_config_helper }}")
   spire_correct_sub("Bearer {{ .spire.compute.dvs_hmi }}")
   spire_correct_sub("Bearer {{ .spire.compute.dvs_map }}")
   spire_correct_sub("Bearer {{ .spire.compute.orca }}")
@@ -124,6 +129,8 @@ spire_ckdump(spire_sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cos_config_mock_path, "headers": {"authorization": spire_sub}}}}}
 }
 
 test_deny_spire_ckdump {
@@ -147,6 +154,8 @@ test_spire_invalid_sub {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": cps_mock_path, "headers": {"authorization": spire_sub}}}}}
+
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": cos_config_mock_path, "headers": {"authorization": spire_sub}}}}}
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": spire_sub}}}}}
