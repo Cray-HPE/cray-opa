@@ -365,7 +365,7 @@ role_perms = {
     "wlm": allowed_methods["wlm"],
     "admin": allowed_methods["admin"],
     "monitor-ro": allowed_methods["monitor-ro"],
-    "system-nexus": allowed_system_methods["system-nexus"],
+    "system-nexus": allowed_methods["system-nexus"],
 }
 
 {{- if .Values.opa.xnamePolicy.enabled }}

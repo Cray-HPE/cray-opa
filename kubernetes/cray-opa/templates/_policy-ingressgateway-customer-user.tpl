@@ -224,7 +224,7 @@ role_perms = {
     "wlm": allowed_methods["wlm"],
     "ckdump": allowed_methods["ckdump"],
     "monitor-ro": allowed_methods["monitor-ro"],
-    "system-nexus": allowed_system_methods["system-nexus"],
+    "system-nexus": allowed_methods["system-nexus"],
 }
 
 
