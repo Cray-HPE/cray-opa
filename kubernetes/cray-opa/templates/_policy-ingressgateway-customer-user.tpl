@@ -207,6 +207,15 @@ allowed_methods := {
       # SMA
       {"method": "GET", "path": `^/apis/sma-telemetry-api/.*$`}, # All SMA telemetry API Calls - GET
   ],
+  "system-nexus": [
+    {"method": "GET", "path": `^/keycloak/admin/realms/shasta/clients/.*$`},
+    {"method": "GET", "path": `^/keycloak/admin/realms/shasta/clients.*$`},
+    {"method": "GET", "path": `^/keycloak/admin/realms/shasta/users/.*$`},
+    {"method": "GET", "path": `^/keycloak/admin/realms/shasta/users.*$`},
+    {"method": "GET", "path": `^/keycloak/admin/realms/shasta/roles/.*$`},
+    {"method": "GET", "path": `^/keycloak/admin/realms/shasta/roles.*$`},
+    {"method": "GET", "path": `^/keycloak/admin/realms/shasta/groups.*$`},
+  ],
 }
 
 # Our list of endpoints we accept based on roles.
@@ -215,6 +224,7 @@ role_perms = {
     "wlm": allowed_methods["wlm"],
     "ckdump": allowed_methods["ckdump"],
     "monitor-ro": allowed_methods["monitor-ro"],
+    "system-nexus": allowed_methods["system-nexus"],
 }
 
 
