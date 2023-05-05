@@ -52,6 +52,8 @@ type createTokenArgs struct {
 	aud    string
 	sub    string
 	typ    string
+	groups string
+	rrole  string
 }
 
 func (t tokenCreator) create(args createTokenArgs) (string, error) {
@@ -72,6 +74,14 @@ func (t tokenCreator) create(args createTokenArgs) (string, error) {
 	}
 	if args.typ != "" {
 		atClaims["typ"] = args.typ
+	}
+	if args.groups != "" {
+		atClaims["groups"] = []string{args.groups}
+	}
+	if args.rrole != "" {
+		atClaims["realm_access"] = map[string]interface{}{
+			"roles": []string{args.rrole},
+		}
 	}
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	token, err := at.SignedString(t.key)
@@ -179,6 +189,20 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("user token:", userToken)
+
+	args = createTokenArgs{rrole: "tenant-admin", groups: "vcluster-coke-tenant-admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
+	tenantToken, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("tenant token:", tenantToken)
+
+	args = createTokenArgs{role: "admin", rrole: "tenant-admin", groups: "vcluster-coke-tenant-admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
+	adminTenantToken, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("admin tenant token:", adminTenantToken)
 
 	args = createTokenArgs{
 		role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Invalid",
@@ -589,6 +613,8 @@ func main() {
 	values = map[string]interface{}{
 		"userToken":            userToken,
 		"adminToken":           adminToken,
+		"tenantToken":          tenantToken,
+		"adminTenantToken":     adminTenantToken,
 		"invalidTypAdminToken": invalidTypAdminToken,
 		"pxeToken":             pxeToken,
 		"computeToken":         computeToken,
@@ -601,7 +627,7 @@ func main() {
 				"ckdump_helper":      spireNcnCkdumpHelper,
 				"cpsmount":           spireNcnCpsmount,
 				"cpsmount_helper":    spireNcnCpsmountHelper,
-				"cos_config_helper":   spireNcnCosConfigHelper,
+				"cos_config_helper":  spireNcnCosConfigHelper,
 				"dvs_hmi":            spireNcnDvsHmi,
 				"dvs_map":            spireNcnDvsMap,
 				"heartbeat":          spireNcnHeartbeat,

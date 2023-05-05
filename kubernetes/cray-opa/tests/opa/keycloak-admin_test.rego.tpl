@@ -158,6 +158,25 @@ test_unauth_role {
 
 }
 
+# Multi Tenancy Tests
+
+test_tenat_admin {
+
+  # Check the tenant admin only has access to tenant endpoints
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/api1", "headers": {"authorization": "Bearer {{ .tenantToken }}", "tenant": "vcluster-coke"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .tenantToken }}", "tenant": "vcluster-coke"}}}}}
+
+  # Check that a tenant has no access to other tenants and has the correct headers
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .tenantToken }}", "tenant": "vcluster-pepsi"}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .tenantToken }}"}}}}}
+
+  # Check System admin still has access to endpoints with or without tenant header
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .adminTenantToken }}"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .adminTenantToken }}", "tenant": "vcluster-pepsi"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/api1", "headers": {"authorization": "Bearer {{ .adminTenantToken }}", "tenant": "vcluster-pepsi"}}}}}
+
+}
+
 # SPIRE Tests
 
 spire_correct_sub(sub) {
