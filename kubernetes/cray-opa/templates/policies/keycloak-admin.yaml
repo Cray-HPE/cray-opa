@@ -82,10 +82,10 @@ data:
     # This checks the JWT if it has tenant-admin role
     # also checks if the tenant header matches the group
     allow {
-        roles_for_tenant[r]
+        roles_for_tenant_admin[r]
         required_admin_roles[r]
         groups := parsed_kc_token.payload.groups[_]
-        trim_suffix(groups, "-tenant-admin") == http_request.headers["tenant"]
+        trim_suffix(groups, "-tenant-admin") == http_request.headers["cray-tenant-name"]
     }
 
     # Check if there is an authorization header and split the type from token
@@ -120,8 +120,8 @@ data:
         r := parsed_kc_token.payload.resource_access.shasta.roles[_]
     }
 
-    # Get the users realm roles from the JWT token
-    roles_for_tenant[r] {
+    # Get the user's realm roles from the JWT token
+    roles_for_tenant_admin[r] {
         r := parsed_kc_token.payload.realm_access.roles[_]
     }
 

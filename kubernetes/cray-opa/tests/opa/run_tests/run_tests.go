@@ -190,19 +190,12 @@ func main() {
 	}
 	fmt.Println("user token:", userToken)
 
-	args = createTokenArgs{rrole: "tenant-admin", groups: "vcluster-coke-tenant-admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
-	tenantToken, err := tc.create(args)
+	args = createTokenArgs{rrole: "tenant-admin", groups: "vcluster-blue-tenant-admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
+	tenantAdminToken, err := tc.create(args)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("tenant token:", tenantToken)
-
-	args = createTokenArgs{role: "admin", rrole: "tenant-admin", groups: "vcluster-coke-tenant-admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
-	adminTenantToken, err := tc.create(args)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("admin tenant token:", adminTenantToken)
+	fmt.Println("tenant token:", tenantAdminToken)
 
 	args = createTokenArgs{
 		role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Invalid",
@@ -613,8 +606,7 @@ func main() {
 	values = map[string]interface{}{
 		"userToken":            userToken,
 		"adminToken":           adminToken,
-		"tenantToken":          tenantToken,
-		"adminTenantToken":     adminTenantToken,
+		"tenantAdminToken":     tenantAdminToken,
 		"invalidTypAdminToken": invalidTypAdminToken,
 		"pxeToken":             pxeToken,
 		"computeToken":         computeToken,
