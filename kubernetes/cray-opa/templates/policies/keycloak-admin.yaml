@@ -90,6 +90,8 @@ data:
         parsed_kc_token.payload.realm_access.roles[_] == "tenant-admin"
         some perm in allowed_tenant_admin_methods
         perm.method = http_request.method
+        # Use an RFC1123 compliant tenant name
+        regex.match("^[a-z0-9][a-z0-9\\-\\.]{1,251}[a-z0-9]$", http_request.headers["cray-tenant-name"])
         groups := parsed_kc_token.payload.groups[_]
         trim_suffix(groups, "-tenant-admin") == http_request.headers["cray-tenant-name"]
         regex.match(perm.path, original_path)
