@@ -75,7 +75,7 @@ data:
         regex.match(perm.path, original_path)
     }
 
-    # Infrastructure Administrator Allow, with cray-tenant-name header (non-empty)
+    # Infrastructure Administrator Allow, with cray-tenant-name header
     allow {
         parsed_kc_token.payload.resource_access.shasta.roles[_] == "admin"
         # Use an RFC1123 compliant tenant name
@@ -85,7 +85,7 @@ data:
         regex.match(perm.path, original_path)
     }
 
-    # Tenant Administrator Allow, require cray-tenant-name group match
+    # Tenant Administrator Allow, require cray-tenant-name group matching
     allow {
         parsed_kc_token.payload.realm_access.roles[_] == "tenant-admin"
         some perm in allowed_tenant_admin_methods
