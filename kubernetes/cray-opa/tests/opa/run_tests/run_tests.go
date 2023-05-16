@@ -644,7 +644,7 @@ func main() {
 		},
 	}
 
-	f, err = os.Create("test.rego")
+	f, err = os.Create("/tmp/test.rego")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -662,7 +662,7 @@ func main() {
 	fmt.Println("Rendered test template:")
 	fmt.Println("*****")
 
-	dat, err = ioutil.ReadFile("test.rego")
+	dat, err = ioutil.ReadFile("/tmp/test.rego")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -686,9 +686,9 @@ func main() {
 	fmt.Printf("Policy File: %s\n", policyTemplateFilename)
 	fmt.Printf("Test File: %s\n", testTemplateFilename)
 
-	fmt.Println("Executing ./opa_envoy_linux_amd64 check -S ./policy.rego ./test.rego")
+	fmt.Println("Executing /app/opa_envoy_linux_amd64 check -S ./policy.rego ./test.rego")
 
-	cmd := exec.Command("./opa_envoy_linux_amd64", "check", "-S", "./policy.rego")
+	cmd := exec.Command("/app/opa_envoy_linux_amd64", "check", "-S", "./policy.rego")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -697,9 +697,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Executing ./opa_envoy_linux_amd64 test ./policy.rego ./test.rego -v")
+	fmt.Println("Executing /app/opa_envoy_linux_amd64 test ./policy.rego ./test.rego -v")
 
-	cmd = exec.Command("./opa_envoy_linux_amd64", "test", "./policy.rego", "./test.rego", "-v")
+	cmd = exec.Command("/app/opa_envoy_linux_amd64", "test", "./policy.rego", "./test.rego", "-v")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
