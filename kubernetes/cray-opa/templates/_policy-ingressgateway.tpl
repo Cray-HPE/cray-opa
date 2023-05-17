@@ -72,7 +72,7 @@ allow
         startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/logout"),
         startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/certs"),
         startswith(original_path, "/keycloak/realms/shasta/.well-known/openid-configuration")
-    ])   
+    ])
 }
 
 allow
