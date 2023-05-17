@@ -58,7 +58,7 @@ data:
       http_request.method in {"GET", "HEAD"}
     }
 
-    # Allow all access to Gitea, Spire JWKS
+    # Allow all access to Gitea
     allow { startswith(original_path, "/vcs") }
 
     # Allow cloud-init endpoints, as we do validation based on incoming IP.
