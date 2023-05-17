@@ -15,6 +15,7 @@ data:
     # Keycloak Admin OPA Policy
     package istio.authz
     import input.attributes.request.http as http_request
+    import future.keywords.in
 
 
     # Whitelist traffic to the Neuxs web UI since it uses Keycloak for authentication.
@@ -65,18 +66,35 @@ data:
     allow { startswith(original_path, "/v2") }
     allow { startswith(original_path, "/service/rest") }
 
-    # Whitelist Capsules UI. The Capsules UI starts at a login page which validates user access by retrieving a valid
-    # token from keycloak with the provided credentials.
-    allow { startswith(original_path, "/capsules/") }
-
-    # Whitelist gozerd (does its own MUNGE auth)
-    allow { startswith(original_path, "/apis/gozerd/") }
-
-    # This actually checks the JWT token passed in
-    # has access to the endpoint requested
+    # Infrastructure Administrator Allow, without cray-tenant-name header
     allow {
-        roles_for_user[r]
-        required_admin_roles[r]
+        parsed_kc_token.payload.resource_access.shasta.roles[_] == "admin"
+        not http_request.headers["cray-tenant-name"]
+        some perm in allowed_admin_methods
+        perm.method = http_request.method
+        regex.match(perm.path, original_path)
+    }
+
+    # Infrastructure Administrator Allow, with cray-tenant-name header
+    allow {
+        parsed_kc_token.payload.resource_access.shasta.roles[_] == "admin"
+        # Use an RFC1123 compliant tenant name
+        regex.match("^[a-z0-9][a-z0-9\\-\\.]{1,251}[a-z0-9]$", http_request.headers["cray-tenant-name"])
+        some perm in allowed_admin_methods
+        perm.method = http_request.method
+        regex.match(perm.path, original_path)
+    }
+
+    # Tenant Administrator Allow, require cray-tenant-name group matching
+    allow {
+        parsed_kc_token.payload.realm_access.roles[_] == "tenant-admin"
+        some perm in allowed_tenant_admin_methods
+        perm.method = http_request.method
+        # Use an RFC1123 compliant tenant name
+        regex.match("^[a-z0-9][a-z0-9\\-\\.]{1,251}[a-z0-9]$", http_request.headers["cray-tenant-name"])
+        groups := parsed_kc_token.payload.groups[_]
+        trim_suffix(groups, "-tenant-admin") == http_request.headers["cray-tenant-name"]
+        regex.match(perm.path, original_path)
     }
 
     # Check if there is an authorization header and split the type from token
@@ -106,50 +124,29 @@ data:
         allowed_issuers[_] = payload.iss
     }
 
-    # Get the users roles from the JWT token
-    roles_for_user[r] {
-        r := parsed_kc_token.payload.resource_access.shasta.roles[_]
-    }
-
-    # Determine if the path/verb requests is authorized based on the JWT roles
-    required_admin_roles[r] {
-        perm := admin_role_perms[r][_]
-        perm.method = http_request.method
-        regex.match(perm.path, original_path)
-    }
-
-
-    allowed_admin_methods := {
-      "admin": [
-          {"method": "GET",  "path": `.*`},
-          {"method": "PUT",  "path": `.*`},
-          {"method": "POST",  "path": `.*`},
-          {"method": "DELETE",  "path": `.*`},
-          {"method": "PATCH",  "path": `.*`},
-          {"method": "HEAD",  "path": `.*`},
-      ],
-      "tenant-admin": [
-          # BOS
-          {"method": "GET",  "path": `^/apis/bos/v2$`}, # Allow access to version linkage
-          {"method": "POST", "path": `^/apis/bos/v2/applystaged$`}, # POST allows tenants to continue booting specific components already staged
-          {"method": "GET",  "path": `^/apis/bos/v2/components$`}, # GET allows a listing of all active components states
-          {"method": "GET",  "path": `^/apis/bos/v2/components/.*$`}, # GET information on an individual component
-          {"method": "GET",  "path": `^/apis/bos/v2/healthz$`}, # Allow tenant admins to know the overall health of the deployment
-          {"method": "POST", "path": `^/apis/bos/v2/sessions$`}, # POST Creates a new BOSv2 Session
-          {"method": "GET",  "path": `^/apis/bos/v2/sessions/.*$`}, # GET allows monitoring status of individual sessions
-          {"method": "GET",  "path": `^/apis/bos/v2/sessions/.*?/status$`}, # Obtain more detailed status information for an individual session
-          {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates$`}, # GET BOSv2 SessionTemplates (list all)
-          {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates/.*?$`}, # GET BOSv2 SessionTemplates (obtain details about a specific session template)
-          {"method": "GET",  "path": `^/apis/bos/v2/version$`} # GETs allow views on specific BOS version information
-      ]
-    }
-
-    # Our list of endpoints we accept based on roles.
-    # The admin roll can make any call.
-    admin_role_perms = {
-        "admin": allowed_admin_methods["admin"],
-        "tenant-admin": allowed_admin_methods["tenant-admin"],
-    }
+    allowed_admin_methods := [
+        {"method": "GET",  "path": `.*`},
+        {"method": "PUT",  "path": `.*`},
+        {"method": "POST",  "path": `.*`},
+        {"method": "DELETE",  "path": `.*`},
+        {"method": "PATCH",  "path": `.*`},
+        {"method": "HEAD",  "path": `.*`},
+    ]
+    
+    allowed_tenant_admin_methods := [
+        # BOS
+        {"method": "GET",  "path": `^/apis/bos/v2$`}, # Allow access to version linkage
+        {"method": "POST", "path": `^/apis/bos/v2/applystaged$`}, # POST allows tenants to continue booting specific components already staged
+        {"method": "GET",  "path": `^/apis/bos/v2/components$`}, # GET allows a listing of all active components states
+        {"method": "GET",  "path": `^/apis/bos/v2/components/.*$`}, # GET information on an individual component
+        {"method": "GET",  "path": `^/apis/bos/v2/healthz$`}, # Allow tenant admins to know the overall health of the deployment
+        {"method": "POST", "path": `^/apis/bos/v2/sessions$`}, # POST Creates a new BOSv2 Session
+        {"method": "GET",  "path": `^/apis/bos/v2/sessions/.*$`}, # GET allows monitoring status of individual sessions
+        {"method": "GET",  "path": `^/apis/bos/v2/sessions/.*?/status$`}, # Obtain more detailed status information for an individual session
+        {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates$`}, # GET BOSv2 SessionTemplates (list all)
+        {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates/.*?$`}, # GET BOSv2 SessionTemplates (obtain details about a specific session template)
+        {"method": "GET",  "path": `^/apis/bos/v2/version$`} # GETs allow views on specific BOS version information
+    ]
 
 {{- end }}
 {{- end }}

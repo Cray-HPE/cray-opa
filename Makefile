@@ -44,10 +44,10 @@ chart_test:
 
 rego_test:
 	docker build -f ${CHART_PATH}/cray-opa/tests/opa/Dockerfile --tag cray-opa-test ${CHART_PATH}/cray-opa
-	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/hmn.yaml /mnt/tests/opa/hmn_test.rego.tpl
-	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/keycloak-admin.yaml /mnt/tests/opa/keycloak-admin_test.rego.tpl
-	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/keycloak-system.yaml /mnt/tests/opa/keycloak-system_test.rego.tpl
-	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/keycloak-user.yaml /mnt/tests/opa/keycloak-user_test.rego.tpl
-	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_test.rego.tpl
-	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test -x /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_test.rego.tpl
-	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/app/run_tests" cray-opa-test -x /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_xname_test.rego.tpl
+	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/tmp/run_tests" cray-opa-test /mnt/templates/policies/hmn.yaml /mnt/tests/opa/hmn_test.rego.tpl
+	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/tmp/run_tests" cray-opa-test /mnt/templates/policies/keycloak-admin.yaml /mnt/tests/opa/keycloak-admin_test.rego.tpl
+	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/tmp/run_tests" cray-opa-test /mnt/templates/policies/keycloak-system.yaml /mnt/tests/opa/keycloak-system_test.rego.tpl
+	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/tmp/run_tests" cray-opa-test /mnt/templates/policies/keycloak-user.yaml /mnt/tests/opa/keycloak-user_test.rego.tpl
+	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/tmp/run_tests" cray-opa-test /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_test.rego.tpl
+	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/tmp/run_tests" cray-opa-test -x /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_test.rego.tpl
+	docker run --rm -v ${PWD}/${CHART_PATH}/cray-opa/:/mnt --entrypoint "/tmp/run_tests" cray-opa-test -x /mnt/templates/policies/spire.yaml /mnt/tests/opa/spire_xname_test.rego.tpl

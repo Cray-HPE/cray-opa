@@ -52,6 +52,8 @@ type createTokenArgs struct {
 	aud    string
 	sub    string
 	typ    string
+	groups string
+	rrole  string
 }
 
 func (t tokenCreator) create(args createTokenArgs) (string, error) {
@@ -72,6 +74,14 @@ func (t tokenCreator) create(args createTokenArgs) (string, error) {
 	}
 	if args.typ != "" {
 		atClaims["typ"] = args.typ
+	}
+	if args.groups != "" {
+		atClaims["groups"] = []string{args.groups}
+	}
+	if args.rrole != "" {
+		atClaims["realm_access"] = map[string]interface{}{
+			"roles": []string{args.rrole},
+		}
 	}
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	token, err := at.SignedString(t.key)
@@ -179,6 +189,13 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("user token:", userToken)
+
+	args = createTokenArgs{rrole: "tenant-admin", groups: "vcluster-blue-tenant-admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer"}
+	tenantAdminToken, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("tenant token:", tenantAdminToken)
 
 	args = createTokenArgs{
 		role: "admin", issuer: keycloakIssuer, aud: shastaAud, typ: "Invalid",
@@ -589,6 +606,7 @@ func main() {
 	values = map[string]interface{}{
 		"userToken":            userToken,
 		"adminToken":           adminToken,
+		"tenantAdminToken":     tenantAdminToken,
 		"invalidTypAdminToken": invalidTypAdminToken,
 		"pxeToken":             pxeToken,
 		"computeToken":         computeToken,
@@ -601,7 +619,7 @@ func main() {
 				"ckdump_helper":      spireNcnCkdumpHelper,
 				"cpsmount":           spireNcnCpsmount,
 				"cpsmount_helper":    spireNcnCpsmountHelper,
-				"cos_config_helper":   spireNcnCosConfigHelper,
+				"cos_config_helper":  spireNcnCosConfigHelper,
 				"dvs_hmi":            spireNcnDvsHmi,
 				"dvs_map":            spireNcnDvsMap,
 				"heartbeat":          spireNcnHeartbeat,
@@ -626,7 +644,7 @@ func main() {
 		},
 	}
 
-	f, err = os.Create("test.rego")
+	f, err = os.Create("/tmp/test.rego")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -644,7 +662,7 @@ func main() {
 	fmt.Println("Rendered test template:")
 	fmt.Println("*****")
 
-	dat, err = ioutil.ReadFile("test.rego")
+	dat, err = ioutil.ReadFile("/tmp/test.rego")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -668,9 +686,9 @@ func main() {
 	fmt.Printf("Policy File: %s\n", policyTemplateFilename)
 	fmt.Printf("Test File: %s\n", testTemplateFilename)
 
-	fmt.Println("Executing ./opa_envoy_linux_amd64 check -S ./policy.rego ./test.rego")
+	fmt.Println("Executing /app/opa_envoy_linux_amd64 check -S ./policy.rego ./test.rego")
 
-	cmd := exec.Command("./opa_envoy_linux_amd64", "check", "-S", "./policy.rego")
+	cmd := exec.Command("/app/opa_envoy_linux_amd64", "check", "-S", "./policy.rego")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -679,9 +697,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Executing ./opa_envoy_linux_amd64 test ./policy.rego ./test.rego -v")
+	fmt.Println("Executing /app/opa_envoy_linux_amd64 test ./policy.rego ./test.rego -v")
 
-	cmd = exec.Command("./opa_envoy_linux_amd64", "test", "./policy.rego", "./test.rego", "-v")
+	cmd = exec.Command("/app/opa_envoy_linux_amd64", "test", "./policy.rego", "./test.rego", "-v")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 

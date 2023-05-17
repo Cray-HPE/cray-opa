@@ -24,18 +24,20 @@
 
 FROM artifactory.algol60.net/csm-docker/stable/docker.io/library/golang:1.17.3-alpine3.15 AS builder
 
+USER 1000:1000
+
 ENV GO111MODULE=on \
   CGO_ENABLED=0 \
   GOOS=linux \
-  GOARCH=amd64
+  GOARCH=amd64 \
+  GOCACHE=/tmp/.go/cache
 
-COPY tests/opa/run_tests src/run_tests
-
+COPY --chown=1000:1000 tests/opa/run_tests src/run_tests
 RUN cd src/run_tests && go mod download
 RUN cd src/run_tests && go build .
 RUN ls src/run_tests
 
-FROM artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa:0.48.0-envoy
-
-COPY --from=builder /go/src/run_tests/run_tests .
-COPY tests/opa/certificate_authority.crt /jwtValidationFetchTls/certificate_authority.crt
+FROM artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa:0.52.0-envoy-rootless
+WORKDIR /tmp
+COPY --from=builder --chown=1000:1000 /go/src/run_tests/run_tests .
+COPY --chown=1000:1000 tests/opa/certificate_authority.crt /jwtValidationFetchTls/certificate_authority.crt
