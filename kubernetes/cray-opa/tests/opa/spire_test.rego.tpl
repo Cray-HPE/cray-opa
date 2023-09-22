@@ -246,8 +246,8 @@ test_spire_invalid_sub {
 }
 
 test_tpm_provisioner {
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm-provisioner/challenge/authorize?xname=ncnw001&type=ncn", "headers": {"authorization": "Bearer {{ .spire.ncn.tpm_provisioner }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm-provisioner/challenge/authorize?xname=x1&type=compute", "headers": {"authorization": "Bearer {{ .spire.compute.tpm_provisioner }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm-provisioner/authorize?xname=ncnw001&type=ncn", "headers": {"authorization": "Bearer {{ .spire.ncn.tpm_provisioner }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm-provisioner/authorize?xname=x1&type=compute", "headers": {"authorization": "Bearer {{ .spire.compute.tpm_provisioner }}" }}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/tpm-provisioner/challenge/request", "headers": {"authorization": "Bearer {{ .spire.ncn.tpm_provisioner }}" }}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/tpm-provisioner/challenge/submit", "headers": {"authorization": "Bearer {{ .spire.ncn.tpm_provisioner }}" }}}}}
@@ -313,7 +313,7 @@ test_wlm {
 }
 
 test_tpm_provisioner_cray_spire {
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm-provisioner/challenge/authorize?xname=x1&type=compute", "headers": {"authorization": "Bearer {{ .spire.compute.cray_tpm_provisioner }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm-provisioner/authorize?xname=x1&type=compute", "headers": {"authorization": "Bearer {{ .spire.compute.cray_tpm_provisioner }}" }}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/tpm-provisioner/challenge/request", "headers": {"authorization": "Bearer {{ .spire.compute.cray_tpm_provisioner }}" }}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/tpm-provisioner/challenge/submit", "headers": {"authorization": "Bearer {{ .spire.compute.cray_tpm_provisioner }}" }}}}}
