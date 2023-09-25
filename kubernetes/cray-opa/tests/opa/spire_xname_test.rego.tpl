@@ -34,6 +34,6 @@ test_spire_wrong_xname_subs {
 }
 
 test_tpm_provisioner_wrong_xname {
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm-provisioner/challenge/authorize?xname=invalid&type=ncn", "headers": {"authorization": "Bearer {{ .spire.ncn.tpm_provisioner }}" }}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm-provisioner/challenge/authorize?xname=invalid&type=compute", "headers": {"authorization": "Bearer {{ .spire.compute.tpm_provisioner }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm-provisioner/authorize?xname=invalid&type=ncn", "headers": {"authorization": "Bearer {{ .spire.ncn.tpm_provisioner }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/tpm-provisioner/authorize?xname=invalid&type=compute", "headers": {"authorization": "Bearer {{ .spire.compute.tpm_provisioner }}" }}}}}
 }
