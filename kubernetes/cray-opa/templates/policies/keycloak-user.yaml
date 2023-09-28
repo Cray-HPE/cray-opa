@@ -59,12 +59,12 @@ data:
     "/keycloak/realms/shasta/protocol/openid-connect/certs",
     "/keycloak/realms/shasta/.well-known/openid-configuration"
     }
-    
+
     allow {
         some x in keycloak_oidc_paths
         startswith(original_path, x)
     }
-    
+
     allow {
         startswith(original_path, "/keycloak/resources")
         http_request.method in {"GET", "HEAD"}
@@ -170,6 +170,8 @@ data:
       "wlm": [
           # BOS - node boot
           {"method": "POST", "path": `^/apis/bos/v2/applystaged$`},
+          {"method": "GET", "path": `^/apis/bos/v2/sessions/.*$`},
+          {"method": "POST", "path": `^/apis/bos/v2/sessions$`},
           # SMD - hardware state query
           {"method": "GET",  "path": `^/apis/smd/hsm/v2/.*$`},
           {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},

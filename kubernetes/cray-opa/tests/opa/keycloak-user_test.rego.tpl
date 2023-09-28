@@ -181,6 +181,8 @@ test_wlm {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/power-control/v1/transitions/test", "headers": {"authorization": wlm_auth}}}}}
   # BOS - allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v2/applystaged", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/sessions/test", "headers": {"authorization": wlm_auth}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v2/sessions", "headers": {"authorization": wlm_auth}}}}}
   # BOS - not allowed
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v1/session", "headers": {"authorization": wlm_auth}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/bos/v1/session", "headers": {"authorization": wlm_auth}}}}}
@@ -226,6 +228,8 @@ test_wlm_xforwarded {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/power-control/v1/transitions/test", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
   # BOS - allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v2/applystaged", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/sessions/test", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v2/sessions", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
   # BOS - not allowed
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/bos/v1/session", "headers": {"x-forwarded-access-token": "{{ .wlmToken }}" }}}}}
