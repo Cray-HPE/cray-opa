@@ -137,7 +137,7 @@ jwtValidation:
     jwksUri: "https://istio-ingressgateway.istio-system.svc.cluster.local./keycloak/realms/shasta/protocol/openid-connect/certs"
   spire:
     jwksUris:
-      - "http://spire-jwks.spire.svc.cluster.local/keys"
+      - "https://istio-ingressgateway.istio-system.svc.cluster.local./spire-jwks-vshastaio/keys"
       - "http://cray-spire-jwks.spire.svc.cluster.local/keys"
     issuers:
       vshasta.io: "http://spire.local/shasta/vshastaio"
