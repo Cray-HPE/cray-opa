@@ -117,6 +117,11 @@ data:
             {"method": "HEAD", "path": `^/apis/jackaloped/.*$`},
             {"method": "POST", "path": `^/apis/jackaloped/.*$`},
             {"method": "DELETE", "path": `^/apis/jackaloped/.*$`},
+            # ogopogod - DRC2
+            {"method": "GET", "path": `^/apis/ogopogod/.*$`},
+            {"method": "HEAD", "path": `^/apis/ogopogod/.*$`},
+            {"method": "POST", "path": `^/apis/ogopogod/.*$`},
+            {"method": "DELETE", "path": `^/apis/ogopogod/.*$`},
         ],
         "heartbeat": [
         {{- if and (eq $.Values.opa.xnamePolicy.heartbeat true) (eq $.Values.opa.xnamePolicy.enabled true) }}
