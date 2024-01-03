@@ -310,6 +310,13 @@ test_wlm {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/jackaloped/fabric/nics", "headers": {"authorization": spire_sub}}}}}
   # jackaloped - not allowed
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/jackaloped/fabric/nics", "headers": {"authorization": spire_sub}}}}}
+  # ogopogod - allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/ogopogod/partitions", "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/ogopogod/partitions", "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/ogopogod/partitions", "headers": {"authorization": spire_sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/ogopogod/partitions", "headers": {"authorization": spire_sub}}}}}
+  # ogopogod - not allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/ogopogod/partitions", "headers": {"authorization": spire_sub}}}}}
 }
 
 test_tpm_provisioner_cray_spire {
