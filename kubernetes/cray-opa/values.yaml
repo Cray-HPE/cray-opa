@@ -108,7 +108,6 @@ opa:
       cpu: "250m"
     limits:
       memory: "10Gi"
-      cpu: "4"
   # Timeout defaults to 200ms if not specified. Setting it to 20s, an
   # arbitrary long timeout, provides sufficient overhead to resolve
   # CASMPET-1804/2570 "deadline exceeded" gRPC errors for the ext_authz filter.
