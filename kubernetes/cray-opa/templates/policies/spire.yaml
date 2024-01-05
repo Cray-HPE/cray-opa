@@ -84,6 +84,10 @@ data:
           {"method": "GET",   "path": `^/apis/smd/hsm/v2/.*$`},
           {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},
 
+          #SLS -> GET - node map IP addresses
+          {"method": "GET",   "path": `^/apis/sls/v1/.*$`},
+          {"method": "HEAD",  "path": `^/apis/sls/v1/.*$`},
+
           #HMNFD -> subscribe only, cannot create state change notifications
           {"method": "GET",   "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
           {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
