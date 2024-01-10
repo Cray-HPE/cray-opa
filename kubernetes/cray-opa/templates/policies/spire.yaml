@@ -1,5 +1,5 @@
 {{- /*
-Copyright 2021-2023 Hewlett Packard Enterprise Development LP
+Copyright 2021-2024 Hewlett Packard Enterprise Development LP
 */ -}}
 {{- range $name, $options := .Values.ingresses }}
 {{- if $options.policies.spire }}
@@ -80,11 +80,15 @@ data:
           # These pass xnames via POST. This will be removed once the v2 API is being used.
           {"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
 
-          #SMD -> GET everything,  DVS needs SoftwareStatus.  REVOKED permission to update BulkSoftwareStatus
+          # SMD -> GET everything,  DVS needs SoftwareStatus.  REVOKED permission to update BulkSoftwareStatus
           {"method": "GET",   "path": `^/apis/smd/hsm/v2/.*$`},
           {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},
 
-          #HMNFD -> subscribe only, cannot create state change notifications
+          # SLS -> GET - node map IP addresses
+          {"method": "GET",   "path": `^/apis/sls/v1/.*$`},
+          {"method": "HEAD",  "path": `^/apis/sls/v1/.*$`},
+
+          # HMNFD -> subscribe only, cannot create state change notifications
           {"method": "GET",   "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
           {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
           {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
