@@ -57,7 +57,7 @@ spire_correct_ncn_sub(sub) {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": smd_softwarestatus_ncn_path, "headers": {"authorization": sub}}}}}
 
   # Validate that DVS can access SoftwareStatus
-  # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/smd/hsm/v2/State/Components/ncnw001/SoftwareStatus", "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/smd/hsm/v2/State/Components/ncnw001/SoftwareStatus", "headers": {"authorization": sub}}}}}
 
   # SLS - Allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": sls_networks_path, "headers": {"authorization": sub}}}}}
