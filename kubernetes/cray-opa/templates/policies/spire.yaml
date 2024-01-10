@@ -135,6 +135,9 @@ data:
           {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
           {{- end }}
           {"method": "GET", "path": `^/apis/hbtd/hmi/v1/params$`},
+        ],
+        "sbps-marshal": [
+          {"method": "GET", "path": `^/apis/ims/v3/images$`},
         ]
       }
 
@@ -203,6 +206,7 @@ data:
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/heartbeat": spire_methods["heartbeat"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/orca": spire_methods["dvs"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/tpm-provisioner": spire_methods["tpm-provisioner"],
+          "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/sbps-marshal": spire_methods["sbps-marshal"],  
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/heartbeat": spire_methods["heartbeat"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/tpm-provisioner": spire_methods["tpm-provisioner"],
@@ -272,6 +276,7 @@ data:
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/heartbeat": spire_methods["heartbeat"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/orca": spire_methods["dvs"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/tpm-provisioner": spire_methods["tpm-provisioner"],
+        "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/sbps-marshal": spire_methods["sbps-marshal"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/workload/cfs-state-reporter": spire_methods["cfs"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/workload/heartbeat": spire_methods["heartbeat"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/workload/tpm-provisioner": spire_methods["tpm-provisioner"],

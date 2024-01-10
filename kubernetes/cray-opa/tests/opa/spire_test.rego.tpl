@@ -21,6 +21,7 @@ sls_networks_path = "/apis/sls/v1/networks"
 hmnfd_subscribe_path = "/apis/hmnfd/hmi/v1/subscribe"
 hmnfd_subscriptions_path = "/apis/hmnfd/hmi/v1/subscriptions"
 pals_mock_path = "/apis/pals/v1/mock"
+sbps_marshal_ims_path = "/apis/ims/v3/images"
 
 # Tests for denying access to pals mock path for ckdump sub
 
@@ -346,4 +347,8 @@ test_tpm_provisioner_cray_spire {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/tpm-provisioner/whitelist/add", "headers": {"authorization": "Bearer {{ .spire.compute.cray_tpm_provisioner }}" }}}}}
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/tpm-provisioner/whitelist/remove", "headers": {"authorization": "Bearer {{ .spire.compute.cray_tpm_provisioner }}" }}}}}
+}
+
+test_spire_sbps_marshal {
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": sbps_marshal_ims_path, "headers": {"authorization": "Bearer {{ .spire.ncn.sbps_marshal }}"}}}}}
 }
