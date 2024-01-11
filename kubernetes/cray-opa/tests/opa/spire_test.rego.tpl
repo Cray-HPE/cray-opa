@@ -1,4 +1,4 @@
-# Copyright 2021-2023 Hewlett Packard Enterprise Development LP
+# Copyright 2021-2024 Hewlett Packard Enterprise Development LP
 
 package istio.authz
 ## HOW TO DO UNIT TESTING
@@ -13,9 +13,11 @@ cos_config_mock_path = "/apis/v2/cos/mock"
 hbtb_heartbeat_path = "/apis/hbtd/hmi/v1/heartbeat"
 nmd_mock_path = "/apis/v2/nmd/status"
 smd_statecomponents_path = "/apis/smd/hsm/v2/State/Components"
+smd_ethernetinterfaces_path = "/apis/smd/hsm/v2/Inventory/EthernetInterfaces"
 smd_softwarestatus_compute_path = "/apis/smd/hsm/v2/State/Components/x1/SoftwareStatus"
 smd_softwarestatus_ncn_path = "/apis/smd/hsm/v2/State/Components/ncnw001/SoftwareStatus"
 smd_softwarestatus_invalid_path = "/apis/smd/hsm/v2/State/Components/invalid/SoftwareStatus"
+sls_networks_path = "/apis/sls/v1/networks"
 hmnfd_subscribe_path = "/apis/hmnfd/hmi/v1/subscribe"
 hmnfd_subscriptions_path = "/apis/hmnfd/hmi/v1/subscriptions"
 pals_mock_path = "/apis/pals/v1/mock"
@@ -46,11 +48,22 @@ spire_correct_ncn_sub(sub) {
 
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
 
+  # SMD - Allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_ethernetinterfaces_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_ethernetinterfaces_path, "headers": {"authorization": sub}}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": smd_softwarestatus_ncn_path, "headers": {"authorization": sub}}}}}
 
+  # Validate that DVS can access SoftwareStatus
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/smd/hsm/v2/State/Components/ncnw001/SoftwareStatus", "headers": {"authorization": sub}}}}}
+
+  # SLS - Allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": sls_networks_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": sls_networks_path, "headers": {"authorization": sub}}}}}
+
+  # HMNFD - Allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
@@ -69,10 +82,6 @@ spire_correct_ncn_sub(sub) {
 
   # Validate that only CFS can access
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": cfs_ncn_mock_path, "headers": {"authorization": sub}}}}}
-
-  # Validate that DVS can access SoftwareStatus
-  # not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/smd/hsm/v2/State/Components/ncnw001/SoftwareStatus", "headers": {"authorization": sub}}}}}
-
 }
 
 spire_correct_compute_sub(sub) {
@@ -87,11 +96,17 @@ spire_correct_compute_sub(sub) {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": nmd_mock_path, "headers": {"authorization": sub}}}}}
 
+  # SMD - Allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": smd_statecomponents_path, "headers": {"authorization": sub}}}}}
 
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": smd_softwarestatus_compute_path, "headers": {"authorization": sub}}}}}
 
+  # SLS - Allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": sls_networks_path, "headers": {"authorization": sub}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": sls_networks_path, "headers": {"authorization": sub}}}}}
+
+  # HMNFD - Allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"authorization": sub}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscribe_path, "headers": {"authorization": sub}}}}}
