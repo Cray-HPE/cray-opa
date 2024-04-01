@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2021-2024 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -24,7 +24,7 @@
 ---
 image:
   repository: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa
-  tag: 0.42.1-envoy  # When changing this, also update tests/opa//Dockerfile.
+  tag: 0.62.0-envoy-rootless  # When changing this, also update tests/opa//Dockerfile.
   pullPolicy: IfNotPresent
 
 priorityClassName: csm-high-priority-service
@@ -107,8 +107,7 @@ opa:
       memory: "128Mi"
       cpu: "250m"
     limits:
-      memory: "10Gi"
-      cpu: "4"
+      memory: "800Mi"
   # Timeout defaults to 200ms if not specified. Setting it to 20s, an
   # arbitrary long timeout, provides sufficient overhead to resolve
   # CASMPET-1804/2570 "deadline exceeded" gRPC errors for the ext_authz filter.
