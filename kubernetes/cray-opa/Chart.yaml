@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2022-2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2022-2024 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -23,7 +23,7 @@
 #
 apiVersion: v2
 name: cray-opa
-version: 1.32.9
+version: 1.32.10
 description: Cray Open Policy Agent
 keywords:
   - opa
@@ -33,9 +33,9 @@ sources:
 maintainers:
   - name: bo-quan
   - name: ndavidson-hpe
-appVersion: 0.52.0
+appVersion: 0.62.0
 annotations:
   artifacthub.io/images: |-
     - name: cray-opa
-      image: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa:0.52.0-envoy-rootless
+      image: artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa:0.62.0-envoy-rootless
   artifacthub.io/license: MIT
