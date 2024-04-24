@@ -1,5 +1,5 @@
 {{- /*
-Copyright 2021-2023 Hewlett Packard Enterprise Development LP
+Copyright 2021-2024 Hewlett Packard Enterprise Development LP
 */ -}}
 {{- range $name, $options := .Values.ingresses }}
 {{- if $options.policies.keycloak.admin }}
@@ -167,6 +167,7 @@ data:
         {"method": "GET",  "path": `^/apis/bos/v2/components$`}, # GET allows a listing of all active components states
         {"method": "GET",  "path": `^/apis/bos/v2/components/.*$`}, # GET information on an individual component
         {"method": "GET",  "path": `^/apis/bos/v2/healthz$`}, # Allow tenant admins to know the overall health of the deployment
+        {"method": "GET",  "path": `^/apis/bos/v2/sessions$`}, # GET BOSv2 Sessions (list all)
         {"method": "POST", "path": `^/apis/bos/v2/sessions$`}, # POST Creates a new BOSv2 Session
         {"method": "GET",  "path": `^/apis/bos/v2/sessions/.*$`}, # GET allows monitoring status of individual sessions
         {"method": "GET",  "path": `^/apis/bos/v2/sessions/.*?/status$`}, # Obtain more detailed status information for an individual session

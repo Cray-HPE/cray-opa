@@ -1,4 +1,4 @@
-# Copyright 2021-2023 Hewlett Packard Enterprise Development LP
+# Copyright 2021-2024 Hewlett Packard Enterprise Development LP
 
 package istio.authz
 ## HOW TO DO UNIT TESTING
@@ -188,6 +188,7 @@ test_tenant_admin {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/components", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/components/foo", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/healthz", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/sessions", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v2/sessions", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/sessions/foo", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/sessions/foo/status", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
