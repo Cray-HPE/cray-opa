@@ -51,7 +51,7 @@ data:
         startswith(original_path, "/keycloak")
         startswith(http_request.host, "auth.cmn.")
     }
-    
+
     allow
     {
         startswith(original_path, "/keycloak/realms/shasta/protocol/openid-connect/auth")
@@ -83,9 +83,14 @@ data:
     # Allow cloud-init endpoints, as we do validation based on incoming IP.
     # In the future, these requests will come in via the TOR switches and ideally
     # not through the 'front door'.   This is an expansion to BSS.
-    allow { startswith(original_path, "/meta-data") }
-    allow { startswith(original_path, "/user-data") }
-    allow { startswith(original_path, "/phone-home") }
+    allow {
+        startswith(original_path, "/meta-data")
+        http_request.method = "GET"
+    }
+    allow {
+        startswith(original_path, "/user-data")
+        http_request.method = "GET"
+    }
 
     # Whitelist Nexus repository pods. Nexus uses it's own RBAC so open
     # all commands. Keycloak Gatekeeper is used to pass the tokens through
@@ -159,7 +164,7 @@ data:
         {"method": "PATCH",  "path": `.*`},
         {"method": "HEAD",  "path": `.*`},
     ]
-    
+
     allowed_tenant_admin_methods := [
         # BOS
         {"method": "GET",  "path": `^/apis/bos/v2$`}, # Allow access to version linkage
