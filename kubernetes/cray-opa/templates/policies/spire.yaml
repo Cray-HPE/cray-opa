@@ -1,5 +1,5 @@
 {{- /*
-Copyright 2021-2023 Hewlett Packard Enterprise Development LP
+Copyright 2021-2024 Hewlett Packard Enterprise Development LP
 */ -}}
 {{- range $name, $options := .Values.ingresses }}
 {{- if $options.policies.spire }}
@@ -80,11 +80,15 @@ data:
           # These pass xnames via POST. This will be removed once the v2 API is being used.
           {"method": "POST", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
 
-          #SMD -> GET everything,  DVS needs SoftwareStatus.  REVOKED permission to update BulkSoftwareStatus
+          # SMD -> GET everything,  DVS needs SoftwareStatus.  REVOKED permission to update BulkSoftwareStatus
           {"method": "GET",   "path": `^/apis/smd/hsm/v2/.*$`},
           {"method": "HEAD",  "path": `^/apis/smd/hsm/v2/.*$`},
 
-          #HMNFD -> subscribe only, cannot create state change notifications
+          # SLS -> GET - node map IP addresses
+          {"method": "GET",   "path": `^/apis/sls/v1/.*$`},
+          {"method": "HEAD",  "path": `^/apis/sls/v1/.*$`},
+
+          # HMNFD -> subscribe only, cannot create state change notifications
           {"method": "GET",   "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
           {"method": "HEAD",  "path": `^/apis/hmnfd/hmi/v1/subscriptions$`},
           {"method": "PATCH", "path": `^/apis/hmnfd/hmi/v1/subscribe$`},
@@ -117,6 +121,11 @@ data:
             {"method": "HEAD", "path": `^/apis/jackaloped/.*$`},
             {"method": "POST", "path": `^/apis/jackaloped/.*$`},
             {"method": "DELETE", "path": `^/apis/jackaloped/.*$`},
+            # ogopogod - DRC2
+            {"method": "GET", "path": `^/apis/ogopogod/.*$`},
+            {"method": "HEAD", "path": `^/apis/ogopogod/.*$`},
+            {"method": "POST", "path": `^/apis/ogopogod/.*$`},
+            {"method": "DELETE", "path": `^/apis/ogopogod/.*$`},
         ],
         "heartbeat": [
         {{- if and (eq $.Values.opa.xnamePolicy.heartbeat true) (eq $.Values.opa.xnamePolicy.enabled true) }}
@@ -126,6 +135,9 @@ data:
           {"method": "POST", "path": `^/apis/hbtd/hmi/v1/heartbeat/.*$`},
           {{- end }}
           {"method": "GET", "path": `^/apis/hbtd/hmi/v1/params$`},
+        ],
+        "sbps-marshal": [
+          {"method": "GET", "path": `^/apis/ims/v3/images$`},
         ]
       }
 
@@ -194,6 +206,7 @@ data:
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/heartbeat": spire_methods["heartbeat"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/orca": spire_methods["dvs"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/tpm-provisioner": spire_methods["tpm-provisioner"],
+          "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/XNAME/workload/sbps-marshal": spire_methods["sbps-marshal"],  
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/cfs-state-reporter": spire_methods["cfs"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/heartbeat": spire_methods["heartbeat"],
           "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/XNAME/workload/tpm-provisioner": spire_methods["tpm-provisioner"],
@@ -263,6 +276,7 @@ data:
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/heartbeat": spire_methods["heartbeat"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/orca": spire_methods["dvs"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/tpm-provisioner": spire_methods["tpm-provisioner"],
+        "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/ncn/workload/sbps-marshal": spire_methods["sbps-marshal"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/workload/cfs-state-reporter": spire_methods["cfs"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/workload/heartbeat": spire_methods["heartbeat"],
         "spiffe://{{ $.Values.jwtValidation.spire.trustDomain }}/storage/workload/tpm-provisioner": spire_methods["tpm-provisioner"],

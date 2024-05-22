@@ -351,6 +351,16 @@ func main() {
 	}
 	fmt.Println(spireSub, ":", spireNcnTPMProvisioner)
 
+	spireSub = spireSubNCNPrefix + "sbps-marshal"
+        args = createTokenArgs{
+                issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+        }
+        spireNcnSBPSMarshal, err := tc.create(args)
+        if err != nil {
+                log.Fatal(err)
+        }
+        fmt.Println(spireSub, ":", spireNcnSBPSMarshal)
+
 	spireSub = spireSubComputePrefix + "cfs-state-reporter"
 	args = createTokenArgs{
 		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
@@ -625,6 +635,7 @@ func main() {
 				"heartbeat":          spireNcnHeartbeat,
 				"orca":               spireNcnOrca,
 				"tpm_provisioner":    spireNcnTPMProvisioner,
+				"sbps_marshal":       spireNcnSBPSMarshal,
 			},
 			"compute": map[string]interface{}{
 				"cfs_state_reporter":   spireComputeCfsStateReporter,

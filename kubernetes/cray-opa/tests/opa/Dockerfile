@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2021-2024 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -37,7 +37,7 @@ RUN cd src/run_tests && go mod download
 RUN cd src/run_tests && go build .
 RUN ls src/run_tests
 
-FROM artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa:0.52.0-envoy-rootless
+FROM artifactory.algol60.net/csm-docker/stable/docker.io/openpolicyagent/opa:0.62.0-envoy-rootless
 WORKDIR /tmp
 COPY --from=builder --chown=1000:1000 /go/src/run_tests/run_tests .
 COPY --chown=1000:1000 tests/opa/certificate_authority.crt /jwtValidationFetchTls/certificate_authority.crt
