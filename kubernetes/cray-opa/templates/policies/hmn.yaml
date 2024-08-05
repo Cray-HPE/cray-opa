@@ -35,7 +35,7 @@ data:
         # Mitigate CVE-2020-10770
         not regex.match(`^/keycloak/realms/[a-zA-Z0-9]+/protocol/openid-connect/.*request_uri=.*$`, original_path)
     }
-    
+
     keycloak_oidc_paths := {
     "/keycloak/realms/shasta/protocol/openid-connect/token",
     "/keycloak/realms/shasta/protocol/openid-connect/userinfo",
@@ -56,6 +56,11 @@ data:
 
     allow {
         roles_for_user[r]
+        required_roles[r]
+    }
+
+    allow {
+        system_slingshot_roles_for_user[r]
         required_roles[r]
     }
 
@@ -85,6 +90,11 @@ data:
         r := parsed_kc_token.payload.resource_access.shasta.roles[_]
     }
 
+    # Get the users roles from the JWT token
+    system_slingshot_roles_for_user[r] {
+        r := parsed_kc_token.payload.resource_access["system-slingshot-client"].roles[_]
+    }
+
     # Determine if the path/verb requests is authorized based on the JWT roles
     required_roles[r] {
         perm := role_perms[r][_]
@@ -94,18 +104,55 @@ data:
 
     # Our list of endpoints we accept based on roles.
     role_perms = {
-        "admin": allowed_methods["fabric"],
+        "admin": allowed_methods["fabric-slingshot-admin"],
+        "system-slingshot": allowed_methods["fabric-slingshot-admin"],
+        "slingshot-admin" : allowed_methods["fabric-slingshot-admin"],
+        "slingshot-operator" : allowed_methods["fabric-slingshot-operator"],
+        "slingshot-guest" : allowed_methods["fabric-slingshot-guest"],
+        "slingshot-security" : allowed_methods["fabric-slingshot-security"]
     }
 
+    # Fabric Manager access
     allowed_methods := {
-      "fabric": [
-          # Fabric Manager API access
+      "fabric-slingshot-admin": [
           {"method": "DELETE", "path": `^/apis/fabric-manager/.*$`},
           {"method": "GET", "path": `^/apis/fabric-manager/.*$`},
-          {"method": "HEAD", "path": `^/apis/fabric-manager/.*$`},
           {"method": "PATCH", "path": `^/apis/fabric-manager/.*$`},
           {"method": "POST", "path": `^/apis/fabric-manager/.*$`},
-          {"method": "PUT", "path": `^/apis/fabric-manager/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/.*$`}
+      ],
+      "fabric-slingshot-operator": [
+          {"method": "GET", "path": `^/apis/fabric-manager/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "POST", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/switch-telemetry/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/switch-telemetry/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/switch-telemetry/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/telemetry/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/telemetry/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/telemetry/.*$`}
+      ],
+      "fabric-slingshot-guest": [
+          {"method": "GET", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "GET", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "GET", "path": `^/apis/fabric-manager/telemetry/.*$`}
+      ],
+      "fabric-slingshot-security": [
+          {"method": "GET", "path": `^/apis/fabric-manager/.*$`},
+          {"method": "DELETE", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/fabric/rosetta-auth-token`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/rosetta-auth-token`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/rosetta-auth-token`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/fabric/shasta-auth-token`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/shasta-auth-token`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/shasta-auth-token`}
       ],
     }
 {{- end }}

@@ -1,3 +1,5 @@
+# -*- mode: rego -*-
+
 # Copyright 2021-2024 Hewlett Packard Enterprise Development LP
 
 package istio.authz
@@ -383,3 +385,25 @@ test_spire_invalid_sub {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"x-forwarded-access-token": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscriptions_path, "headers": {"x-forwarded-access-token": spire_sub}}}}}
 }
+
+# Slingshot Admin Role
+test_slingshot_admin {
+
+  # Verify slingshot-admin role has access to only FM endpoints
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/fabric-manager/fabric/host-settings", "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}"}}}}}
+
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/fabric-manager/fabric/agents/x0c0r0b0", "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/fabric-manager/fabric/agents/x0c0r0b0", "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/fabric-manager/fabric/agents/x0c0r0b0", "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/fabric-manager/fabric/agents/x0c0r0b0", "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/fabric-manager/fabric/agents/x0c0r0b0", "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}"}}}}}
+
+  # Verify slingshot-admin role has no access to non-FM endpoints
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}"}}}}}
+  }
+
+# Slingshot Guest Role
+test_slingshot_guest {
+  # Verify non slingshot-admin role has no access to non-FM endpoints
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/fabric-manager/fabric/host-settings", "headers": {"authorization": "Bearer {{ .slingshotGuestToken }}"}}}}}
+  }
