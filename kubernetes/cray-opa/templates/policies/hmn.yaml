@@ -90,7 +90,7 @@ data:
         r := parsed_kc_token.payload.resource_access.shasta.roles[_]
     }
 
-    # Get the users roles from the JWT token
+    # Get the system-slingshot user roles from the JWT token
     system_slingshot_roles_for_user[r] {
         r := parsed_kc_token.payload.resource_access["system-slingshot-client"].roles[_]
     }
