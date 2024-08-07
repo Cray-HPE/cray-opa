@@ -100,7 +100,7 @@ data:
 
     # Infrastructure Administrator Allow, without cray-tenant-name header
     allow {
-        parsed_kc_token.payload.resource_access.shasta.roles[_] == "admin"
+        parsed_kc_shasta_token.payload.resource_access.shasta.roles[_] == "admin"
         not http_request.headers["cray-tenant-name"]
         some perm in allowed_admin_methods
         perm.method = http_request.method
@@ -109,7 +109,7 @@ data:
 
     # Infrastructure Administrator Allow, with cray-tenant-name header
     allow {
-        parsed_kc_token.payload.resource_access.shasta.roles[_] == "admin"
+        parsed_kc_shasta_token.payload.resource_access.shasta.roles[_] == "admin"
         # Use an RFC1123 compliant tenant name
         regex.match("^[a-z0-9][a-z0-9\\-\\.]{1,251}[a-z0-9]$", http_request.headers["cray-tenant-name"])
         some perm in allowed_admin_methods
@@ -119,13 +119,21 @@ data:
 
     # Tenant Administrator Allow, require cray-tenant-name group matching
     allow {
-        parsed_kc_token.payload.realm_access.roles[_] == "tenant-admin"
+        parsed_kc_shasta_token.payload.realm_access.roles[_] == "tenant-admin"
         some perm in allowed_tenant_admin_methods
         perm.method = http_request.method
         # Use an RFC1123 compliant tenant name
         regex.match("^[a-z0-9][a-z0-9\\-\\.]{1,251}[a-z0-9]$", http_request.headers["cray-tenant-name"])
-        groups := parsed_kc_token.payload.groups[_]
+        groups := parsed_kc_shasta_token.payload.groups[_]
         trim_suffix(groups, "-tenant-admin") == http_request.headers["cray-tenant-name"]
+        regex.match(perm.path, original_path)
+    }
+
+    # Slingshot Administrator Allow, only to Fabric Manager endpoints
+    allow {
+        parsed_kc_system_slingshot_client_token.payload.resource_access["system-slingshot-client"].roles[_] == "slingshot-admin"
+        some perm in allowed_slingshot_admin_methods
+        perm.method = http_request.method
         regex.match(perm.path, original_path)
     }
 
@@ -142,10 +150,24 @@ data:
     }
 
     # If the auth type is bearer, decode the JWT
-    parsed_kc_token = {"payload": payload} {
+    parsed_kc_shasta_token = {"payload": payload} {
         found_auth.type == "Bearer"
         response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.keycloak.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt", "raise_error": false})
         [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "shasta"})
+
+        # Verify that the issuer is as expected.
+        allowed_issuers := [
+    {{- range $key, $value := $options.issuers }}
+          "{{ $value }}",
+    {{- end }}
+        ]
+        allowed_issuers[_] = payload.iss
+    }
+
+    parsed_kc_system_slingshot_client_token = {"payload": payload} {
+        found_auth.type == "Bearer"
+        response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.keycloak.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt", "raise_error": false})
+        [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "system-slingshot-client"})
 
         # Verify that the issuer is as expected.
         allowed_issuers := [
@@ -179,6 +201,15 @@ data:
         {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates$`}, # GET BOSv2 SessionTemplates (list all)
         {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates/.*?$`}, # GET BOSv2 SessionTemplates (obtain details about a specific session template)
         {"method": "GET",  "path": `^/apis/bos/v2/version$`} # GETs allow views on specific BOS version information
+    ]
+
+    allowed_slingshot_admin_methods := [
+        # Fabric Manager
+        {"method": "DELETE", "path": `^/apis/fabric-manager/.*$`},
+        {"method": "GET",    "path": `^/apis/fabric-manager/.*$`},
+        {"method": "PATCH",  "path": `^/apis/fabric-manager/.*$`},
+        {"method": "POST",   "path": `^/apis/fabric-manager/.*$`},
+        {"method": "PUT",    "path": `^/apis/fabric-manager/.*$`}
     ]
 
 {{- end }}

@@ -105,6 +105,11 @@ data:
         required_user_roles[r]
     }
 
+    allow {
+        system_slingshot_roles_for_user[r]
+        required_user_roles[r]
+    }
+
     # Check if there is an authorization header and split the type from token
     found_auth = {"type": a_type, "token": a_token} {
         [a_type, a_token] := split(http_request.headers.authorization, " ")
@@ -118,7 +123,7 @@ data:
     }
 
     # If the auth type is bearer, decode the JWT
-    parsed_kc_token = {"payload": payload} {
+    parsed_kc_shasta_token = {"payload": payload} {
         found_auth.type == "Bearer"
         response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.keycloak.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt", "raise_error": false})
         [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "shasta"})
@@ -132,10 +137,28 @@ data:
         allowed_issuers[_] = payload.iss
     }
 
+    parsed_kc_system_slingshot_client_token = {"payload": payload} {
+        found_auth.type == "Bearer"
+        response := http.send({"method": "get", "url": "{{ $.Values.jwtValidation.keycloak.jwksUri }}", "cache": true, "tls_ca_cert_file": "/jwtValidationFetchTls/certificate_authority.crt", "raise_error": false})
+        [_, _, payload] := io.jwt.decode_verify(found_auth.token, {"cert": response.raw_body, "aud": "system-slingshot-client"})
+
+        # Verify that the issuer is as expected.
+        allowed_issuers := [
+    {{- range $key, $value := $options.issuers }}
+          "{{ $value }}",
+    {{- end }}
+        ]
+        allowed_issuers[_] = payload.iss
+    }
 
     # Get the users roles from the JWT token
     roles_for_user[r] {
-        r := parsed_kc_token.payload.resource_access.shasta.roles[_]
+        r := parsed_kc_shasta_token.payload.resource_access.shasta.roles[_]
+    }
+
+    # Get the system-slingshot user roles from the JWT token
+    system_slingshot_roles_for_user[r] {
+        r := parsed_kc_system_slingshot_client_token.payload.resource_access["system-slingshot-client"].roles[_]
     }
 
     # Determine if the path/verb requests is authorized based on the JWT roles
@@ -144,7 +167,6 @@ data:
         perm.method = http_request.method
         regex.match(perm.path, original_path)
     }
-
 
     allowed_user_methods := {
       "user": [
@@ -190,6 +212,18 @@ data:
           {"method": "HEAD", "path": `^/apis/jackaloped/.*$`},
           {"method": "POST", "path": `^/apis/jackaloped/.*$`},
           {"method": "DELETE", "path": `^/apis/jackaloped/.*$`},
+          # Fabric Manager - Collectives
+          {"method": "GET", "path": `^/apis/fabric-manager/certmgr/certificate-authorities/.*$`},
+          {"method": "GET", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "DELETE", "path": `^/apis/fabric-manager/fabric/collectives/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/fabric/collectives/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/collectives/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/collectives/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/collectives/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/collectives/jobs`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/collectives/multicasts`},
+          {"method": "GET", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "GET", "path": `^/apis/fabric-manager/telemetry/.*$`}
       ],
       "ckdump": [
           {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
@@ -201,6 +235,39 @@ data:
           # SMA
           {"method": "GET", "path": `^/apis/sma-telemetry-api/.*$`}, # All SMA telemetry API Calls - GET
       ],
+      "slingshot-operator": [
+          {"method": "GET", "path": `^/apis/fabric-manager/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "POST", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/switch-telemetry/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/switch-telemetry/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/switch-telemetry/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/telemetry/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/telemetry/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/telemetry/.*$`}
+      ],
+      "slingshot-guest": [
+          {"method": "GET", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "GET", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "GET", "path": `^/apis/fabric-manager/telemetry/.*$`}
+      ],
+      "slingshot-security": [
+          {"method": "GET", "path": `^/apis/fabric-manager/.*$`},
+          {"method": "DELETE", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/fabric/rosetta-auth-token`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/rosetta-auth-token`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/rosetta-auth-token`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/fabric/shasta-auth-token`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/shasta-auth-token`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/shasta-auth-token`}
+      ]
     }
 
     # Our list of endpoints we accept based on roles.
@@ -209,6 +276,9 @@ data:
         "wlm": allowed_user_methods["wlm"],
         "ckdump": allowed_user_methods["ckdump"],
         "monitor-ro": allowed_user_methods["monitor-ro"],
+        "slingshot-operator": allowed_user_methods["slingshot-operator"],
+        "slingshot-security": allowed_user_methods["slingshot-security"],
+        "slingshot-guest": allowed_user_methods["slingshot-guest"]
     }
 {{- end }}
 {{- end }}

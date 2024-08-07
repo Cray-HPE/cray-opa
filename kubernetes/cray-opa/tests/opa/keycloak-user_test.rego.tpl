@@ -1,3 +1,4 @@
+# -*- mode: rego -*-
 # Copyright 2021-2023 Hewlett Packard Enterprise Development LP
 
 package istio.authz
@@ -493,4 +494,106 @@ test_spire_invalid_sub {
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": hmnfd_subscriptions_path, "headers": {"x-forwarded-access-token": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": hmnfd_subscriptions_path, "headers": {"x-forwarded-access-token": spire_sub}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": hmnfd_subscriptions_path, "headers": {"x-forwarded-access-token": spire_sub}}}}}
+}
+
+# Test for all Slingshot roles
+
+fabric_mock_path = "/apis/fabric-manager/fabric/agents/x0c0r0b0"
+certmgr_mock_path = "/apis/fabric-manager/certmgr/switch-certificates/x0c0r0b0"
+fabric_rosetta_auth_token_mock_path = "/apis/fabric-manager/fabric/rosetta-auth-token"
+fabric_telemetry_mock_path = "/apis/fabric-manager/telemetry/test1"
+fabric_switch_telemetry_mock_path = "/apis/fabric-manager/switch-telemetry/test1"
+fabric_host_settings_mock_path = "/apis/fabric-manager/host-settings"
+fabric_collectives_jobs_mock_path = "/apis/fabric-manager/fabric/collectives/jobs/1"
+fabric_collectives_multicasts_mock_path = "/apis/fabric-manager/fabric/collectives/multicasts/1"
+
+test_slingshot_when_slingshot_admin {
+  # Deny random api path
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/api/api1", "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotAdminToken }}" }}}}}
+}
+
+test_slingshot_when_slingshot_operator {
+  # Deny random api path
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/api/api1", "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  # Deny disallowed methods
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  # Deny disallowed certmgr path
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": certmgr_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+
+  # Allow Fabric Manager endpoints
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": fabric_telemetry_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_telemetry_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_telemetry_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_telemetry_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": fabric_switch_telemetry_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_switch_telemetry_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_switch_telemetry_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_switch_telemetry_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": fabric_host_settings_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_host_settings_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_host_settings_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_host_settings_mock_path, "headers": {"authorization": "Bearer {{ .slingshotOperatorToken }}" }}}}}
+}
+
+test_slingshot_when_slingshot_security {
+  # Deny random api path
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/api/api1", "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+  # Deny disallowed Fabric Manager endpoints
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .singshotSecurityToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+
+
+  # Allow Fabric and Certificate Manager endpoints
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": certmgr_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": certmgr_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": certmgr_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": certmgr_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": certmgr_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": fabric_rosetta_auth_token_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_rosetta_auth_token_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_rosetta_auth_token_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_rosetta_auth_token_mock_path, "headers": {"authorization": "Bearer {{ .slingshotSecurityToken }}" }}}}}
+}
+
+test_slingshot_when_slingshot_guest {
+  # Deny random api path
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/api/api1", "headers": {"authorization": "Bearer {{ .slingshotGuestToken }}" }}}}}
+  # Deny disallowed methods
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotGuestToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .singshotGuestToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotGuestToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotGuestToken }}" }}}}}
+
+  # Allow fabric path
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .slingshotGuestToken }}" }}}}}
+}
+
+test_slingshot_when_wlm {
+  # Deny disallowed methods
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .singshotGuestToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
+
+  # Allow fabric path
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": fabric_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": fabric_collectives_jobs_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_collectives_jobs_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_collectives_jobs_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_collectives_jobs_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": fabric_collectives_multicasts_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": fabric_collectives_multicasts_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": fabric_collectives_multicasts_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": fabric_collectives_multicasts_mock_path, "headers": {"authorization": "Bearer {{ .wlmToken }}" }}}}}
 }
