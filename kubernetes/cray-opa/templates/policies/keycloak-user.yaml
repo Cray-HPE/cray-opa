@@ -138,6 +138,10 @@ data:
         r := parsed_kc_token.payload.resource_access.shasta.roles[_]
     }
 
+    roles_for_user[r] {
+        r := parsed_kc_token.payload.resource_access["system-slingshot-client"].roles[_]
+    }
+
     # Determine if the path/verb requests is authorized based on the JWT roles
     required_user_roles[r] {
         perm := user_role_perms[r][_]
@@ -190,6 +194,17 @@ data:
           {"method": "HEAD", "path": `^/apis/jackaloped/.*$`},
           {"method": "POST", "path": `^/apis/jackaloped/.*$`},
           {"method": "DELETE", "path": `^/apis/jackaloped/.*$`},
+          # Fabric Manager - Collectives
+          {"method": "GET", "path": `^/apis/fabric-manager/certmgr/certificate-authorities/.*$`},
+          {"method": "GET", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "DELETE", "path": `^/apis/fabric-manager/fabric/collectives/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/fabric/collectives/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/collectives/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/collectives/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/collectives/jobs`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/collectives/multicasts`},
+          {"method": "GET", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "GET", "path": `^/apis/fabric-manager/telemetry/.*$`}
       ],
       "ckdump": [
           {"method": "GET",  "path": `^/apis/v2/nmd/.*$`},
@@ -201,6 +216,39 @@ data:
           # SMA
           {"method": "GET", "path": `^/apis/sma-telemetry-api/.*$`}, # All SMA telemetry API Calls - GET
       ],
+      "slingshot-operator": [
+          {"method": "GET", "path": `^/apis/fabric-manager/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "POST", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/switch-telemetry/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/switch-telemetry/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/switch-telemetry/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/telemetry/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/telemetry/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/telemetry/.*$`}
+      ],
+      "slingshot-guest": [
+          {"method": "GET", "path": `^/apis/fabric-manager/fabric/.*$`},
+          {"method": "GET", "path": `^/apis/fabric-manager/host-settings`},
+          {"method": "GET", "path": `^/apis/fabric-manager/telemetry/.*$`}
+      ],
+      "slingshot-security": [
+          {"method": "GET", "path": `^/apis/fabric-manager/.*$`},
+          {"method": "DELETE", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "POST", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/certmgr/.*$`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/fabric/rosetta-auth-token`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/rosetta-auth-token`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/rosetta-auth-token`},
+          {"method": "PATCH", "path": `^/apis/fabric-manager/fabric/shasta-auth-token`},
+          {"method": "POST", "path": `^/apis/fabric-manager/fabric/shasta-auth-token`},
+          {"method": "PUT", "path": `^/apis/fabric-manager/fabric/shasta-auth-token`}
+      ],
     }
 
     # Our list of endpoints we accept based on roles.
@@ -209,6 +257,10 @@ data:
         "wlm": allowed_user_methods["wlm"],
         "ckdump": allowed_user_methods["ckdump"],
         "monitor-ro": allowed_user_methods["monitor-ro"],
+        "slingshot-operator": allowed_user_methods["slingshot-operator"],
+        "slingshot-security": allowed_user_methods["slingshot-security"],
+        "slingshot-guest": allowed_user_methods["slingshot-guest"],
     }
+
 {{- end }}
 {{- end }}

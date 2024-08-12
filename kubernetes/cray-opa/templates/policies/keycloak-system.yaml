@@ -126,7 +126,6 @@ data:
         regex.match(perm.path, original_path)
     }
 
-
     allowed_system_methods := {
       "system-pxe": [
 
@@ -178,6 +177,13 @@ data:
         {"method": "GET", "path": `^/keycloak/admin/realms/shasta/roles.*$`},
         {"method": "GET", "path": `^/keycloak/admin/realms/shasta/groups.*$`},
       ],
+      "system-slingshot": [
+        {"method": "DELETE", "path": `^/apis/fabric-manager/.*$`},
+        {"method": "GET",    "path": `^/apis/fabric-manager/.*$`},
+        {"method": "PATCH",  "path": `^/apis/fabric-manager/.*$`},
+        {"method": "POST",   "path": `^/apis/fabric-manager/.*$`},
+        {"method": "PUT",    "path": `^/apis/fabric-manager/.*$`}
+      ],
     }
 
     # Our list of endpoints we accept based on roles.
@@ -185,6 +191,7 @@ data:
       "system-pxe": allowed_system_methods["system-pxe"],
       "system-compute": allowed_system_methods["system-compute"],
       "system-nexus": allowed_system_methods["system-nexus"],
+      "system-slingshot": allowed_system_methods["system-slingshot"],
     }
 {{- end }}
 {{- end }}
