@@ -129,6 +129,14 @@ data:
         regex.match(perm.path, original_path)
     }
 
+    # Slingshot Admin Allow, with or without tenant header
+    allow {
+        parsed_kc_token.payload.resource_access["system-slingshot-client"].roles[_] == "slingshot-admin"
+        some perm in allowed_slingshot_admin_methods
+        perm.method = http_request.method
+        regex.match(perm.path, original_path)
+    }
+
     # Check if there is an authorization header and split the type from token
     found_auth = {"type": a_type, "token": a_token} {
         [a_type, a_token] := split(http_request.headers.authorization, " ")
@@ -179,6 +187,15 @@ data:
         {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates$`}, # GET BOSv2 SessionTemplates (list all)
         {"method": "GET",  "path": `^/apis/bos/v2/sessiontemplates/.*?$`}, # GET BOSv2 SessionTemplates (obtain details about a specific session template)
         {"method": "GET",  "path": `^/apis/bos/v2/version$`} # GETs allow views on specific BOS version information
+    ]
+
+    allowed_slingshot_admin_methods := [
+        # Fabric Manager
+        {"method": "DELETE", "path": `^/apis/fabric-manager/.*$`},
+        {"method": "GET",    "path": `^/apis/fabric-manager/.*$`},
+        {"method": "PATCH",  "path": `^/apis/fabric-manager/.*$`},
+        {"method": "POST",   "path": `^/apis/fabric-manager/.*$`},
+        {"method": "PUT",    "path": `^/apis/fabric-manager/.*$`}
     ]
 
 {{- end }}

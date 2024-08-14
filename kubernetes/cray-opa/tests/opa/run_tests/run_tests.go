@@ -47,13 +47,14 @@ type tokenCreator struct {
 }
 
 type createTokenArgs struct {
-	role   string
-	issuer string
-	aud    string
-	sub    string
-	typ    string
-	groups string
-	rrole  string
+	role          string
+	issuer        string
+	aud           string
+	sub           string
+	typ           string
+	groups        string
+	rrole         string
+	slingshotrole string
 }
 
 func (t tokenCreator) create(args createTokenArgs) (string, error) {
@@ -81,6 +82,13 @@ func (t tokenCreator) create(args createTokenArgs) (string, error) {
 	if args.rrole != "" {
 		atClaims["realm_access"] = map[string]interface{}{
 			"roles": []string{args.rrole},
+		}
+	}
+	if args.slingshotrole != "" {
+		atClaims["resource_access"] = map[string]interface{}{
+			"system-slingshot-client": map[string]interface{}{
+				"roles": []string{args.slingshotrole},
+			},
 		}
 	}
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
@@ -205,6 +213,51 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("Invalid typ admin token:", invalidTypAdminToken)
+
+	args = createTokenArgs{
+		role: "system-slingshot", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer",
+	}
+	systemSlingshotToken, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("slingshot client token:", systemSlingshotToken)
+
+	args = createTokenArgs{
+		issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer", slingshotrole: "slingshot-admin",
+	}
+	slingshotAdminToken, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("slingshot admin token:", slingshotAdminToken)
+
+	args = createTokenArgs{
+		issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer", slingshotrole: "slingshot-operator",
+	}
+	slingshotOperatorToken, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("slingshot operator token:", slingshotOperatorToken)
+
+	args = createTokenArgs{
+		issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer", slingshotrole: "slingshot-guest",
+	}
+	slingshotGuestToken, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("slingshot guest token:", slingshotGuestToken)
+
+	args = createTokenArgs{
+		issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer", slingshotrole: "slingshot-security",
+	}
+	slingshotSecurityToken, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("slingshot security token:", slingshotSecurityToken)
 
 	args = createTokenArgs{
 		role: "system-pxe", issuer: keycloakIssuer, aud: shastaAud, typ: "Bearer",
@@ -352,14 +405,14 @@ func main() {
 	fmt.Println(spireSub, ":", spireNcnTPMProvisioner)
 
 	spireSub = spireSubNCNPrefix + "sbps-marshal"
-        args = createTokenArgs{
-                issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
-        }
-        spireNcnSBPSMarshal, err := tc.create(args)
-        if err != nil {
-                log.Fatal(err)
-        }
-        fmt.Println(spireSub, ":", spireNcnSBPSMarshal)
+	args = createTokenArgs{
+		issuer: spireIssuer, aud: systemComputeAud, sub: spireSub,
+	}
+	spireNcnSBPSMarshal, err := tc.create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(spireSub, ":", spireNcnSBPSMarshal)
 
 	spireSub = spireSubComputePrefix + "cfs-state-reporter"
 	args = createTokenArgs{
@@ -614,13 +667,18 @@ func main() {
 		template.New("base").Funcs(sprig.FuncMap()).Parse(string(dat)))
 
 	values = map[string]interface{}{
-		"userToken":            userToken,
-		"adminToken":           adminToken,
-		"tenantAdminToken":     tenantAdminToken,
-		"invalidTypAdminToken": invalidTypAdminToken,
-		"pxeToken":             pxeToken,
-		"computeToken":         computeToken,
-		"wlmToken":             wlmToken,
+		"userToken":              userToken,
+		"adminToken":             adminToken,
+		"tenantAdminToken":       tenantAdminToken,
+		"invalidTypAdminToken":   invalidTypAdminToken,
+		"slingshotAdminToken":    slingshotAdminToken,
+		"systemSlingshotToken":   systemSlingshotToken,
+		"slingshotOperatorToken": slingshotOperatorToken,
+		"slingshotGuestToken":    slingshotGuestToken,
+		"slingshotSecurityToken": slingshotSecurityToken,
+		"pxeToken":               pxeToken,
+		"computeToken":           computeToken,
+		"wlmToken":               wlmToken,
 		"spire": map[string]interface{}{
 			"invalidSub": spireInvalidSub,
 			"ncn": map[string]interface{}{
