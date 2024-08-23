@@ -70,6 +70,18 @@ test_sma_kibana {
   # Allowed
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "sma_kibana_mock_path", "headers": {"x-envoy-decorator-operation": "sma-kibana.services.svc.cluster.local:5601/*"}}}}}
 }
+
+test_vault {
+  # Allowed
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/vault/v1/auth/kubernetes/login"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/vault/v1/auth/jwt/login"}}}}
+
+  # Not Allowed
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/vault/v1/auth/kubernetes/login"}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/vault/v1/auth/kubernetes/login"}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/vault/v1/fake"}}}}
+}
+
 # Tests for system-pxe role
 
 pxe_auth = "Bearer {{ .pxeToken }}"

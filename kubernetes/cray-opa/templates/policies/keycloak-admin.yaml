@@ -77,6 +77,25 @@ data:
         http_request.method in {"GET", "HEAD"}
     }
 
+    # Allow paths for vault logins
+    vault_login_paths := {
+    "/apis/vault/v1/auth/jwt/login",
+    "/apis/vault/v1/auth/kubernetes/login"
+    }
+
+    # Allow vault login
+    allow {
+        some x in vault_login_paths
+        startswith(original_path, x)
+        http_request.method == "POST"
+    }
+
+    # Allow vault access with a vault token
+    allow {
+        regex.match(`^hvs\.\S{24,}$`, http_request.headers["x-vault-token"])
+        startswith(original_path, "/apis/vault/v1/")
+    }
+
     # Allow all access to Gitea
     allow { startswith(original_path, "/vcs") }
 
