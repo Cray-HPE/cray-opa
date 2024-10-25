@@ -73,13 +73,13 @@ test_sma_kibana {
 
 test_vault {
   # Allowed
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/vault/v1/auth/kubernetes/login"}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/vault/v1/auth/jwt/login"}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/v1/auth/kubernetes/login", "headers": {"x-envoy-decorator-operation": "cray-vault.vault.svc.cluster.local:8200/*"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/v1/auth/jwt/login", "headers": {"x-envoy-decorator-operation": "cray-vault.vault.svc.cluster.local:8200/*"}}}}}
 
   # Not Allowed
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/vault/v1/auth/kubernetes/login"}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/apis/vault/v1/auth/kubernetes/login"}}}}
-  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/vault/v1/fake"}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/v1/auth/kubernetes/login", "headers": {"x-envoy-decorator-operation": "cray-vault.vault.svc.cluster.local:8200/*"}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "HEAD", "path": "/v1/auth/kubernetes/login", "headers": {"x-envoy-decorator-operation": "cray-vault.vault.svc.cluster.local:8200/*"}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/v1/fake", "headers": {"x-envoy-decorator-operation": "cray-vault.vault.svc.cluster.local:8200/*"}}}}}
 }
 
 # Tests for system-pxe role
