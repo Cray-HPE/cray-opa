@@ -1,4 +1,4 @@
-# Copyright 2021-2024 Hewlett Packard Enterprise Development LP
+# Copyright 2021-2025 Hewlett Packard Enterprise Development LP
 
 package istio.authz
 ## HOW TO DO UNIT TESTING
@@ -190,11 +190,16 @@ test_tenant_admin {
   # Verify infrastructure administrator has access to all endpoints, tenant header or not
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .adminToken }}"}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .adminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .adminToken }}"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .adminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
+
 
   # Verify infrastructure administrator cannot supply an invalid tenant name
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .adminToken }}", "cray-tenant-name": ""}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .adminToken }}", "cray-tenant-name": ""}}}}}
 
   # Verify tenant administrator (only authorized for vcluster-blue) can access valid endpoints
+  # BOS
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v2/applystaged", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/components", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
@@ -208,16 +213,24 @@ test_tenant_admin {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/sessiontemplates/foo", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "POST", "path": "/apis/bos/v2/sessions", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/version", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
+  # CFS
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
 
   # Verify tenant administrator cannot access unauthorized endpoints
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/api1", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
 
   # Verify tenant administrator cannot access a non-permitted tenant (vcluster-red)
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-red"}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-red"}}}}}
 
   # Verify tenant administrator must supply a tenant header and cannot supply an invalid tenant name
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}"}}}}}
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": ""}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}"}}}}}
+  allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": ""}}}}}
 }
 
 # SPIRE Tests
