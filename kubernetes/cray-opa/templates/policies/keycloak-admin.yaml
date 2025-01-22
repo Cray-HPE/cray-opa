@@ -210,9 +210,10 @@ data:
         {"method": "GET",  "path": `^/apis/bos/v2/version$`}, # GETs allow views on specific BOS version information
         # CFS
         {"method": "GET", "path": `^/apis/cfs/v3/configurations$`}, # GET allows listing one or all all configurations for this tenant
-        {"method": "PUT", "path": `^/apis/cfs/v3/configurations$`}, # PUT allows creating/overwriting a configuration
-        {"method": "PATCH", "path": `^/apis/cfs/v3/configurations$`}, # PATCH allows updating/overwriting a configuration
-        {"method": "DELETE", "path": `^/apis/cfs/v3/configurations$`} # DELETE allows deleting a configuration
+        {"method": "GET", "path": `^/apis/cfs/v3/configurations/.*$`}, # GET allows listing one or all all configurations for this tenant	
+        {"method": "PUT", "path": `^/apis/cfs/v3/configurations/.*$`}, # PUT allows creating/overwriting a configuration
+        {"method": "PATCH", "path": `^/apis/cfs/v3/configurations/.*$`}, # PATCH allows updating/overwriting a configuration
+        {"method": "DELETE", "path": `^/apis/cfs/v3/configurations/.*$`} # DELETE allows deleting a configuration
     ]
 
     allowed_slingshot_admin_methods := [
