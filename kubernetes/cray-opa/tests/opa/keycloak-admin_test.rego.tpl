@@ -215,9 +215,9 @@ test_tenant_admin {
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/bos/v2/version", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
   # CFS
   not allow.http_status with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
-  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/cfs/v3/configurations", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PUT", "path": "/apis/cfs/v3/configurations/mock", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "PATCH", "path": "/apis/cfs/v3/configurations/mock", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
+  not allow.http_status with input as {"attributes": {"request": {"http": {"method": "DELETE", "path": "/apis/cfs/v3/configurations/mock", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
 
   # Verify tenant administrator cannot access unauthorized endpoints
   allow.http_status == 403 with input as {"attributes": {"request": {"http": {"method": "GET", "path": "/apis/api1", "headers": {"authorization": "Bearer {{ .tenantAdminToken }}", "cray-tenant-name": "vcluster-blue"}}}}}
