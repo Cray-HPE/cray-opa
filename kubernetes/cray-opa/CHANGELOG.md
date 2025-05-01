@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - Tenant admins can access the CFS v3 configurations endpoint
+- Tenant admins can access the console endpoints
 ### Changed
 - Reduce scope of WLM roles
 

@@ -213,7 +213,10 @@ data:
         {"method": "GET", "path": `^/apis/cfs/v3/configurations/.*$`}, # GET allows listing one configuration for this tenant	
         {"method": "PUT", "path": `^/apis/cfs/v3/configurations/.*$`}, # PUT allows creating/overwriting a configuration
         {"method": "PATCH", "path": `^/apis/cfs/v3/configurations/.*$`}, # PATCH allows updating/overwriting a configuration
-        {"method": "DELETE", "path": `^/apis/cfs/v3/configurations/.*$`} # DELETE allows deleting a configuration
+        {"method": "DELETE", "path": `^/apis/cfs/v3/configurations/.*$`}, # DELETE allows deleting a configuration
+        # Console
+        {"method": "GET", "path": `^/apis/console-operator/console-operator/tail/.*$`}, # GET initiates websocket connection to follow a console
+        {"method": "GET", "path": `^/apis/console-operator/console-operator/interact/.*$`} # GET initiates websocket connection to interact with a console
     ]
 
     allowed_slingshot_admin_methods := [
